@@ -7,6 +7,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <geometry_msgs/msg/point_stamped.hpp>
 
 namespace furuta_pendulum
 {
@@ -50,6 +51,10 @@ public:
       "torque", 10, std::bind(&SimulationNode::SetTorqueCb, this, std::placeholders::_1));
     disturbance_sub_ = this->create_subscription<std_msgs::msg::Float64>(
       "disturbance", 10, std::bind(&SimulationNode::SetDisturbanceCb, this, std::placeholders::_1));
+
+    rviz_disturbance_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>(
+      "clicked_point", 10,
+      std::bind(&SimulationNode::RvizDisturbanceCb, this, std::placeholders::_1));
   }
 
 private:
@@ -81,9 +86,11 @@ private:
   rclcpp::TimerBase::SharedPtr simulation_timer_;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr torque_sub_;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr disturbance_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr rviz_disturbance_sub_;
 
   void SetTorqueCb(std_msgs::msg::Float64::SharedPtr msg) { SetTorque(msg->data); }
   void SetDisturbanceCb(std_msgs::msg::Float64::SharedPtr msg) { SetDisturbance(msg->data); }
+  void RvizDisturbanceCb(geometry_msgs::msg::PointStamped::SharedPtr msg) { SetDisturbance(10.0); }
 
   void Simulate()
   {
