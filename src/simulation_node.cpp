@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <memory>
 
@@ -50,7 +51,7 @@ public:
 
 private:
   double dt = 0.001;
-  static constexpr double g = 9.81;
+  static constexpr double g = 9.80665;
 
   // Mechanical System
   double J0_hat, J2_hat;
@@ -60,11 +61,14 @@ private:
   double L1, L2;
   double b1, b2;
 
-  double theta1 = 0.0, theta2 = 0.0;
+  double theta1 = 0.0, theta2 = M_PI;
   double dtheta1 = 0.0, dtheta2 = 0.0;
   double ddtheta1 = 0.0, ddtheta2 = 0.0;
 
   double tau1 = 0.0, tau2 = 0.0;
+
+  double max_torque_ = 1.47;
+  double max_velocity_ = 10.0;
 
   // Motor
   double L, R, Km;
@@ -110,8 +114,8 @@ private:
     ddtheta1 = vector_4(0);
     ddtheta2 = vector_4(1);
 
-    dtheta1 += ddtheta1 * dt;
-    dtheta2 += ddtheta2 * dt;
+    dtheta1 = std::clamp(dtheta1 + ddtheta1 * dt, -max_velocity_, max_velocity_);
+    dtheta2 = std::clamp(dtheta2 + ddtheta2 * dt, -max_velocity_, max_velocity_);
 
     theta1 += dtheta1 * dt;
     theta2 += dtheta2 * dt;
@@ -128,10 +132,16 @@ private:
     joint_state_msg.velocity.push_back(dtheta2);
 
     joint_state_pub_->publish(joint_state_msg);
+    
+    // treat disturbance as impulse and set it back to 0.
+    tau2 = 0.0;
   }
 
-  void SetTorque(double torque) { tau1 = torque; }
-  void SetDisturbance(double disturbance) { tau2 = disturbance; }
+  void SetTorque(double torque) { tau1 = std::clamp(torque, -max_torque_, max_torque_); }
+  void SetDisturbance(double disturbance)
+  {
+    tau2 = std::clamp(disturbance, -max_torque_, max_torque_);
+  }
 };
 }  // namespace furuta_pendulum
 
