@@ -50,9 +50,17 @@ def generate_launch_description():
         arguments=["-d", rviz_config],
     )
 
+    simulation_params = PathJoinSubstitution(
+        [
+            FindPackageShare("furuta_pendulum"),
+            "config",
+            "simulation.yaml",
+        ]
+    )
     furuta_pendulum_simulation_node = Node(
         package="furuta_pendulum",
         executable="simulation_node",
+        parameters=[simulation_params],
     )
 
     actions = [

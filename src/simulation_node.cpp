@@ -16,6 +16,9 @@ public:
   SimulationNode(const rclcpp::NodeOptions & options)
   : Node("furuta_pendulum_simulation_node", options)
   {
+    this->declare_parameter("theta2", 0.0);
+    theta2 = this->get_parameter("theta2").as_double();
+
     // from https://www.hindawi.com/journals/jcse/2011/528341/
     m1 = 0.3;
     m2 = 0.075;
@@ -61,7 +64,7 @@ private:
   double L1, L2;
   double b1, b2;
 
-  double theta1 = 0.0, theta2 = M_PI;
+  double theta1 = 0.0, theta2 = 0.0;
   double dtheta1 = 0.0, dtheta2 = 0.0;
   double ddtheta1 = 0.0, ddtheta2 = 0.0;
 
@@ -132,7 +135,7 @@ private:
     joint_state_msg.velocity.push_back(dtheta2);
 
     joint_state_pub_->publish(joint_state_msg);
-    
+
     // treat disturbance as impulse and set it back to 0.
     tau2 = 0.0;
   }
