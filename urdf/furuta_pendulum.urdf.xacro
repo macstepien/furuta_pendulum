@@ -1,17 +1,11 @@
 <?xml version="1.0"?>
 <robot name="furuta_pendulum" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <material name="red">
-    <color rgba="1.0 0.0 0.0 1.0" />
-  </material>
-  <material name="blue">
-    <color rgba="0.0 0.0 1.0 1.0" />
-  </material>
-  <material name="green">
-    <color rgba="0.0 1.0 0.0 1.0" />
+  <material name="grey">
+    <color rgba="0.4 0.4 0.4 1.0" />
   </material>
 
-  <xacro:property name="base_radius" value="0.02" />
+  <xacro:property name="base_radius" value="0.1" />
   <xacro:property name="base_length" value="0.1" />
   <xacro:property name="arm1_radius" value="0.02" />
   <xacro:property name="arm1_length" value="0.278" />
@@ -25,12 +19,12 @@
       <geometry>
         <cylinder radius="${base_radius}" length="${base_length}" />
       </geometry>
-      <material name="red" />
+      <material name="grey" />
     </visual>
   </link>
 
   <joint name="joint1" type="continuous">
-    <origin xyz="0.0 0.0 ${base_length}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${base_length+arm1_radius}" rpy="0.0 0.0 0.0" />
     <parent link="base_link" />
     <child link="arm1" />
     <axis xyz="0 0 1" />
@@ -42,7 +36,7 @@
       <geometry>
         <cylinder radius="${arm1_radius}" length="${arm1_length}" />
       </geometry>
-      <material name="blue" />
+      <material name="grey" />
     </visual>
   </link>
 
@@ -60,7 +54,7 @@
       <geometry>
         <cylinder radius="${arm2_radius}" length="${arm2_length}" />
       </geometry>
-      <material name="green" />
+      <material name="grey" />
     </visual>
   </link>
 
