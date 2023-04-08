@@ -37,6 +37,11 @@ private:
 
   Eigen::Vector4d K;
 
+  double m2 = 0.075;
+  double l2 = 0.148;
+  double g = 9.80665;
+  double u_max = 10.0;
+
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
     Eigen::Vector4d state_vector;
@@ -45,7 +50,25 @@ private:
     state_vector(2) = msg->velocity[0];
     state_vector(3) = msg->velocity[1];
 
-    double u = -K.dot(state_vector);
+    double u = 0.0;
+    if (fabs(state_vector(1)) < 0.7) {
+      // LQR
+      u = -K.dot(state_vector);
+    } else {
+      // Swingup
+      // based on http://bulletin.pan.pl/(52-3)153.pdf
+      double dtheta2 = msg->velocity[1];
+      double theta2 = msg->position[1];
+      double E = 0.5 * m2 * pow(l2, 2.0) * pow(dtheta2, 2.0) + m2 * g * l2 * cos(theta2);
+      double E0 = m2 * g * l2;
+
+      double x = (E - E0) * dtheta2 * cos(theta2);
+      if (x > 0) {
+        u = -u_max;
+      } else {
+        u = u_max;
+      }
+    }
 
     std_msgs::msg::Float64 torque_cmd_msg;
     torque_cmd_msg.data = u;

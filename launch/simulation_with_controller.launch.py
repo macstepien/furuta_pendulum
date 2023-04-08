@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.substitutions import (
     PathJoinSubstitution,
 )
@@ -33,6 +33,6 @@ def generate_launch_description():
             )
         ),
     )
-    actions = [simulation_launch, controller_launch]
+    actions = [simulation_launch, TimerAction(period=2.0, actions=[controller_launch])]
 
     return LaunchDescription(actions)
