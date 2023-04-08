@@ -37,6 +37,20 @@ install(
   LIBRARY DESTINATION lib
 )
 
+add_library(controller SHARED 
+  src/controller_node.cpp)
+ament_target_dependencies(controller ${PACKAGE_INCLUDE_DEPENDS})
+rclcpp_components_register_nodes(controller "furuta_pendulum::ControllerNode")
+rclcpp_components_register_node(controller
+  PLUGIN "furuta_pendulum::ControllerNode"
+  EXECUTABLE controller_node
+)
+
+install(
+  TARGETS controller
+  LIBRARY DESTINATION lib
+)
+
 install(DIRECTORY
   config
   launch

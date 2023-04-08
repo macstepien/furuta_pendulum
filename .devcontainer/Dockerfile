@@ -18,7 +18,9 @@ RUN sudo apt-get update && \
     git htop ros-$ROS_DISTRO-rmw-fastrtps-cpp ros-$ROS_DISTRO-plotjuggler \
     ros-$ROS_DISTRO-plotjuggler-ros ros-$ROS_DISTRO-rviz2 ros-$ROS_DISTRO-teleop-twist-keyboard \
     python3-vcstool python3-rosdep python3-colcon-common-extensions && \
-    /usr/bin/python3 -m pip install -U black --user
+    /usr/bin/python3 -m pip install -U black control --user
+    # control - python control toolbox
+    
 
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
     echo "source /home/$user/ros2_ws/install/setup.bash --extend" >> /home/${user}/.bashrc
