@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "name": "ROS",
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/humble/include/**",
+        "/home/maciej/ros2_ws/install/furuta_pendulum/include/**",
+        "/usr/include/**"
+      ],
+      "intelliSenseMode": "linux-clang-x64",
+      "compilerPath": "/usr/bin/c++",
+      "cStandard": "c17",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}

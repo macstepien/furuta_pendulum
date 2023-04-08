@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<robot name="furuta_pendulum" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="red">
+    <color rgba="1.0 0.0 0.0 1.0" />
+  </material>
+  <material name="blue">
+    <color rgba="0.0 0.0 1.0 1.0" />
+  </material>
+  <material name="green">
+    <color rgba="0.0 1.0 0.0 1.0" />
+  </material>
+
+  <xacro:property name="base_radius" value="0.02" />
+  <xacro:property name="base_length" value="0.1" />
+  <xacro:property name="arm1_radius" value="0.02" />
+  <xacro:property name="arm1_length" value="0.278" />
+  <xacro:property name="arm2_radius" value="0.02" />
+  <xacro:property name="arm2_length" value="0.3" />
+
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.0 0.0 ${base_length/2.0}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${base_radius}" length="${base_length}" />
+      </geometry>
+      <material name="red" />
+    </visual>
+  </link>
+
+  <joint name="joint1" type="continuous">
+    <origin xyz="0.0 0.0 ${base_length}" rpy="0.0 0.0 0.0" />
+    <parent link="base_link" />
+    <child link="arm1" />
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="arm1">
+    <visual>
+      <origin xyz="${arm1_length/2.0} 0.0 0.0" rpy="0.0 ${pi/2.0} 0.0" />
+      <geometry>
+        <cylinder radius="${arm1_radius}" length="${arm1_length}" />
+      </geometry>
+      <material name="blue" />
+    </visual>
+  </link>
+
+  <joint name="joint2" type="continuous">
+    <!-- -pi rotation so that for 0 pendulum is downward -->
+    <origin xyz="${arm1_length} 0.0 0.0" rpy="${-pi} 0.0 0.0" />
+    <parent link="arm1" />
+    <child link="arm2" />
+    <axis xyz="1 0 0" />
+  </joint>
+
+  <link name="arm2">
+    <visual>
+      <origin xyz="0.0 0.0 ${arm2_length/2.0}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${arm2_radius}" length="${arm2_length}" />
+      </geometry>
+      <material name="green" />
+    </visual>
+  </link>
+
+</robot>
