@@ -1,17 +1,38 @@
 <?xml version="1.0"?>
 <robot name="furuta_pendulum" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="m1" default="0.0" />
+  <xacro:arg name="m2" default="0.0" />
+
+  <xacro:arg name="l1" default="0.0" />
+  <xacro:arg name="l2" default="0.0" />
+  
+  <xacro:arg name="L1" default="0.0" />
+  <xacro:arg name="L2" default="0.0" />
+  
+  <xacro:arg name="J1" default="0.0" />
+  <xacro:arg name="J2" default="0.0" />
+  
+  <xacro:arg name="b1" default="0.0" />
+  <xacro:arg name="b2" default="0.0" />
 
   <material name="grey">
-    <color rgba="0.4 0.4 0.4 1.0" />
+    <color rgba="0.8 0.8 0.8 1.0" />
   </material>
 
   <xacro:property name="base_radius" value="0.1" />
   <xacro:property name="base_length" value="0.1" />
-  <xacro:property name="arm1_radius" value="0.02" />
-  <xacro:property name="arm1_length" value="0.278" />
-  <xacro:property name="arm2_radius" value="0.02" />
-  <xacro:property name="arm2_length" value="0.3" />
 
+  <xacro:property name="arm1_radius" value="0.02" />
+  <xacro:property name="arm1_length" value="$(arg L1)" />
+  
+  <xacro:property name="arm2_radius" value="0.02" />
+  <xacro:property name="arm2_length" value="$(arg L2)" />
+
+  <!-- https://www.hindawi.com/journals/jcse/2011/528341/ here this inertias 
+    are approximated by 0.0, I set them to really low value, to get correct 
+    visualtizations in rviz -->
+  <xacro:property name="arm1_inertia_x" value="0.000001" />
+  <xacro:property name="arm2_inertia_z" value="0.000001" />
 
   <link name="base_link">
     <visual>
@@ -28,6 +49,7 @@
     <parent link="base_link" />
     <child link="arm1" />
     <axis xyz="0 0 1" />
+    <dynamics damping="$(arg b1)" />
   </joint>
 
   <link name="arm1">
@@ -38,6 +60,21 @@
       </geometry>
       <material name="grey" />
     </visual>
+
+    <collision>
+      <origin xyz="${arm1_length/2.0} 0.0 0.0" rpy="0.0 ${pi/2.0} 0.0" />
+      <geometry>
+        <cylinder radius="${arm1_radius}" length="${arm1_length}" />
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="$(arg m1)" />
+      <origin xyz="$(arg l1) 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <inertia ixx="${arm1_inertia_x}" ixy="0.0"       ixz="0.0"
+                                       iyy="$(arg J1)" iyz="0.0"
+                                                       izz="$(arg J1)" />
+    </inertial>
   </link>
 
   <joint name="joint2" type="continuous">
@@ -46,6 +83,7 @@
     <parent link="arm1" />
     <child link="arm2" />
     <axis xyz="1 0 0" />
+    <dynamics damping="$(arg b2)" />
   </joint>
 
   <link name="arm2">
@@ -56,6 +94,21 @@
       </geometry>
       <material name="grey" />
     </visual>
+
+    <collision>
+      <origin xyz="0.0 0.0 ${arm2_length/2.0}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${arm2_radius}" length="${arm2_length}" />
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="$(arg m2)" />
+      <origin xyz="0.0 0.0 $(arg l2)" rpy="0.0 0.0 0.0" />
+      <inertia ixx="$(arg J2)" ixy="0.0"       ixz="0.0"
+                               iyy="$(arg J2)" iyz="0.0"
+                                               izz="${arm2_inertia_z}" />
+    </inertial>
   </link>
 
 </robot>
