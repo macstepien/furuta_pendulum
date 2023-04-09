@@ -18,12 +18,16 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_sub_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr torque_cmd_pub_;
 
-  Eigen::Vector4d K;
+  Eigen::Vector4d K_;
 
-  double m2 = 0.075;
-  double l2 = 0.148;
-  double g = 9.80665;
-  double u_max = 10.0;
+  double m2_;
+  double l2_;
+
+  double u_max_;
+
+  double lqr_transition_angle_;
+
+  static constexpr double g_ = 9.80665;
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg);
   double LqrControl(sensor_msgs::msg::JointState::SharedPtr current_state);

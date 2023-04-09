@@ -18,10 +18,18 @@ def generate_launch_description():
         ]
     )
 
+    pendulum_params = PathJoinSubstitution(
+        [
+            FindPackageShare("furuta_pendulum"),
+            "config",
+            "pendulum_parameters.yaml",
+        ]
+    )
+
     furuta_pendulum_controller_node = Node(
         package="furuta_pendulum",
         executable="controller_node",
-        parameters=[controller_params],
+        parameters=[controller_params, pendulum_params],
     )
 
     actions = [

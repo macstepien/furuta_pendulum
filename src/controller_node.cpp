@@ -15,16 +15,22 @@ namespace furuta_pendulum
 ControllerNode::ControllerNode(const rclcpp::NodeOptions & options)
 : Node("furuta_pendulum_controller_node", options)
 {
-  std::vector<double> K_params;
   this->declare_parameter("K", rclcpp::PARAMETER_DOUBLE_ARRAY);
+  this->declare_parameter("m2", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("l2", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("u_max", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("lqr_transition_angle", rclcpp::PARAMETER_DOUBLE);
+
   try {
-    K_params = this->get_parameter("K").as_double_array();
+    K_ = Eigen::Vector4d(this->get_parameter("K").as_double_array().data());
+    m2_ = this->get_parameter("m2").as_double();
+    l2_ = this->get_parameter("l2").as_double();
+    u_max_ = this->get_parameter("u_max").as_double();
+    lqr_transition_angle_ = this->get_parameter("lqr_transition_angle").as_double();
   } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
     RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
     throw e;
   }
-
-  K = Eigen::Vector4d(K_params.data());
 
   state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
     "joint_states", 10, std::bind(&ControllerNode::StateCb, this, std::placeholders::_1));
@@ -34,7 +40,7 @@ ControllerNode::ControllerNode(const rclcpp::NodeOptions & options)
 void ControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
 {
   double u = 0.0;
-  if (fabs(msg->position[1] - M_PI) < 0.7) {
+  if (fabs(msg->position[1] - M_PI) < lqr_transition_angle_) {
     u = LqrControl(msg);
   } else {
     u = SwingupControl(msg);
@@ -53,7 +59,7 @@ double ControllerNode::LqrControl(sensor_msgs::msg::JointState::SharedPtr curren
   state_vector(2) = current_state->velocity[0];
   state_vector(3) = current_state->velocity[1];
 
-  return -K.dot(state_vector);
+  return -K_.dot(state_vector);
 }
 
 double ControllerNode::SwingupControl(sensor_msgs::msg::JointState::SharedPtr current_state)
@@ -61,14 +67,14 @@ double ControllerNode::SwingupControl(sensor_msgs::msg::JointState::SharedPtr cu
   // based on http://bulletin.pan.pl/(52-3)153.pdf
   double dtheta2 = current_state->velocity[1];
   double theta2 = current_state->position[1];
-  double E = 0.5 * m2 * pow(l2, 2.0) * pow(dtheta2, 2.0) + m2 * g * l2 * cos(theta2);
-  double E0 = m2 * g * l2;
+  double E = 0.5 * m2_ * pow(l2_, 2.0) * pow(dtheta2, 2.0) + m2_ * g_ * l2_ * cos(theta2);
+  double E0 = m2_ * g_ * l2_;
 
   double x = (E - E0) * dtheta2 * cos(theta2);
-  if (x > 0) {
-    return -u_max;
+  if (x > 0.0) {
+    return -u_max_;
   } else {
-    return u_max;
+    return u_max_;
   }
 }
 
