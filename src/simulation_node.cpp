@@ -16,31 +16,65 @@ namespace furuta_pendulum
 SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
 : Node("furuta_pendulum_simulation_node", options)
 {
-  this->declare_parameter("theta2", 0.0);
-  theta2_ = this->get_parameter("theta2").as_double();
+  this->declare_parameter("initial_conditions.theta1", 0.0);
+  this->declare_parameter("initial_conditions.theta2", 0.0);
+  this->declare_parameter("initial_conditions.dtheta1", 0.0);
+  this->declare_parameter("initial_conditions.dtheta2", 0.0);
+  this->declare_parameter("initial_conditions.ddtheta1", 0.0);
+  this->declare_parameter("initial_conditions.ddtheta2", 0.0);
+  this->declare_parameter("initial_conditions.tau1", 0.0);
+  this->declare_parameter("initial_conditions.tau2", 0.0);
+  theta1_ = this->get_parameter("initial_conditions.theta1").as_double();
+  theta2_ = this->get_parameter("initial_conditions.theta2").as_double();
+  dtheta1_ = this->get_parameter("initial_conditions.dtheta1").as_double();
+  dtheta2_ = this->get_parameter("initial_conditions.dtheta2").as_double();
+  ddtheta1_ = this->get_parameter("initial_conditions.ddtheta1").as_double();
+  ddtheta2_ = this->get_parameter("initial_conditions.ddtheta2").as_double();
+  tau1_ = this->get_parameter("initial_conditions.tau1").as_double();
+  tau2_ = this->get_parameter("initial_conditions.tau2").as_double();
 
-  // from https://www.hindawi.com/journals/jcse/2011/528341/
-  m1_ = 0.3;
-  m2_ = 0.075;
+  this->declare_parameter("simulation_dt", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("max_torque", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("max_velocity", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("m1", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("m2", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("l1", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("l2", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("L1", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("L2", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("b1", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("b2", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("L", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("R", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("Km", rclcpp::PARAMETER_DOUBLE);
 
-  l1_ = 0.15;
-  l2_ = 0.148;
+  this->declare_parameter("J1", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("J2", rclcpp::PARAMETER_DOUBLE);
+  try {
+    dt_ = this->get_parameter("simulation_dt").as_double();
+    max_torque_ = this->get_parameter("max_torque").as_double();
+    max_velocity_ = this->get_parameter("max_velocity").as_double();
+    m1_ = this->get_parameter("m1").as_double();
+    m2_ = this->get_parameter("m2").as_double();
+    l1_ = this->get_parameter("l1").as_double();
+    l2_ = this->get_parameter("l2").as_double();
+    L1_ = this->get_parameter("L1").as_double();
+    L2_ = this->get_parameter("L2").as_double();
+    b1_ = this->get_parameter("b1").as_double();
+    b2_ = this->get_parameter("b2").as_double();
+    L_ = this->get_parameter("L").as_double();
+    R_ = this->get_parameter("R").as_double();
+    Km_ = this->get_parameter("Km").as_double();
 
-  L1_ = 0.278;
-  L2_ = 0.3;
+    double J1 = this->get_parameter("J1").as_double();
+    double J2 = this->get_parameter("J2").as_double();
+    J2_hat_ = J2 + m2_ * l2_ * l2_;
+    J0_hat_ = J1 + m1_ * l1_ * l1_ + m2_ * L1_ * L1_;
 
-  double J1 = 0.0248;
-  double J2 = 0.00386;
-
-  J2_hat_ = J2 + m2_ * l2_ * l2_;
-  J0_hat_ = J1 + m1_ * l1_ * l1_ + m2_ * L1_ * L1_;
-
-  b1 = 0.0001;
-  b2 = 0.00028;
-
-  L_ = 0.005;
-  R_ = 7.8;
-  Km_ = 0.09;
+  } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
+    RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
+    throw e;
+  }
 
   joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
   simulation_timer_ = this->create_wall_timer(
@@ -67,11 +101,11 @@ void SimulationNode::Simulate()
   inertia_matrix(1, 1) = J2_hat_;
 
   Eigen::Matrix2d viscous_damping_centripetal_coriolis;
-  viscous_damping_centripetal_coriolis(0, 0) = b1 + 0.5 * dtheta2_ * J2_hat_ * sin(2.0 * theta2_);
+  viscous_damping_centripetal_coriolis(0, 0) = b1_ + 0.5 * dtheta2_ * J2_hat_ * sin(2.0 * theta2_);
   viscous_damping_centripetal_coriolis(0, 1) =
     0.5 * dtheta2_ * J2_hat_ * sin(2.0 * theta2_) - m2_ * L1_ * l2_ * sin(theta2_) * dtheta2_;
   viscous_damping_centripetal_coriolis(1, 0) = -0.5 * dtheta1_ * J2_hat_ * sin(2.0 * theta2_);
-  viscous_damping_centripetal_coriolis(1, 1) = b2;
+  viscous_damping_centripetal_coriolis(1, 1) = b2_;
 
   Eigen::Vector2d dtheta;
   dtheta(0) = dtheta1_;

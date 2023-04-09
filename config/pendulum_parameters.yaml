@@ -1,6 +1,7 @@
 
 /**:
   ros__parameters:
+    # parameters from https://www.hindawi.com/journals/jcse/2011/528341/
     m1: 0.3
     m2: 0.075
     

@@ -16,8 +16,8 @@ public:
   SimulationNode(const rclcpp::NodeOptions & options);
 
 private:
-  double dt_ = 0.001;
   static constexpr double g_ = 9.80665;
+  double dt_;
 
   // Mechanical System parameters
   double J0_hat_, J2_hat_;
@@ -25,16 +25,16 @@ private:
   double m1_, m2_;
   double l1_, l2_;
   double L1_, L2_;
-  double b1, b2;
+  double b1_, b2_;
 
-  double theta1_ = 0.0, theta2_ = 0.0;
-  double dtheta1_ = 0.0, dtheta2_ = 0.0;
-  double ddtheta1_ = 0.0, ddtheta2_ = 0.0;
+  double theta1_, theta2_;
+  double dtheta1_, dtheta2_;
+  double ddtheta1_, ddtheta2_;
 
-  double tau1_ = 0.0, tau2_ = 0.0;
+  double tau1_, tau2_;
 
-  double max_torque_ = 1.47;
-  double max_velocity_ = 10.0;
+  double max_torque_;
+  double max_velocity_;
 
   // Motor parameters
   double L_, R_, Km_;
