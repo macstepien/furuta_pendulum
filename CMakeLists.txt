@@ -54,6 +54,7 @@ install(
 install(DIRECTORY
   config
   launch
+  rviz
   urdf
   DESTINATION share/${PROJECT_NAME}
 )
