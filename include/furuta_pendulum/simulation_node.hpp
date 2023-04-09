@@ -50,8 +50,11 @@ private:
 
   void SetEffortCb(std_msgs::msg::Float64MultiArray::SharedPtr msg)
   {
-    SetTorque(msg->data[0]);
-    SetDisturbance(msg->data[1]);
+    if (msg->data.size() > 1) {
+      SetTorque(msg->data[0]);
+    }
+    // Ignore disturbance from effort command
+    // SetDisturbance(msg->data[1]);
   }
   void RvizDisturbanceCb(geometry_msgs::msg::PointStamped::SharedPtr) { SetDisturbance(10.0); }
 
