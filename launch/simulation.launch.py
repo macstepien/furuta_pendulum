@@ -39,7 +39,7 @@ def generate_launch_description():
     rviz_config = PathJoinSubstitution(
         [
             FindPackageShare("furuta_pendulum"),
-            "config",
+            "rviz",
             "furuta_pendulum.rviz",
         ]
     )
