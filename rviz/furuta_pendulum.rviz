@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /RobotModel1
+        - /RobotModel1/Mass Properties1
         - /TF1
       Splitter Ratio: 0.5
     Tree Height: 555
@@ -48,7 +49,7 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 1
+    - Alpha: 0.800000011920929
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
       Description File: ""
@@ -83,7 +84,7 @@ Visualization Manager:
           Value: true
       Mass Properties:
         Inertia: false
-        Mass: false
+        Mass: true
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
@@ -158,7 +159,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.8968247175216675
+      Distance: 1.8167835474014282
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -173,10 +174,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4803977608680725
+      Pitch: 0.5053977370262146
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.9553996324539185
+      Yaw: 1.2654011249542236
     Saved: ~
 Window Geometry:
   Displays:
