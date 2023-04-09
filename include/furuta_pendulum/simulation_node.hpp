@@ -5,7 +5,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 
 namespace furuta_pendulum
@@ -41,16 +41,18 @@ private:
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
   rclcpp::TimerBase::SharedPtr simulation_timer_;
-  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr torque_sub_;
-  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr disturbance_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr effort_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr rviz_disturbance_sub_;
 
   void Simulate();
 
   void PublishJointStates();
 
-  void SetTorqueCb(std_msgs::msg::Float64::SharedPtr msg) { SetTorque(msg->data); }
-  void SetDisturbanceCb(std_msgs::msg::Float64::SharedPtr msg) { SetDisturbance(msg->data); }
+  void SetEffortCb(std_msgs::msg::Float64MultiArray::SharedPtr msg)
+  {
+    SetTorque(msg->data[0]);
+    SetDisturbance(msg->data[1]);
+  }
   void RvizDisturbanceCb(geometry_msgs::msg::PointStamped::SharedPtr) { SetDisturbance(10.0); }
 
   void SetTorque(double torque) { tau1_ = std::clamp(torque, -max_torque_, max_torque_); }

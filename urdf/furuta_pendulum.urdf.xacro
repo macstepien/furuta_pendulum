@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
 <robot name="furuta_pendulum" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="use_sim" default="true" />
+
   <xacro:arg name="m1" default="0.0" />
   <xacro:arg name="m2" default="0.0" />
 
   <xacro:arg name="l1" default="0.0" />
   <xacro:arg name="l2" default="0.0" />
-  
+
   <xacro:arg name="L1" default="0.0" />
   <xacro:arg name="L2" default="0.0" />
-  
+
   <xacro:arg name="J1" default="0.0" />
   <xacro:arg name="J2" default="0.0" />
-  
+
   <xacro:arg name="b1" default="0.0" />
   <xacro:arg name="b2" default="0.0" />
 
@@ -20,11 +22,12 @@
   </material>
 
   <xacro:property name="base_radius" value="0.1" />
-  <xacro:property name="base_length" value="0.1" />
+  <xacro:property name="L2" value="$(arg L2)" />
+  <xacro:property name="base_length" value="${L2+0.05}" />
 
   <xacro:property name="arm1_radius" value="0.02" />
   <xacro:property name="arm1_length" value="$(arg L1)" />
-  
+
   <xacro:property name="arm2_radius" value="0.02" />
   <xacro:property name="arm2_length" value="$(arg L2)" />
 
@@ -34,6 +37,17 @@
   <xacro:property name="arm1_inertia_x" value="0.000001" />
   <xacro:property name="arm2_inertia_z" value="0.000001" />
 
+
+  <xacro:property name="max_effort" value="4.0" />
+  <xacro:property name="max_velocity" value="15.0" />
+
+  <link name="world" />
+  <joint name="world_to_base_joint" type="fixed">
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="world" />
+    <child link="base_link" />
+  </joint>
+
   <link name="base_link">
     <visual>
       <origin xyz="0.0 0.0 ${base_length/2.0}" rpy="0.0 0.0 0.0" />
@@ -42,6 +56,21 @@
       </geometry>
       <material name="grey" />
     </visual>
+
+    <collision>
+      <origin xyz="0.0 0.0 ${base_length/2.0}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${base_radius}" length="${base_length}" />
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="10.0" />
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0"
+        iyy="0.1" iyz="0.0"
+        izz="0.1" />
+    </inertial>
   </link>
 
   <joint name="joint1" type="continuous">
@@ -50,6 +79,7 @@
     <child link="arm1" />
     <axis xyz="0 0 1" />
     <dynamics damping="$(arg b1)" />
+    <limit effort="${max_effort}" velocity="${max_velocity}" />
   </joint>
 
   <link name="arm1">
@@ -71,9 +101,9 @@
     <inertial>
       <mass value="$(arg m1)" />
       <origin xyz="$(arg l1) 0.0 0.0" rpy="0.0 0.0 0.0" />
-      <inertia ixx="${arm1_inertia_x}" ixy="0.0"       ixz="0.0"
-                                       iyy="$(arg J1)" iyz="0.0"
-                                                       izz="$(arg J1)" />
+      <inertia ixx="${arm1_inertia_x}" ixy="0.0" ixz="0.0"
+        iyy="$(arg J1)" iyz="0.0"
+        izz="$(arg J1)" />
     </inertial>
   </link>
 
@@ -84,6 +114,7 @@
     <child link="arm2" />
     <axis xyz="1 0 0" />
     <dynamics damping="$(arg b2)" />
+    <limit effort="${max_effort}" velocity="${max_velocity}" />
   </joint>
 
   <link name="arm2">
@@ -105,10 +136,49 @@
     <inertial>
       <mass value="$(arg m2)" />
       <origin xyz="0.0 0.0 $(arg l2)" rpy="0.0 0.0 0.0" />
-      <inertia ixx="$(arg J2)" ixy="0.0"       ixz="0.0"
-                               iyy="$(arg J2)" iyz="0.0"
-                                               izz="${arm2_inertia_z}" />
+      <inertia ixx="$(arg J2)" ixy="0.0" ixz="0.0"
+        iyy="$(arg J2)" iyz="0.0"
+        izz="${arm2_inertia_z}" />
     </inertial>
   </link>
+
+  <ros2_control name="furuta_pendulum" type="system">
+    <hardware>
+      <xacro:if value="$(arg use_sim)">
+        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+      </xacro:if>
+    </hardware>
+
+    <joint name="joint1">
+      <command_interface name="effort">
+        <param name="min">${-max_effort}</param>
+        <param name="max">${max_effort}</param>
+      </command_interface>
+
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="joint2">
+      <command_interface name="effort">
+        <param name="min">${-max_effort}</param>
+        <param name="max">${max_effort}</param>
+      </command_interface>
+
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+  </ros2_control>
+
+  <xacro:if value="$(arg use_sim)">
+    <gazebo>
+      <plugin filename="ign_ros2_control-system"
+        name="ign_ros2_control::IgnitionROS2ControlPlugin">
+        <parameters>$(find furuta_pendulum)/config/furuta_pendulum_ros2_control.yaml</parameters>
+        <ros>
+          <remapping>/forward_effort_controller/commands:=/effort_control</remapping>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:if>
 
 </robot>

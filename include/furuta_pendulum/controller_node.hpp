@@ -5,7 +5,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
 
 namespace furuta_pendulum
 {
@@ -16,7 +16,7 @@ public:
 
 private:
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_sub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr torque_cmd_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr torque_cmd_pub_;
 
   Eigen::Vector4d K_;
 

@@ -1,0 +1,21 @@
+simulation_ignition_ros_control:
+  ros__parameters:
+    use_sim_time: true
+
+controller_manager:
+  ros__parameters:
+    use_sim_time: true
+    update_rate: 1000 # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    forward_effort_controller:
+      type: forward_command_controller/ForwardCommandController
+
+forward_effort_controller:
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+    interface_name: effort

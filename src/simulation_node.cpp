@@ -7,7 +7,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 
 namespace furuta_pendulum
@@ -80,10 +80,8 @@ SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
   simulation_timer_ = this->create_wall_timer(
     std::chrono::duration<double>(dt_), std::bind(&SimulationNode::Simulate, this));
 
-  torque_sub_ = this->create_subscription<std_msgs::msg::Float64>(
-    "torque", 10, std::bind(&SimulationNode::SetTorqueCb, this, std::placeholders::_1));
-  disturbance_sub_ = this->create_subscription<std_msgs::msg::Float64>(
-    "disturbance", 10, std::bind(&SimulationNode::SetDisturbanceCb, this, std::placeholders::_1));
+  effort_sub_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
+    "effort_control", 10, std::bind(&SimulationNode::SetEffortCb, this, std::placeholders::_1));
 
   rviz_disturbance_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>(
     "clicked_point", 10,

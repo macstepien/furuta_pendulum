@@ -7,7 +7,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
 
 namespace furuta_pendulum
 {
@@ -34,7 +34,7 @@ ControllerNode::ControllerNode(const rclcpp::NodeOptions & options)
 
   state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
     "joint_states", 10, std::bind(&ControllerNode::StateCb, this, std::placeholders::_1));
-  torque_cmd_pub_ = this->create_publisher<std_msgs::msg::Float64>("torque", 10);
+  torque_cmd_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>("effort_control", 10);
 }
 
 void ControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
@@ -46,8 +46,9 @@ void ControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
     u = SwingupControl(msg);
   }
 
-  std_msgs::msg::Float64 torque_cmd_msg;
-  torque_cmd_msg.data = u;
+  std_msgs::msg::Float64MultiArray torque_cmd_msg;
+  torque_cmd_msg.data.push_back(u);
+  torque_cmd_msg.data.push_back(0.0);
   torque_cmd_pub_->publish(torque_cmd_msg);
 }
 
