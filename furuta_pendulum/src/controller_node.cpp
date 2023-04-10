@@ -66,16 +66,16 @@ double ControllerNode::LqrControl(sensor_msgs::msg::JointState::SharedPtr curren
 double ControllerNode::SwingupControl(sensor_msgs::msg::JointState::SharedPtr current_state)
 {
   // based on http://bulletin.pan.pl/(52-3)153.pdf
-  double dtheta2 = current_state->velocity[1];
-  double theta2 = current_state->position[1];
-  double E = 0.5 * m2_ * pow(l2_, 2.0) * pow(dtheta2, 2.0) + m2_ * g_ * l2_ * cos(theta2);
-  double E0 = m2_ * g_ * l2_;
+  const double dtheta2 = current_state->velocity[1];
+  const double theta2 = current_state->position[1] - M_PI;
+  const double E = 0.5 * m2_ * pow(l2_, 2) * pow(dtheta2, 2) + m2_ * g_ * l2_ * cos(theta2);
+  const double E0 = m2_ * g_ * l2_;
 
-  double x = (E - E0) * dtheta2 * cos(theta2);
+  const double x = (E - E0) * dtheta2 * cos(theta2);
   if (x > 0.0) {
-    return -u_max_;
+    return -u_max_ * fabs(E - E0);
   } else {
-    return u_max_;
+    return u_max_ * fabs(E - E0);
   }
 }
 
