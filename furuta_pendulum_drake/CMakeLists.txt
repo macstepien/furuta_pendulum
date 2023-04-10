@@ -10,6 +10,9 @@ find_package(drake CONFIG REQUIRED PATHS /opt/drake)
 add_executable(cart_pole_example_urdf_lqr src/cart_pole_example_urdf_lqr.cpp)
 target_link_libraries(cart_pole_example_urdf_lqr drake::drake)
 
+add_executable(furuta_pendulum_urdf_lqr src/furuta_pendulum_urdf_lqr.cpp)
+target_link_libraries(furuta_pendulum_urdf_lqr drake::drake)
+
 # set(PACKAGE_INCLUDE_DEPENDS
 #   ament_cmake
 #   Eigen3
