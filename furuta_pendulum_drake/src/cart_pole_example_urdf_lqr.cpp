@@ -33,7 +33,9 @@ namespace
 {
 
 // Fixed path to double pendulum SDF model.
-static const char * const kCartPoleSdfPath = "drake/examples/multibody/cart_pole/cart_pole.sdf";
+// static const char * const kCartPoleSdfPath = "drake/examples/multibody/cart_pole/cart_pole.sdf";
+static const char * const kCartPoleSdfPath =
+  "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_drake/urdf/cart_pole.sdf";
 
 //
 // Main function for demo.
@@ -56,9 +58,9 @@ void DoMain()
   cp->RegisterAsSourceForSceneGraph(&scene_graph);
 
   drake::multibody::Parser parser(cp);
-  const std::string sdf_path = FindResourceOrThrow(kCartPoleSdfPath);
+  // const std::string sdf_path = FindResourceOrThrow(kCartPoleSdfPath);
   drake::multibody::ModelInstanceIndex plant_model_instance_index =
-    parser.AddModelFromFile(sdf_path);
+    parser.AddModelFromFile(kCartPoleSdfPath);
   (void)plant_model_instance_index;
 
   // Now the plant is complete.
@@ -68,7 +70,7 @@ void DoMain()
   auto cp_context = cp->CreateDefaultContext();
   const int CartPole_actuation_port = 3;
   // Set nominal torque to zero.
-  Eigen::VectorXd u0 = Eigen::VectorXd::Zero(1);
+  Eigen::VectorXd u0 = Eigen::VectorXd::Zero(2);
   cp_context->FixInputPort(CartPole_actuation_port, Value<systems::BasicVector<double>>(u0));
 
   // Set nominal state to the upright fixed point.
@@ -83,7 +85,7 @@ void DoMain()
   Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(4, 4);
   Q(0, 0) = 10;
   Q(1, 1) = 10;
-  Eigen::MatrixXd R = Eigen::MatrixXd::Identity(1, 1);
+  Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2, 2);
   Eigen::MatrixXd N;
   auto lqr = builder.AddSystem(systems::controllers::LinearQuadraticRegulator(
     *cp, *cp_context, Q, R, N, CartPole_actuation_port));
