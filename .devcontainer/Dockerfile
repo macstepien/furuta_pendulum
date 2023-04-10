@@ -27,9 +27,4 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
-# install bazel for drake https://bazel.build/install/ubuntu
-
-# bash: line 1: patch: command not found
-# sudo apt install patch
-# sudo apt install default-jdk
-# sudo apt install libglew-dev libtiff-dev
+# https://drake.mit.edu/apt.html#stable-releases

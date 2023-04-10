@@ -7,10 +7,11 @@
         "limitSymbolsToIncludedHeaders": false
       },
       "includePath": [
+        "/usr/include/**",
+        "/opt/drake/include/**",
         "/opt/ros/humble/include/**",
-        "/home/maciej/ros2_ws/src/furuta_pendulum/include/**",
-        "/home/maciej/**",
-        "/usr/include/**"
+        "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum/include/**",
+        "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_drake/include/**",
       ],
       "intelliSenseMode": "linux-clang-x64",
       "compilerPath": "/usr/bin/c++",
