@@ -45,6 +45,40 @@ void DoMain()
   // Now the model is complete.
   furuta_pendulum.Finalize();
 
+  // ---------------
+
+  // Create LQR Controller.
+  auto furuta_pendulum_context = furuta_pendulum.CreateDefaultContext();
+  const int furuta_pendulum_actuation_port = 3;
+  // Set nominal torque to zero.
+  furuta_pendulum_context->FixInputPort(
+    furuta_pendulum_actuation_port, Value<systems::BasicVector<double>>(Eigen::VectorXd::Zero(1)));
+  // furuta_pendulum.get_actuation_input_port().FixValue(furuta_pendulum_context.get(), 0.0);
+
+  // Set nominal state to the upright fixed point.
+  Eigen::VectorXd x0 = Eigen::VectorXd::Zero(4);
+  x0[0] = 0.0;
+  x0[1] = M_PI;
+  furuta_pendulum_context->SetDiscreteState(x0);
+
+  // Setup LQR Cost matrices (penalize position error 10x more than velocity
+  // to roughly address difference in units, using sqrt(g/l) as the time
+  // constant.
+  Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(4, 4);
+  Q(0, 0) = 10;
+  Q(1, 1) = 10;
+  // Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2, 2);
+  Vector1d R = Vector1d::Constant(1);
+  Eigen::MatrixXd N;
+
+  auto lqr = builder.AddSystem(systems::controllers::LinearQuadraticRegulator(
+    furuta_pendulum, *furuta_pendulum_context, Q, R, N, furuta_pendulum_actuation_port));
+
+  builder.Connect(furuta_pendulum.get_state_output_port(), lqr->get_input_port());
+  builder.Connect(lqr->get_output_port(), furuta_pendulum.get_actuation_input_port());
+
+  // -------------
+
   geometry::MeshcatVisualizerd::AddToBuilder(
     &builder, scene_graph, std::make_shared<geometry::Meshcat>());
 
@@ -53,16 +87,17 @@ void DoMain()
   // Create a context for this system:
   std::unique_ptr<systems::Context<double>> diagram_context = diagram->CreateDefaultContext();
   diagram->SetDefaultContext(diagram_context.get());
-  systems::Context<double> & furuta_pendulum_context =
+  systems::Context<double> & furuta_pendulum_context_2 =
     diagram->GetMutableSubsystemContext(furuta_pendulum, diagram_context.get());
 
-  // There is no input actuation in this example for the passive dynamics.
-  furuta_pendulum.get_actuation_input_port().FixValue(
-    &furuta_pendulum_context, Value<systems::BasicVector<double>>(Eigen::VectorXd::Zero(2)));
+  Eigen::VectorXd positions = Eigen::VectorXd::Zero(2);
+  positions[0] = 0.0;
+  positions[1] = 2.8;
+  furuta_pendulum.SetPositions(&furuta_pendulum_context_2, positions);
 
   systems::Simulator<double> simulator(*diagram, std::move(diagram_context));
 
-  simulator.set_publish_every_time_step(false);
+  simulator.set_publish_every_time_step(true);
   simulator.set_target_realtime_rate(kTargetRealtimeRate);
   simulator.Initialize();
   simulator.AdvanceTo(kSimulationTime);

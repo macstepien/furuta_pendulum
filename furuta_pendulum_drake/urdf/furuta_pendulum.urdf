@@ -19,12 +19,16 @@
       </geometry>
       <material name="grey" />
     </visual>
-    <collision>
+    <!-- Collisions disabled, because I had problems getting drake's lqr to work - 
+    when collisions are enabled it is necessary to use context with scene and plant, 
+    without collisions it is sufficient to use only plant's context: 
+    https://stackoverflow.com/questions/65471497/how-are-you-supposed-to-use-a-controller-with-a-urdf -->
+    <!-- <collision>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175" />
       <geometry>
         <cylinder length="0.35" radius="0.1" />
       </geometry>
-    </collision>
+    </collision> -->
     <inertial>
       <mass value="10.0" />
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
@@ -49,12 +53,12 @@
       </geometry>
       <material name="grey" />
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.139 0.0 0.0" />
       <geometry>
         <cylinder length="0.278" radius="0.02" />
       </geometry>
-    </collision>
+    </collision> -->
     <inertial>
       <mass value="0.3" />
       <origin rpy="0.0 0.0 0.0" xyz="0.15 0.0 0.0" />
@@ -80,12 +84,12 @@
       </geometry>
       <material name="grey" />
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.15" />
       <geometry>
         <cylinder length="0.3" radius="0.02" />
       </geometry>
-    </collision>
+    </collision> -->
     <inertial>
       <mass value="0.075" />
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.148" />
@@ -99,9 +103,9 @@
     <mechanicalReduction>1</mechanicalReduction>
   </transmission>
 
-  <transmission name="joint2_trans" type="SimpleTransmission">
+  <!-- <transmission name="joint2_trans" type="SimpleTransmission">
     <actuator name="joint2_actuator" />
     <joint name="joint2" />
     <mechanicalReduction>1</mechanicalReduction>
-  </transmission>
+  </transmission> -->
 </robot>
