@@ -9,6 +9,7 @@
       "includePath": [
         "/opt/ros/humble/include/**",
         "/home/maciej/ros2_ws/src/furuta_pendulum/include/**",
+        "/home/maciej/**",
         "/usr/include/**"
       ],
       "intelliSenseMode": "linux-clang-x64",
