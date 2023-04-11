@@ -28,3 +28,5 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 # https://drake.mit.edu/apt.html#stable-releases
+# To have working executable after installation
+# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/drake/lib/

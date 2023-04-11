@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.8)
+project(furuta_pendulum_control_toolbox)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+set(PACKAGE_INCLUDE_DEPENDS
+  ament_cmake
+  ct_core
+  ct_optcon
+  ct_rbd
+  ct_models
+)
+
+foreach(Dependency IN ITEMS ${PACKAGE_INCLUDE_DEPENDS})
+  find_package(${Dependency} REQUIRED)
+endforeach()
+
+find_package(drake CONFIG REQUIRED PATHS /opt/drake)
+
+add_executable(ct_test src/ct_test.cpp)
+target_link_libraries(ct_test ct_core)
+
+install(
+  TARGETS ct_test
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_package()
