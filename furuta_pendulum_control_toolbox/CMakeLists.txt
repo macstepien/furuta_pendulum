@@ -17,13 +17,14 @@ foreach(Dependency IN ITEMS ${PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
-find_package(drake CONFIG REQUIRED PATHS /opt/drake)
-
 add_executable(ct_test src/ct_test.cpp)
 target_link_libraries(ct_test ct_core)
 
+add_executable(NLOC_MPC src/NLOC_MPC.cpp)
+target_link_libraries(NLOC_MPC ct_core ct_rbd ct_models)
+
 install(
-  TARGETS ct_test
+  TARGETS ct_test NLOC_MPC
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 

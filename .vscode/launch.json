@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "cppdbg",
             "cwd": "/",
-            "program": "/home/maciej/ros2_ws/build/furuta_pendulum_drake/furuta_pendulum_urdf_lqr"
+            "program": "/home/maciej/ros2_ws/install/furuta_pendulum_control_toolbox/lib/furuta_pendulum_control_toolbox/NLOC_MPC"
         }
     ]
 }
