@@ -73,3 +73,35 @@ sudo ./install.sh
 ! in tmp it is generated for newer 0.5 version
 <!-- /tmp/gen$ cp -r cpp/ /home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/include/furuta_pendulum/ -->
 maciej@maciej:~/ros2_ws/robcogen-0.4ad.0/run/gen_code$ cp -r cpp ~/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/include/furuta_pendulum/
+
+#!/bin/bash
+
+sudo apt-get update
+
+## get lapack
+yes Y | sudo apt-get install liblapack-dev
+
+## get eigen3
+yes Y | sudo apt-get install libeigen3-dev
+
+
+## get IPOPT
+yes Y | sudo apt-get install coinor-libipopt-dev
+
+## get boost
+yes Y | sudo apt-get install libboost-all-dev
+
+## get open mp
+yes Y | sudo apt install libomp-dev
+
+## get clang
+yes Y | sudo apt install clang
+
+## get python 3 and related python packages
+yes Y | sudo apt install python3 python3-dev python3-numpy python3-matplotlib
+
+## get CppAD and CppADCodeGen
+sudo ./install_cppadcg.sh
+
+
+!!!!!!!!Important dont run ## get cmake sudo ./install_cmake.sh
