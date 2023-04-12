@@ -15,6 +15,8 @@ sudo apt install maxima
 
 ! has to bo version 0.4ad.0
 https://github.com/ethz-adrl/control-toolbox/issues/166
+Simply removing a "/" sign from the framework.properties configuration resolved this issue, like:
+generator.maxima.libs.path = ../etc/maxima-libs (do NOT use "/" at the end).
 
 ./robcogen.sh /home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/model/FurutaPendulum.kindsl
 # you may now input 1, 4, and 28 to exit

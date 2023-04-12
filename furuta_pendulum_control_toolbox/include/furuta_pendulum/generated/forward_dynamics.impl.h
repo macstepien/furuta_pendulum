@@ -22,16 +22,11 @@ iit::FurutaPendulum::dyn::tpl::ForwardDynamics<TRAIT>::ForwardDynamics(iit::Furu
 template <typename TRAIT>
 void iit::FurutaPendulum::dyn::tpl::ForwardDynamics<TRAIT>::fd(
     JointState& qdd,
-    Acceleration& base_link_a,
-    const Velocity& base_link_v,
-    const Acceleration& g,
     const JointState& qd,
     const JointState& tau,
     const ExtForces& fext/* = zeroExtForces */)
 {
     
-    base_link_AI = inertiaProps->getTensor_base_link();
-    base_link_p = - fext[BASE_LINK];
     arm1_AI = inertiaProps->getTensor_arm1();
     arm1_p = - fext[ARM1];
     arm2_AI = inertiaProps->getTensor_arm2();
@@ -44,15 +39,10 @@ void iit::FurutaPendulum::dyn::tpl::ForwardDynamics<TRAIT>::fd(
     
     // + Link arm1
     //  - The spatial velocity:
-    arm1_v = (motionTransforms-> fr_arm1_X_fr_base_link) * base_link_v;
-    arm1_v(iit::rbd::AZ) += qd(JOINT1);
-    
-    //  - The velocity-product acceleration term:
-    iit::rbd::motionCrossProductMx<Scalar>(arm1_v, vcross);
-    arm1_c = vcross.col(iit::rbd::AZ) * qd(JOINT1);
+    arm1_v(iit::rbd::AZ) = qd(JOINT1);
     
     //  - The bias force term:
-    arm1_p += iit::rbd::vxIv(arm1_v, arm1_AI);
+    arm1_p += iit::rbd::vxIv(qd(JOINT1), arm1_AI);
     
     // + Link arm2
     //  - The spatial velocity:
@@ -66,8 +56,6 @@ void iit::FurutaPendulum::dyn::tpl::ForwardDynamics<TRAIT>::fd(
     //  - The bias force term:
     arm2_p += iit::rbd::vxIv(arm2_v, arm2_AI);
     
-    // + The floating base body
-    base_link_p += iit::rbd::vxIv(base_link_v, base_link_AI);
     
     // ---------------------- SECOND PASS ---------------------- //
     Matrix66S IaB;
@@ -89,17 +77,10 @@ void iit::FurutaPendulum::dyn::tpl::ForwardDynamics<TRAIT>::fd(
     arm1_U = arm1_AI.col(iit::rbd::AZ);
     arm1_D = arm1_U(iit::rbd::AZ);
     
-    iit::rbd::compute_Ia_revolute(arm1_AI, arm1_U, arm1_D, Ia_r);  // same as: Ia_r = arm1_AI - arm1_U/arm1_D * arm1_U.transpose();
-    pa = arm1_p + Ia_r * arm1_c + arm1_U * arm1_u/arm1_D;
-    ctransform_Ia_revolute(Ia_r, motionTransforms-> fr_arm1_X_fr_base_link, IaB);
-    base_link_AI += IaB;
-    base_link_p += (motionTransforms-> fr_arm1_X_fr_base_link).transpose() * pa;
     
-    // + The acceleration of the floating base base_link, without gravity
-    base_link_a = - TRAIT::solve(base_link_AI, base_link_p);  // base_link_a = - IA^-1 * base_link_p
     
     // ---------------------- THIRD PASS ---------------------- //
-    arm1_a = (motionTransforms-> fr_arm1_X_fr_base_link) * base_link_a + arm1_c;
+    arm1_a = (motionTransforms-> fr_arm1_X_fr_base_link).col(iit::rbd::LZ) * Scalar(iit::rbd::g);
     qdd(JOINT1) = (arm1_u - arm1_U.dot(arm1_a)) / arm1_D;
     arm1_a(iit::rbd::AZ) += qdd(JOINT1);
     
@@ -108,6 +89,4 @@ void iit::FurutaPendulum::dyn::tpl::ForwardDynamics<TRAIT>::fd(
     arm2_a(iit::rbd::AZ) += qdd(JOINT2);
     
     
-    // + Add gravity to the acceleration of the floating base
-    base_link_a += g;
 }

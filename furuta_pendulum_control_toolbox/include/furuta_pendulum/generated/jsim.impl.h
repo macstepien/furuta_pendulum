@@ -12,18 +12,15 @@ iit::FurutaPendulum::dyn::tpl::JSIM<TRAIT>::JSIM(IProperties& inertiaProperties,
 }
 
 #define DATA tpl::JSIM<TRAIT>::operator()
-#define Fcol(j) (tpl::JSIM<TRAIT>:: template block<6,1>(0,(j)+6))
-#define F(i,j) DATA((i),(j)+6)
 
 template <typename TRAIT>
 const typename iit::FurutaPendulum::dyn::tpl::JSIM<TRAIT>& iit::FurutaPendulum::dyn::tpl::JSIM<TRAIT>::update(const JointState& state) {
+    ForceVector F;
 
     // Precomputes only once the coordinate transforms:
     frcTransf -> fr_arm1_X_fr_arm2(state);
-    frcTransf -> fr_base_link_X_fr_arm1(state);
 
     // Initializes the composite inertia tensors
-    base_link_Ic = linkInertias.getTensor_base_link();
     arm1_Ic = linkInertias.getTensor_arm1();
 
     // "Bottom-up" loop to update the inertia-composite property of each link, for the current configuration
@@ -32,27 +29,19 @@ const typename iit::FurutaPendulum::dyn::tpl::JSIM<TRAIT>& iit::FurutaPendulum::
     iit::rbd::transformInertia<Scalar>(arm2_Ic, frcTransf -> fr_arm1_X_fr_arm2, Ic_spare);
     arm1_Ic += Ic_spare;
 
-    Fcol(JOINT2) = arm2_Ic.col(iit::rbd::AZ);
-    DATA(JOINT2+6, JOINT2+6) = Fcol(JOINT2)(iit::rbd::AZ);
+    F = arm2_Ic.col(iit::rbd::AZ);
+    DATA(JOINT2, JOINT2) = F(iit::rbd::AZ);
 
-    Fcol(JOINT2) = frcTransf -> fr_arm1_X_fr_arm2 * Fcol(JOINT2);
-    DATA(JOINT2+6, JOINT1+6) = F(iit::rbd::AZ,JOINT2);
-    DATA(JOINT1+6, JOINT2+6) = DATA(JOINT2+6, JOINT1+6);
-    Fcol(JOINT2) = frcTransf -> fr_base_link_X_fr_arm1 * Fcol(JOINT2);
+    F = frcTransf -> fr_arm1_X_fr_arm2 * F;
+    DATA(JOINT2, JOINT1) = F(iit::rbd::AZ);
+    DATA(JOINT1, JOINT2) = DATA(JOINT2, JOINT1);
 
     // Link arm1:
-    iit::rbd::transformInertia<Scalar>(arm1_Ic, frcTransf -> fr_base_link_X_fr_arm1, Ic_spare);
-    base_link_Ic += Ic_spare;
 
-    Fcol(JOINT1) = arm1_Ic.col(iit::rbd::AZ);
-    DATA(JOINT1+6, JOINT1+6) = Fcol(JOINT1)(iit::rbd::AZ);
+    F = arm1_Ic.col(iit::rbd::AZ);
+    DATA(JOINT1, JOINT1) = F(iit::rbd::AZ);
 
-    Fcol(JOINT1) = frcTransf -> fr_base_link_X_fr_arm1 * Fcol(JOINT1);
 
-    // Copies the upper-right block into the lower-left block, after transposing
-    JSIM<TRAIT>:: template block<2, 6>(6,0) = (JSIM<TRAIT>:: template block<6, 2>(0,6)).transpose();
-    // The composite-inertia of the whole robot is the upper-left quadrant of the JSIM
-    JSIM<TRAIT>:: template block<6,6>(0,0) = base_link_Ic;
     return *this;
 }
 

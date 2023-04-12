@@ -67,89 +67,42 @@ public:
     InverseDynamics(IProperties& in, MTransforms& tr);
 
     /** \name Inverse dynamics
-     * The full algorithm for the inverse dynamics of this robot.
+     * The full Newton-Euler algorithm for the inverse dynamics of this robot.
      *
-     * All the spatial vectors in the parameters are expressed in base coordinates,
-     * besides the external forces: each force must be expressed in the reference
-     * frame of the link it is acting on.
      * \param[out] jForces the joint force vector required to achieve the desired accelerations
-     * \param[out] baseAccel the spatial acceleration of the robot base
-     * \param[in] g the gravity acceleration, as a spatial vector;
-     *              gravity implicitly specifies the orientation of the base in space
-     * \param[in] base_link_v the spatial velocity of the base
      * \param[in] q the joint position vector
      * \param[in] qd the joint velocity vector
      * \param[in] qdd the desired joint acceleration vector
      * \param[in] fext the external forces acting on the links; this parameters
      *            defaults to zero
-     */ ///@{
+     */
+    ///@{
     void id(
-        JointState& jForces, Acceleration& base_link_a,
-        const Acceleration& g, const Velocity& base_link_v,
+        JointState& jForces,
         const JointState& q, const JointState& qd, const JointState& qdd,
         const ExtForces& fext = zeroExtForces);
     void id(
-        JointState& jForces, Acceleration& base_link_a,
-        const Acceleration& g, const Velocity& base_link_v,
+        JointState& jForces,
         const JointState& qd, const JointState& qdd,
         const ExtForces& fext = zeroExtForces);
     ///@}
-    /** \name Inverse dynamics, fully actuated base
-     * The inverse dynamics algorithm for the floating base robot,
-     * in the assumption of a fully actuated base.
-     *
-     * All the spatial vectors in the parameters are expressed in base coordinates,
-     * besides the external forces: each force must be expressed in the reference
-     * frame of the link it is acting on.
-     * \param[out] baseWrench the spatial force to be applied to the robot base to achieve
-     *             the desired accelerations
-     * \param[out] jForces the joint force vector required to achieve the desired accelerations
-     * \param[in] g the gravity acceleration, as a spatial vector;
-     *              gravity implicitly specifies the orientation of the base in space
-     * \param[in] base_link_v the spatial velocity of the base
-     * \param[in] baseAccel the desired spatial acceleration of the robot base
-     * \param[in] q the joint position vector
-     * \param[in] qd the joint velocity vector
-     * \param[in] qdd the desired joint acceleration vector
-     * \param[in] fext the external forces acting on the links; this parameters
-     *            defaults to zero
-     */ ///@{
-    void id_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Acceleration& g, const Velocity& base_link_v, const Acceleration& baseAccel,
-        const JointState& q, const JointState& qd, const JointState& qdd, const ExtForces& fext = zeroExtForces);
-    void id_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Acceleration& g, const Velocity& base_link_v, const Acceleration& baseAccel,
-        const JointState& qd, const JointState& qdd, const ExtForces& fext = zeroExtForces);
-    ///@}
-    /** \name Gravity terms, fully actuated base
+
+    /** \name Gravity terms
+     * The joint forces (linear or rotational) required to compensate
+     * for the effect of gravity, in a specific configuration.
      */
     ///@{
-    void G_terms_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Acceleration& g, const JointState& q);
-    void G_terms_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Acceleration& g);
+    void G_terms(JointState& jForces, const JointState& q);
+    void G_terms(JointState& jForces);
     ///@}
-    /** \name Centrifugal and Coriolis terms, fully actuated base
-     *
-     * These functions take only velocity inputs, that is, they assume
-     * a zero spatial acceleration of the base (in addition to zero acceleration
-     * at the actuated joints).
-     * Note that this is NOT the same as imposing zero acceleration
-     * at the virtual 6-dof-floting-base joint, which would result, in general,
-     * in a non-zero spatial acceleration of the base, due to velocity
-     * product terms.
+
+    /** \name Centrifugal and Coriolis terms
+     * The forces (linear or rotational) acting on the joints due to centrifugal and
+     * Coriolis effects, for a specific configuration.
      */
     ///@{
-    void C_terms_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Velocity& base_link_v, const JointState& q, const JointState& qd);
-    void C_terms_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Velocity& base_link_v, const JointState& qd);
+    void C_terms(JointState& jForces, const JointState& q, const JointState& qd);
+    void C_terms(JointState& jForces, const JointState& qd);
     ///@}
     /** Updates all the kinematics transforms used by the inverse dynamics routine. */
     void setJointStatus(const JointState& q) const;
@@ -172,7 +125,6 @@ public:
      * of the links is unaffected by the computation of the gravity terms).
      */
     ///@{
-    const Force& getForce_base_link() const { return base_link_f; }
     const Velocity& getVelocity_arm1() const { return arm1_v; }
     const Acceleration& getAcceleration_arm1() const { return arm1_a; }
     const Force& getForce_arm1() const { return arm1_f; }
@@ -181,7 +133,8 @@ public:
     const Force& getForce_arm2() const { return arm2_f; }
     ///@}
 protected:
-    void secondPass_fullyActuated(JointState& jForces);
+    void firstPass(const JointState& qd, const JointState& qdd, const ExtForces& fext);
+    void secondPass(JointState& jForces);
 
 private:
     IProperties* inertiaProps;
@@ -199,13 +152,6 @@ private:
     Acceleration  arm2_a;
     Force         arm2_f;
 
-    // The robot base
-    const InertiaMatrix& base_link_I;
-    InertiaMatrix base_link_Ic;
-    Force         base_link_f;
-    // The composite inertia tensors
-    InertiaMatrix arm1_Ic;
-    const InertiaMatrix& arm2_Ic;
 
 private:
     static const ExtForces zeroExtForces;
@@ -219,44 +165,27 @@ inline void InverseDynamics<TRAIT>::setJointStatus(const JointState& q) const
 }
 
 template <typename TRAIT>
+inline void InverseDynamics<TRAIT>::G_terms(JointState& jForces, const JointState& q)
+{
+    setJointStatus(q);
+    G_terms(jForces);
+}
+
+template <typename TRAIT>
+inline void InverseDynamics<TRAIT>::C_terms(JointState& jForces, const JointState& q, const JointState& qd)
+{
+    setJointStatus(q);
+    C_terms(jForces, qd);
+}
+
+template <typename TRAIT>
 inline void InverseDynamics<TRAIT>::id(
-    JointState& jForces, Acceleration& base_link_a,
-    const Acceleration& g, const Velocity& base_link_v,
+    JointState& jForces,
     const JointState& q, const JointState& qd, const JointState& qdd,
     const ExtForces& fext)
 {
     setJointStatus(q);
-    id(jForces, base_link_a, g, base_link_v,
-       qd, qdd, fext);
-}
-
-template <typename TRAIT>
-inline void InverseDynamics<TRAIT>::G_terms_fully_actuated(
-    Force& baseWrench, JointState& jForces,
-    const Acceleration& g, const JointState& q)
-{
-    setJointStatus(q);
-    G_terms_fully_actuated(baseWrench, jForces, g);
-}
-
-template <typename TRAIT>
-inline void InverseDynamics<TRAIT>::C_terms_fully_actuated(
-    Force& baseWrench, JointState& jForces,
-    const Velocity& base_link_v, const JointState& q, const JointState& qd)
-{
-    setJointStatus(q);
-    C_terms_fully_actuated(baseWrench, jForces, base_link_v, qd);
-}
-
-template <typename TRAIT>
-inline void InverseDynamics<TRAIT>::id_fully_actuated(
-        Force& baseWrench, JointState& jForces,
-        const Acceleration& g, const Velocity& base_link_v, const Acceleration& baseAccel,
-        const JointState& q, const JointState& qd, const JointState& qdd, const ExtForces& fext)
-{
-    setJointStatus(q);
-    id_fully_actuated(baseWrench, jForces, g, base_link_v,
-        baseAccel, qd, qdd, fext);
+    id(jForces, qd, qdd, fext);
 }
 
 }

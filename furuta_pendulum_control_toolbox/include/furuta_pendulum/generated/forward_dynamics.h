@@ -61,10 +61,6 @@ public:
      */ ///@{
     /**
      * \param qdd the joint accelerations vector (output parameter).
-     * \param base_link_a
-     * \param base_link_v
-     * \param g the gravity acceleration vector, expressed in the
-     *          base coordinates
      * \param q the joint status vector
      * \param qd the joint velocities vector
      * \param tau the joint forces (torque or force)
@@ -73,12 +69,10 @@ public:
      *              exerted on.
      */
     void fd(
-       JointState& qdd, Acceleration& base_link_a, // output parameters,
-       const Velocity& base_link_v, const Acceleration& g,
-       const JointState& q, const JointState& qd, const JointState& tau, const ExtForces& fext = zeroExtForces);
+        JointState& qdd, // output parameter
+        const JointState& q, const JointState& qd, const JointState& tau, const ExtForces& fext = zeroExtForces);
     void fd(
-        JointState& qdd, Acceleration& base_link_a, // output parameters,
-        const Velocity& base_link_v, const Acceleration& g,
+        JointState& qdd, // output parameter
         const JointState& qd, const JointState& tau, const ExtForces& fext = zeroExtForces);
     ///@}
 
@@ -91,9 +85,6 @@ private:
 
     Matrix66S vcross; // support variable
     Matrix66S Ia_r;   // support variable, articulated inertia in the case of a revolute joint
-    // Link 'base_link'
-    Matrix66S base_link_AI;
-    Force base_link_p;
 
     // Link 'arm1' :
     Matrix66S arm1_AI;
@@ -127,15 +118,14 @@ inline void ForwardDynamics<TRAIT>::setJointStatus(const JointState& q) const {
 
 template <typename TRAIT>
 inline void ForwardDynamics<TRAIT>::fd(
-    JointState& qdd, Acceleration& base_link_a, // output parameters,
-    const Velocity& base_link_v, const Acceleration& g,
+    JointState& qdd,
     const JointState& q,
     const JointState& qd,
     const JointState& tau,
     const ExtForces& fext/* = zeroExtForces */)
 {
     setJointStatus(q);
-    fd(qdd, base_link_a, base_link_v, g, qd, tau, fext);
+    fd(qdd, qd, tau, fext);
 }
 
 }

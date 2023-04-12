@@ -10,7 +10,6 @@ iit::rbd::Vector3d iit::FurutaPendulum::getWholeBodyCOM(
 {
     iit::rbd::Vector3d tmpSum(iit::rbd::Vector3d::Zero());
 
-    tmpSum += inertiaProps.getCOM_base_link() * inertiaProps.getMass_base_link();
 
     HomogeneousTransforms::MatrixType tmpX(HomogeneousTransforms::MatrixType::Identity());
     tmpX = tmpX * ht.fr_base_link_X_fr_arm1;

@@ -42,7 +42,7 @@ struct Traits {
 
     static const int joints_count = FurutaPendulum::jointsCount;
     static const int links_count  = FurutaPendulum::linksCount;
-    static const bool floating_base = true;
+    static const bool floating_base = false;
 
     static inline const JointID* orderedJointIDs();
     static inline const LinkID*  orderedLinkIDs();

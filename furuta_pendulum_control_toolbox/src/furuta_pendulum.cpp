@@ -7,7 +7,7 @@
 using namespace ct::rbd;
 
 const size_t njoints = ct::rbd::FurutaPendulum::Kinematics::NJOINTS;
-const size_t actuator_state_dim = 1;
+const size_t actuator_state_dim = 2;
 
 using RobotState_t = ct::rbd::FixBaseRobotState<njoints, actuator_state_dim>;
 static const size_t state_dim = RobotState_t::NSTATE;
