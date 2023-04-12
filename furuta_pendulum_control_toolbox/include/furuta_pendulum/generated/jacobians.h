@@ -29,10 +29,40 @@ class Jacobians {
 
         typedef JointState<Scalar> JState;
 
+        class Type_fr_base_link_J_fr_arm2 : public JacobianT<Scalar, 2, Type_fr_base_link_J_fr_arm2>
+        {
+        public:
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+            Type_fr_base_link_J_fr_arm2();
+            const Type_fr_base_link_J_fr_arm2& update(const JState&);
+        protected:
+        };
+        
+        class Type_fr_base_link_J_fr_arm1 : public JacobianT<Scalar, 1, Type_fr_base_link_J_fr_arm1>
+        {
+        public:
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+            Type_fr_base_link_J_fr_arm1();
+            const Type_fr_base_link_J_fr_arm1& update(const JState&);
+        protected:
+        };
+        
+        class Type_fr_base_link_J_fr_ee : public JacobianT<Scalar, 2, Type_fr_base_link_J_fr_ee>
+        {
+        public:
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+            Type_fr_base_link_J_fr_ee();
+            const Type_fr_base_link_J_fr_ee& update(const JState&);
+        protected:
+        };
+        
     public:
         Jacobians();
         void updateParameters();
     public:
+        Type_fr_base_link_J_fr_arm2 fr_base_link_J_fr_arm2;
+        Type_fr_base_link_J_fr_arm1 fr_base_link_J_fr_arm1;
+        Type_fr_base_link_J_fr_ee fr_base_link_J_fr_ee;
 
     protected:
 
