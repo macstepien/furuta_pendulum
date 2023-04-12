@@ -22,20 +22,23 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(ct_test src/ct_test.cpp)
-target_link_libraries(ct_test ct_core)
+# add_executable(ct_test src/ct_test.cpp)
+# target_link_libraries(ct_test ct_core)
 
-add_executable(NLOC_MPC src/NLOC_MPC.cpp)
-target_link_libraries(NLOC_MPC ct_core ct_rbd ct_models)
+# add_executable(NLOC_MPC src/NLOC_MPC.cpp)
+# target_link_libraries(NLOC_MPC ct_core ct_rbd ct_models)
 
-add_executable(furuta_pendulum_nloc src/furuta_pendulum_nloc.cpp)
-target_link_libraries(furuta_pendulum_nloc ct_core ct_rbd ct_models)
+# add_executable(furuta_pendulum_nloc src/furuta_pendulum_nloc.cpp)
+# target_link_libraries(furuta_pendulum_nloc ct_core ct_rbd ct_models)
 
-add_executable(furuta_pendulum_lqr src/furuta_pendulum_lqr.cpp)
-target_link_libraries(furuta_pendulum_lqr ct_core ct_rbd ct_models)
+# add_executable(furuta_pendulum_lqr src/furuta_pendulum_lqr.cpp)
+# target_link_libraries(furuta_pendulum_lqr ct_core ct_rbd ct_models)
+
+add_executable(simulate_furuta_pendulum src/simulate_furuta_pendulum.cpp)
+target_link_libraries(simulate_furuta_pendulum ct_core ct_rbd)
 
 install(
-  TARGETS ct_test NLOC_MPC furuta_pendulum_nloc furuta_pendulum_lqr
+  TARGETS simulate_furuta_pendulum
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
