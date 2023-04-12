@@ -73,8 +73,8 @@ int main()
     std::string workingDirectory =
       "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/config";
 
-    std::string configFile = workingDirectory + "/solver.info";
-    std::string costFunctionFile = workingDirectory + "/cost.info";
+    std::string configFile = workingDirectory + "/solver_furuta_pendulum.info";
+    std::string costFunctionFile = workingDirectory + "/cost_furuta_pendulum.info";
 
     const double k_spring = 160;
     const double gear_ratio = 50;
