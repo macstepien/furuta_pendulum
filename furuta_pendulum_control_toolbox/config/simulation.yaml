@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    simulation_dt: 0.001
+
+    initial_conditions:
+      theta1: 0.0
+      theta2: 3.0
+
+      dtheta1: 3.0
+      dtheta2: 0.0

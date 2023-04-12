@@ -7,6 +7,11 @@ endif()
 
 set(PACKAGE_INCLUDE_DEPENDS
   ament_cmake
+  Eigen3
+  rclcpp
+  rclcpp_components
+  std_msgs
+  sensor_msgs
   ct_core
   ct_optcon
   ct_rbd
@@ -40,6 +45,29 @@ target_link_libraries(simulate_furuta_pendulum ct_core ct_rbd)
 install(
   TARGETS simulate_furuta_pendulum
   RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+add_library(simulate_furuta_pendulum_ros SHARED 
+  src/simulate_furuta_pendulum_ros_node.cpp)
+
+ament_target_dependencies(simulate_furuta_pendulum_ros 
+  ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd)
+rclcpp_components_register_nodes(simulate_furuta_pendulum_ros
+  "furuta_pendulum_control_toolbox::CtSimulationNode")
+rclcpp_components_register_node(simulate_furuta_pendulum_ros
+  PLUGIN "furuta_pendulum_control_toolbox::CtSimulationNode"
+  EXECUTABLE simulate_furuta_pendulum_ros_node
+)
+
+install(
+  TARGETS simulate_furuta_pendulum_ros
+  LIBRARY DESTINATION lib
+)
+
+install(DIRECTORY
+  config
+  launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 ament_package()
