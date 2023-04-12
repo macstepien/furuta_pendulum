@@ -36,14 +36,14 @@ include_directories(
 # add_executable(furuta_pendulum_nloc src/furuta_pendulum_nloc.cpp)
 # target_link_libraries(furuta_pendulum_nloc ct_core ct_rbd ct_models)
 
-# add_executable(furuta_pendulum_lqr src/furuta_pendulum_lqr.cpp)
-# target_link_libraries(furuta_pendulum_lqr ct_core ct_rbd ct_models)
+add_executable(furuta_pendulum_lqr src/furuta_pendulum_lqr.cpp)
+target_link_libraries(furuta_pendulum_lqr ct_core ct_rbd ct_models)
 
 add_executable(simulate_furuta_pendulum src/simulate_furuta_pendulum.cpp)
 target_link_libraries(simulate_furuta_pendulum ct_core ct_rbd)
 
 install(
-  TARGETS simulate_furuta_pendulum
+  TARGETS simulate_furuta_pendulum furuta_pendulum_lqr
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 

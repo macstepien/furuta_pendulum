@@ -19,7 +19,10 @@
       "intelliSenseMode": "linux-clang-x64",
       "compilerPath": "/usr/bin/c++",
       "cStandard": "c17",
-      "cppStandard": "c++17"
+      "cppStandard": "c++17",
+      "defines": [
+        "CPPADCG",
+      ]
     }
   ],
   "version": 4
