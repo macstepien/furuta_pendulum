@@ -4,42 +4,37 @@ term0
   kind "quadratic"
   type 0              ; 0 = intermediate, 1 = final
 
+  ; Order:
+  ; joint 1 position
+  ; joint 2 position
+  ; joint 1 velocity
+  ; joint 2 velocity
+
+
   weights
   {
     ; state weighting
     Q
     {
-      scaling 10
-
-      ; joint position
+      scaling 1.0
+      (0,0)   0.0
+      (1,1)   10.0
+      (2,2)   1.0
       (3,3)   1.0
-
-      ; joint velocity
-      (4,4)   1.0
-
-      ; motor position
-      (2,2)   0.0
     }
 
     R
     {
-      scaling 0.02
-
-      ; motor velocity
-
-      (0,0) 0.1
+      scaling 1.0
+      (0,0) 1.0
     }
 
     x_des
     {
-      ; joint position
       (0,0)   0.0
-
-      ; joint velocity
-      (1,0)   0.0
-
-      ; motor position
+      (1,0)   3.14159265
       (2,0)   0.0
+      (3,0)   0.0
     }
   }
 }
@@ -56,28 +51,19 @@ term1
     ; state weighting
     Q
     {
-      scaling 10
-
-      ; joint position
+      scaling 1.0
+      (0,0)   0.0
+      (1,1)   10.0
+      (2,2)   1.0
       (3,3)   1.0
-
-      ; joint velocity
-      (4,4)   1.0
-
-        ; motor position
-      (2,2)   0.0
     }
 
     x_des
     {
-      ; joint position
       (0,0)   0.0
-
-      ; joint velocity
-      (1,0)    0.0
-
-      ; motor pos
+      (1,0)   3.14159265
       (2,0)   0.0
+      (3,0)   0.0
     }
   }
 }
@@ -86,26 +72,20 @@ term1
 ; initial position
 x_0
 {
-  ; joint position
-  (0,0)   -3.14
-
-  ; joint velocity
+  (0,0)   0.0
   (1,0)   0.0
-
-  ; actuator position
-  (2,0)   -3.14
+  (2,0)   0.0
+  (3,0)   0.0
 }
 
 
 K_init
 {
   scaling 0.0
-
-  ; joint position
   (0,0)   0.0
-
-  ; joint velocity
   (1,0)   0.0
+  (2,0)   0.0
+  (3,0)   0.0
 }
 
 

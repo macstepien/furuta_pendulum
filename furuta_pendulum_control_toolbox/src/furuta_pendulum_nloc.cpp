@@ -3,21 +3,23 @@
 
 #include <ct/rbd/rbd.h>
 #include <furuta_pendulum/FurutaPendulum.h>
+#include <furuta_pendulum/FurutaPendulumSystem.h>
+#include <furuta_pendulum/FurutaPendulumNLOC.h>
+#include <furuta_pendulum/FurutaPendulumNLOC-impl.h>
 
 using namespace ct::rbd;
 
 const size_t njoints = ct::rbd::FurutaPendulum::Kinematics::NJOINTS;
-const size_t actuator_state_dim = 2;
 
-using RobotState_t = ct::rbd::FixBaseRobotState<njoints, actuator_state_dim>;
+using RobotState_t = ct::rbd::FixBaseRobotState<njoints>;
 static const size_t state_dim = RobotState_t::NSTATE;
-static const size_t control_dim = njoints;
+static const size_t control_dim = 1;
 
 using IPDynamics = ct::rbd::FurutaPendulum::tpl::Dynamics<double>;
-using IPSystem = ct::rbd::FixBaseFDSystem<IPDynamics, actuator_state_dim, false>;
+using IPSystem = ct::rbd::FurutaPendulumSystem<IPDynamics>;
 using LinearSystem = ct::core::LinearSystem<state_dim, control_dim, double>;
 
-using FurutaPendulumNLOC = FixBaseNLOC<IPSystem>;
+using FurutaPendulumNLOCSystem = FurutaPendulumNLOC<IPSystem>;
 
 class MPCSimulator : public ct::core::ControlSimulator<IPSystem>
 {
@@ -76,12 +78,7 @@ int main()
     std::string configFile = workingDirectory + "/solver_furuta_pendulum.info";
     std::string costFunctionFile = workingDirectory + "/cost_furuta_pendulum.info";
 
-    const double k_spring = 160;
-    const double gear_ratio = 50;
-
-    std::shared_ptr<ct::rbd::SEADynamicsFirstOrder<njoints>> actuatorDynamics(
-      new ct::rbd::SEADynamicsFirstOrder<njoints>(k_spring, gear_ratio));
-    std::shared_ptr<IPSystem> ipSystem(new IPSystem(actuatorDynamics));
+    std::shared_ptr<IPSystem> ipSystem(new IPSystem());
 
     // NLOC settings
     ct::optcon::NLOptConSettings nloc_settings;
@@ -101,7 +98,7 @@ int main()
     /*size_t finalTermID = */ newCost->addFinalTerm(termQuadFinal);
 
     ct::core::Time timeHorizon;
-    FurutaPendulumNLOC::FeedbackArray::value_type fbD;
+    FurutaPendulumNLOCSystem::FeedbackArray::value_type fbD;
     RobotState_t x0;
     RobotState_t xf;
 
@@ -118,14 +115,14 @@ int main()
     ct::optcon::ContinuousOptConProblem<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM> optConProblem(
       timeHorizon, x0.toStateVector(), ipSystem, newCost, linSystem);
 
-    FurutaPendulumNLOC nloc_solver(newCost, nloc_settings, ipSystem, verbose, linSystem);
+    FurutaPendulumNLOCSystem nloc_solver(newCost, nloc_settings, ipSystem, verbose, linSystem);
 
     int K = nloc_solver.getSettings().computeK(timeHorizon);
 
-    FurutaPendulumNLOC::StateVectorArray stateRefTraj(K + 1, x0.toStateVector());
-    FurutaPendulumNLOC::FeedbackArray fbTrajectory(K, -fbD);
-    FurutaPendulumNLOC::ControlVectorArray ffTrajectory(
-      K, FurutaPendulumNLOC::ControlVector::Zero());
+    FurutaPendulumNLOCSystem::StateVectorArray stateRefTraj(K + 1, x0.toStateVector());
+    FurutaPendulumNLOCSystem::FeedbackArray fbTrajectory(K, -fbD);
+    FurutaPendulumNLOCSystem::ControlVectorArray ffTrajectory(
+      K, FurutaPendulumNLOCSystem::ControlVector::Zero());
 
     int initType = 0;
     ct::core::loadScalar(configFile, "initType", initType);
@@ -145,11 +142,11 @@ int main()
         }
         break;
       }
-      case 1:  // linear interpolation
-      {
-        nloc_solver.initializeDirectInterpolation(x0, xf, timeHorizon, K, -fbD);
-        break;
-      }
+      // case 1:  // linear interpolation
+      // {
+      //   nloc_solver.initializeDirectInterpolation(x0, xf, timeHorizon, K, -fbD);
+      //   break;
+      // }
       default: {
         throw std::runtime_error("illegal init type");
         break;
@@ -162,7 +159,7 @@ int main()
     nloc_solver.solve();
     ct::core::StateFeedbackController<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM> initialSolution =
       nloc_solver.getSolution();
-    FurutaPendulumNLOC::StateVectorArray x_nloc = initialSolution.x_ref();
+    FurutaPendulumNLOCSystem::StateVectorArray x_nloc = initialSolution.x_ref();
 
     ct::optcon::NLOptConSettings ilqr_settings_mpc(nloc_solver.getSettings());
     ilqr_settings_mpc.max_iterations = 1;
