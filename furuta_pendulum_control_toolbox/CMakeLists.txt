@@ -64,6 +64,13 @@ install(
   LIBRARY DESTINATION lib
 )
 
+add_executable(furuta_pendulum_nloc_ros_node src/furuta_pendulum_nloc_ros_node.cpp)
+ament_target_dependencies(furuta_pendulum_nloc_ros_node ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd ct_models)
+
+install(
+  TARGETS furuta_pendulum_nloc_ros_node
+  DESTINATION lib/${PROJECT_NAME})
+
 install(DIRECTORY
   config
   launch
