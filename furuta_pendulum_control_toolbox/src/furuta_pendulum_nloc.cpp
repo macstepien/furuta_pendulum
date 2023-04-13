@@ -178,12 +178,18 @@ int main()
       ilqr_mpc(optConProblem, ilqr_settings_mpc, mpc_settings);
     ilqr_mpc.setInitialGuess(initialSolution);
 
-    ct::core::Time sim_dt = 1e-3;
-    ct::core::Time control_dt = 1e-2;
+    ct::core::Time sim_dt;
+    ct::core::loadScalar(configFile, "sim_dt", sim_dt);
+
+    ct::core::Time control_dt;
+    ct::core::loadScalar(configFile, "control_dt", control_dt);
+
+    double simulation_time;
+    ct::core::loadScalar(configFile, "simulation_time", simulation_time);
 
     MPCSimulator mpc_sim(sim_dt, control_dt, x0, ipSystem, ilqr_mpc);
     std::cout << "simulating 3 seconds" << std::endl;
-    mpc_sim.simulate(3.0);
+    mpc_sim.simulate(simulation_time);
     mpc_sim.finish();
 
     ilqr_mpc.printMpcSummary();

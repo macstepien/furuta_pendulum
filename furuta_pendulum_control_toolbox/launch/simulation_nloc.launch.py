@@ -5,9 +5,7 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import (
-    IncludeLaunchDescription,
-)
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.substitutions import (
     PathJoinSubstitution,
 )
@@ -67,7 +65,7 @@ def generate_launch_description():
     actions = [
         description_launch,
         rviz_node,
-        furuta_pendulum_simulation_node,
+        TimerAction(period=4.0, actions=[furuta_pendulum_simulation_node]),
     ]
 
     return LaunchDescription(actions)

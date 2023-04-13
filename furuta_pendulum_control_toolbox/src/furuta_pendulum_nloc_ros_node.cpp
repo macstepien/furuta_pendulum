@@ -34,6 +34,8 @@ using FurutaPendulumNLOCSystem = FurutaPendulumNLOC<IPSystem>;
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 
+#include <furuta_pendulum/FurutaPendulumControlSimulator.h>
+
 class MPCSimulator : public ct::core::ControlSimulator<IPSystem>, public rclcpp::Node
 {
 public:
@@ -48,7 +50,7 @@ public:
     controller_.reset(new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
     joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 
-    simulate(3.0);
+    simulate(100.0);
   }
 
   void finishSystemIteration(ct::core::Time) override
@@ -217,13 +219,23 @@ int main(int argc, char * argv[])
       ilqr_mpc(optConProblem, ilqr_settings_mpc, mpc_settings);
     ilqr_mpc.setInitialGuess(initialSolution);
 
-    ct::core::Time sim_dt = 1e-3;
-    ct::core::Time control_dt = 1e-2;
+    ct::core::Time sim_dt;
+    ct::core::loadScalar(configFile, "sim_dt", sim_dt);
+
+    ct::core::Time control_dt;
+    ct::core::loadScalar(configFile, "control_dt", control_dt);
+
+    double simulation_time;
+    ct::core::loadScalar(configFile, "simulation_time", simulation_time);
 
     std::cout << "simulating 3 seconds" << std::endl;
 
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<MPCSimulator>(sim_dt, control_dt, x0, ipSystem, ilqr_mpc));
+
+    rclcpp::spin(std::make_shared<ct::core::FurutaPendulumControlSimulator<IPSystem>>(
+      sim_dt, control_dt, x0.toStateVector(), ipSystem, ilqr_mpc));
+
+    // rclcpp::spin(std::make_shared<MPCSimulator>(sim_dt, control_dt, x0, ipSystem, ilqr_mpc));
     // std::shared_ptr<MPCSimulator> mpc_sim =
     //   std::make_shared<MPCSimulator>(sim_dt, control_dt, x0, ipSystem, ilqr_mpc);
     // rclcpp::spin(mpc_sim->get_node_base_interface());

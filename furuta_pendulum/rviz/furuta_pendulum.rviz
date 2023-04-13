@@ -82,6 +82,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: true
@@ -101,16 +105,19 @@ Visualization Manager:
           Value: true
         base_link:
           Value: true
+        world:
+          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        base_link:
-          arm1:
-            arm2:
-              {}
+        world:
+          base_link:
+            arm1:
+              arm2:
+                {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -166,9 +173,9 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.03712475672364235
+        Y: -0.08805254101753235
+        Z: 0.17194092273712158
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
