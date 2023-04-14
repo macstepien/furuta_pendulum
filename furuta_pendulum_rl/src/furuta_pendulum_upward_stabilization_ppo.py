@@ -7,7 +7,7 @@ from stable_baselines3.common.env_util import make_vec_env
 max_episode_steps = 200
 register(
     id="FurutaPendulum-v0",
-    entry_point="furuta_pendulum:FurutaPendulumEnv",
+    entry_point="furuta_pendulum_upward_stabilization:FurutaPendulumEnv",
     max_episode_steps=max_episode_steps,
 )
 
