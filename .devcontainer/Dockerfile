@@ -27,6 +27,16 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
+# Drake
 # https://drake.mit.edu/apt.html#stable-releases
 # To have working executable after installation
 # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/drake/lib/
+
+# Mujoco
+# echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/husarion/.mujoco/mujoco210/bin" >> /home/maciej/.bashrc
+# echo "export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGLEW.so" >> /home/maciej/.bashrc
+# pip install git+https://github.com/carlosluis/stable-baselines3@fix_tests
+# pip install mujoco
+# pip install tensorboard
+# pip install stable-baselines3[extra]
+# pip install imageio

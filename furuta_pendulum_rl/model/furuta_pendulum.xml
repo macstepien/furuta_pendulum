@@ -1,0 +1,45 @@
+<mujoco model="furuta_pendulum">
+  <!-- World settings -->
+  <compiler angle="radian" />
+  <size njmax="500" nconmax="100" />
+  <option timestep="0.001" />
+
+  <asset>
+    <texture name="texplane" type="2d" builtin="checker" rgb1="0.26 0.12 0.36"
+      rgb2="0.23 0.09 0.33" width="512" height="512" mark="cross" markrgb=".8 .8 .8" />
+    <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278"
+      rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01" />
+    <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1"
+      texuniform="true" />
+    <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1" />
+  </asset>
+  <visual>
+    <headlight ambient="0.6 0.6 0.6" diffuse="0.5 0.5 0.5" specular="0.2 0.2 0.2" />
+    <map znear="0.001" />
+  </visual>
+
+  <worldbody>
+    <!-- Floor -->
+    <geom contype="1" friction=".5 0.005 0.0001" name="floor" pos="0 0 0.0" size="0 0 .25"
+      type="plane" material="matplane" condim="3" />
+
+    <!-- Pendulum -->
+    <geom size="0.1 0.175" pos="0 0 0.175" type="cylinder" rgba="0.8 0.8 0.8 1" />
+    <body name="arm1" pos="0 0 0.37">
+      <inertial pos="0.15 0 0" quat="0.5 0.5 0.5 0.5" mass="0.3"
+        diaginertia="0.0248 0.0248 1e-06" />
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" damping="0.0001" />
+      <geom size="0.02 0.139" pos="0.139 0 0" quat="0.707107 0 0.707107 0" type="cylinder"
+        rgba="0.8 0.8 0.8 1" />
+      <body name="arm2" pos="0.278 0 0" quat="1 0 0 0">
+        <inertial pos="0 0 0.148" mass="0.075" diaginertia="0.00386 0.00386 1e-06" />
+        <joint name="joint2" pos="0 0 0" axis="1 0 0" damping="0.00028" />
+        <geom size="0.02 0.15" pos="0 0 0.15" type="cylinder" rgba="0.8 0.8 0.8 1" />
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="1.0" joint="joint1" />
+  </actuator>
+</mujoco>

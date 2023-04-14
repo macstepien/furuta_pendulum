@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<robot name="furuta_pendulum">
+  <material name="grey">
+    <color rgba="0.8 0.8 0.8 1.0" />
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175" />
+      <geometry>
+        <cylinder length="0.35" radius="0.1" />
+      </geometry>
+      <material name="grey" />
+    </visual>
+    <collision>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175" />
+      <geometry>
+        <cylinder length="0.35" radius="0.1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="10.0" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+  </link>
+
+  <joint name="joint1" type="continuous">
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.37" />
+    <parent link="base_link" />
+    <child link="arm1" />
+    <axis xyz="0 0 1" />
+    <dynamics damping="0.0001" />
+    <limit effort="4.0" velocity="15.0" />
+  </joint>
+
+  <link name="arm1">
+    <visual>
+      <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.139 0.0 0.0" />
+      <geometry>
+        <cylinder length="0.278" radius="0.02" />
+      </geometry>
+      <material name="grey" />
+    </visual>
+    <collision>
+      <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.139 0.0 0.0" />
+      <geometry>
+        <cylinder length="0.278" radius="0.02" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.3" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.15 0.0 0.0" />
+      <inertia ixx="1e-06" ixy="0.0" ixz="0.0" iyy="0.0248" iyz="0.0" izz="0.0248" />
+    </inertial>
+  </link>
+
+  <joint name="joint2" type="continuous">
+    <!-- -pi rotation so that for 0 pendulum is downward -->
+    <origin rpy="-3.141592653589793 0.0 0.0" xyz="0.278 0.0 0.0" />
+    <parent link="arm1" />
+    <child link="arm2" />
+    <axis xyz="1 0 0" />
+    <dynamics damping="0.00028" />
+    <limit effort="4.0" velocity="15.0" />
+  </joint>
+
+  <link name="arm2">
+    <visual>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.15" />
+      <geometry>
+        <cylinder length="0.3" radius="0.02" />
+      </geometry>
+      <material name="grey" />
+    </visual>
+    <collision>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.15" />
+      <geometry>
+        <cylinder length="0.3" radius="0.02" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.075" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.148" />
+      <inertia ixx="0.00386" ixy="0.0" ixz="0.0" iyy="0.00386" iyz="0.0" izz="1e-06" />
+    </inertial>
+  </link>
+</robot>
