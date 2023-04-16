@@ -40,15 +40,17 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         ob = self._get_obs()
         reward = self.calculate_reward(ob, action)
 
-        if np.abs(ob[1]) < 0.1:
-            self.upward_count += 1
-            reward += 10.0
-        else:
-            self.upward_count = 0
+        # Agent is much more robust when translating it to other 
+        # environments without this additional rewards
+        # if np.abs(ob[1]) < 0.1:
+        #     self.upward_count += 1
+        #     reward += 10.0
+        # else:
+        #     self.upward_count = 0
 
         terminated = bool(not np.isfinite(ob).all())
-        if self.upward_count > 40:
-            terminated = True
+        # if self.upward_count > 40:
+        #     terminated = True
 
         if self.render_mode == "human":
             self.render()
