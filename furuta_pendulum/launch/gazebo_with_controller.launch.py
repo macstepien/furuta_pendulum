@@ -33,6 +33,6 @@ def generate_launch_description():
             )
         ),
     )
-    actions = [simulation_launch, TimerAction(period=8.0, actions=[controller_launch])]
+    actions = [simulation_launch, TimerAction(period=4.0, actions=[controller_launch])]
 
     return LaunchDescription(actions)
