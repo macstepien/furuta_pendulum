@@ -23,10 +23,17 @@ def generate_launch_description():
             )
         ),
     )
-    furuta_pendulum_rl_controller_node = Node(
-        package="furuta_pendulum_rl",
-        executable="rl_controller_node",
+    controller_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("furuta_pendulum_rl"),
+                    "launch",
+                    "controller.launch.py",
+                ]
+            )
+        ),
     )
-    actions = [simulation_launch, TimerAction(period=4.0, actions=[furuta_pendulum_rl_controller_node])]
+    actions = [simulation_launch, TimerAction(period=4.0, actions=[controller_launch])]
 
     return LaunchDescription(actions)
