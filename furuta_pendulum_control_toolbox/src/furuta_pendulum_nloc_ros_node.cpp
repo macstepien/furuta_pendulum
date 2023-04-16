@@ -1,11 +1,24 @@
 // Based on NLOC_MPC example from control_toolbox library
 // https://github.com/ethz-adrl/control-toolbox/blob/v3.0.2/ct_models/examples/mpc/InvertedPendulum/NLOC_MPC.cpp
 
+#include <chrono>
+#include <memory>
+#include <algorithm>
+
+#include <Eigen/Dense>
+
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <geometry_msgs/msg/point_stamped.hpp>
+
 #include <ct/rbd/rbd.h>
+
 #include <furuta_pendulum/FurutaPendulum.h>
 #include <furuta_pendulum/FurutaPendulumSystem.h>
 #include <furuta_pendulum/FurutaPendulumNLOC.h>
 #include <furuta_pendulum/FurutaPendulumNLOC-impl.h>
+#include <furuta_pendulum/FurutaPendulumControlSimulator.h>
 
 using namespace ct::rbd;
 
@@ -20,94 +33,6 @@ using IPSystem = ct::rbd::FurutaPendulumSystem<IPDynamics>;
 using LinearSystem = ct::core::LinearSystem<state_dim, control_dim, double>;
 
 using FurutaPendulumNLOCSystem = FurutaPendulumNLOC<IPSystem>;
-
-#include <furuta_pendulum/FurutaPendulum.h>
-
-#include <chrono>
-#include <memory>
-#include <algorithm>
-
-#include <Eigen/Dense>
-
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/joint_state.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
-#include <geometry_msgs/msg/point_stamped.hpp>
-
-#include <furuta_pendulum/FurutaPendulumControlSimulator.h>
-
-class MPCSimulator : public ct::core::ControlSimulator<IPSystem>, public rclcpp::Node
-{
-public:
-  MPCSimulator(
-    ct::core::Time sim_dt, ct::core::Time control_dt, const RobotState_t & x0,
-    std::shared_ptr<IPSystem> ip_system,
-    ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc)
-  : ct::core::ControlSimulator<IPSystem>(sim_dt, control_dt, x0.toStateVector(), ip_system),
-    Node("furuta_pendulum_nloc_ros_node"),
-    mpc_(mpc)
-  {
-    controller_.reset(new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
-    joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
-
-    simulate(100.0);
-  }
-
-  void finishSystemIteration(ct::core::Time) override
-  {
-    control_mtx_.lock();
-    system_->setController(controller_);
-    control_mtx_.unlock();
-
-    state_mtx_.lock();
-    ct::core::StateVector<STATE_DIM> x_temp = x_;
-    state_mtx_.unlock();
-    PublishJointStates(x_temp);
-  }
-
-  void prepareControllerIteration(ct::core::Time sim_time) override
-  {
-    mpc_.prepareIteration(sim_time);
-  }
-  void finishControllerIteration(ct::core::Time sim_time) override
-  {
-    state_mtx_.lock();
-    ct::core::StateVector<STATE_DIM> x_temp = x_;
-    state_mtx_.unlock();
-
-    std::shared_ptr<ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>> new_controller(
-      new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
-
-    bool success = mpc_.finishIteration(x_temp, sim_time, *new_controller, controller_ts_);
-
-    if (!success) throw std::runtime_error("Failed to finish MPC iteration.");
-
-    control_mtx_.lock();
-    controller_ = new_controller;
-    control_mtx_.unlock();
-  }
-
-  void PublishJointStates(ct::core::StateVector<STATE_DIM> state)
-  {
-    sensor_msgs::msg::JointState joint_state_msg;
-    joint_state_msg.header.stamp = this->get_clock()->now();
-
-    joint_state_msg.name.push_back("joint1");
-    joint_state_msg.position.push_back(state(0));
-    joint_state_msg.velocity.push_back(state(2));
-
-    joint_state_msg.name.push_back("joint2");
-    joint_state_msg.position.push_back(state(1));
-    joint_state_msg.velocity.push_back(state(3));
-
-    joint_state_pub_->publish(joint_state_msg);
-  }
-
-private:
-  ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc_;
-  ct::core::Time controller_ts_;
-  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
-};
 
 int main(int argc, char * argv[])
 {
@@ -234,15 +159,6 @@ int main(int argc, char * argv[])
 
     rclcpp::spin(std::make_shared<ct::core::FurutaPendulumControlSimulator<IPSystem>>(
       sim_dt, control_dt, x0.toStateVector(), ipSystem, ilqr_mpc));
-
-    // rclcpp::spin(std::make_shared<MPCSimulator>(sim_dt, control_dt, x0, ipSystem, ilqr_mpc));
-    // std::shared_ptr<MPCSimulator> mpc_sim =
-    //   std::make_shared<MPCSimulator>(sim_dt, control_dt, x0, ipSystem, ilqr_mpc);
-    // rclcpp::spin(mpc_sim->get_node_base_interface());
-
-    // MPCSimulator mpc_sim(sim_dt, control_dt, x0, ipSystem, ilqr_mpc);
-    // mpc_sim.simulate(3.0);
-    // mpc_sim.finish();
 
     rclcpp::shutdown();
 
