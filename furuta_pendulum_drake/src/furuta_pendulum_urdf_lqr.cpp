@@ -148,11 +148,11 @@ void DoMain()
 
   Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(4, 4);
   Q(0, 0) = 0.0;
-  Q(1, 1) = 20.0;
-  Q(2, 2) = 10.0;
-  Q(3, 3) = 10.0;
+  Q(1, 1) = 10.0;
+  Q(2, 2) = 1.0;
+  Q(3, 3) = 1.0;
   // Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2, 2);
-  Vector1d R = Vector1d::Constant(10.0);
+  Vector1d R = Vector1d::Constant(1.0);
   Eigen::MatrixXd N;
 
   auto lqr = builder.AddSystem(systems::controllers::LinearQuadraticRegulator(
