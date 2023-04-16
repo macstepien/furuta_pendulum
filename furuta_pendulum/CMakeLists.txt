@@ -37,17 +37,17 @@ install(
   LIBRARY DESTINATION lib
 )
 
-add_library(controller SHARED 
+add_library(lqr_controller SHARED 
   src/controller_node.cpp)
-ament_target_dependencies(controller ${PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(controller "furuta_pendulum::ControllerNode")
-rclcpp_components_register_node(controller
+ament_target_dependencies(lqr_controller ${PACKAGE_INCLUDE_DEPENDS})
+rclcpp_components_register_nodes(lqr_controller "furuta_pendulum::ControllerNode")
+rclcpp_components_register_node(lqr_controller
   PLUGIN "furuta_pendulum::ControllerNode"
-  EXECUTABLE controller_node
+  EXECUTABLE lqr_controller_node
 )
 
 install(
-  TARGETS controller
+  TARGETS lqr_controller
   LIBRARY DESTINATION lib
 )
 
