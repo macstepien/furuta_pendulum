@@ -64,6 +64,21 @@ install(
   LIBRARY DESTINATION lib
 )
 
+add_library(controller SHARED 
+  src/controller_node.cpp)
+ament_target_dependencies(controller 
+  ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd)
+rclcpp_components_register_nodes(controller
+  "furuta_pendulum_control_toolbox::CtControllerNode")
+rclcpp_components_register_node(controller
+  PLUGIN "furuta_pendulum_control_toolbox::CtControllerNode"
+  EXECUTABLE controller_node
+)
+install(
+  TARGETS controller
+  LIBRARY DESTINATION lib
+)
+
 add_executable(furuta_pendulum_nloc_ros_node src/furuta_pendulum_nloc_ros_node.cpp)
 ament_target_dependencies(furuta_pendulum_nloc_ros_node ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd ct_models)
 

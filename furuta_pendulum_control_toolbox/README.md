@@ -109,7 +109,7 @@ sudo ./install_cppadcg.sh
 
 For some reason, it works correctly only in RelWithDebInfo
 
-colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+colcon build --symlink-install --packages-select furuta_pendulum_control_toolbox --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 in Release i got: 
 ```
