@@ -47,7 +47,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             self.upward_count = 0
 
         terminated = bool(not np.isfinite(ob).all())
-        if self.upward_count > 20:
+        if self.upward_count > 40:
             terminated = True
 
         if self.render_mode == "human":
@@ -57,7 +57,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
     def reset_model(self):
         qpos = self.init_qpos
         # set downward position
-        qpos[1] = -3.14159
+        qpos[1] = -3.14159265
         qvel = self.init_qvel
         self.set_state(qpos, qvel)
         return self._get_obs()
@@ -79,9 +79,9 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
     def calculate_reward(self, obs: np.array, a: np.array):
         theta1_weight = 0.0
         theta2_weight = 10.0
-        dtheta1_weight = 0.1
-        dtheta2_weight = 0.5
-        u_weight = 0.0
+        dtheta1_weight = 1.0
+        dtheta2_weight = 1.0
+        u_weight = 1.0
 
         Q = np.array(
             [
