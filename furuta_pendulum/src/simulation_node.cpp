@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/time.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
@@ -78,7 +79,7 @@ SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
 
   joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
   simulation_timer_ = this->create_wall_timer(
-    std::chrono::duration<double>(dt_), std::bind(&SimulationNode::Simulate, this));
+    std::chrono::duration<double>(dt_), std::bind(&SimulationNode::Simulate2, this));
 
   effort_sub_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
     "effort_control", 10, std::bind(&SimulationNode::SetEffortCb, this, std::placeholders::_1));
@@ -124,8 +125,11 @@ void SimulationNode::Simulate()
   ddtheta1_ = ddtheta(0);
   ddtheta2_ = ddtheta(1);
 
-  dtheta1_ = std::clamp(dtheta1_ + ddtheta1_ * dt_, -max_velocity_, max_velocity_);
-  dtheta2_ = std::clamp(dtheta2_ + ddtheta2_ * dt_, -max_velocity_, max_velocity_);
+  dtheta1_ = dtheta1_ + ddtheta1_ * dt_;
+  dtheta2_ = dtheta2_ + ddtheta2_ * dt_;
+
+  // dtheta1_ = std::clamp(dtheta1_ + ddtheta1_ * dt_, -max_velocity_, max_velocity_);
+  // dtheta2_ = std::clamp(dtheta2_ + ddtheta2_ * dt_, -max_velocity_, max_velocity_);
 
   theta1_ += dtheta1_ * dt_;
   theta2_ += dtheta2_ * dt_;
@@ -134,12 +138,121 @@ void SimulationNode::Simulate()
 
   // treat disturbance as impulse and set it back to 0.
   tau2_ = 0.0;
+
+  current_time_ += dt_;
+}
+
+Eigen::Vector4d SimulationNode::F(Eigen::Vector4d y)
+{
+  // based on https://www.hindawi.com/journals/jcse/2011/528341/
+
+  // theta3 = dtheta1
+  // theta4 = dtheta2
+  // dtheta3 = ddtheta1
+  // dtheta4 = ddtheta2
+  double theta1 = y(0);
+  double theta2 = y(1);
+  double theta3 = y(2);
+  double theta4 = y(3);
+
+  Eigen::Matrix<long double, 5, 1> vec11;
+  vec11(0) = -J2_hat_ * b1_;
+  vec11(1) = m2_ * L1_ * l2_ * cos(theta2) * b2_;
+  vec11(2) = -pow(J2_hat_, 2) * sin(2.0 * theta2);
+  vec11(3) = -0.5 * J2_hat_ * m2_ * L1_ * l2_ * cos(theta2) * sin(2.0 * theta2);
+  vec11(4) = J2_hat_ * m2_ * L1_ * l2_ * sin(theta2);
+
+  Eigen::Matrix<long double, 5, 1> vec21;
+  vec21(0) = m2_ * L1_ * l2_ * cos(theta2) * b1_;
+  vec21(1) = -b2_ * (J0_hat_ + J2_hat_ * pow(sin(theta2), 2));
+  vec21(2) = m2_ * L1_ * l2_ * J2_hat_ * cos(theta2) * sin(2.0 * theta2);
+  vec21(3) = -0.5 * sin(2.0 * theta2) * (J0_hat_ * J2_hat_ + pow(J2_hat_ * sin(theta2), 2));
+  vec21(4) = -0.5 * pow(m2_ * L1_ * l2_, 2) * sin(2.0 * theta2);
+
+  Eigen::Matrix<long double, 5, 1> thetas_vec;
+  thetas_vec(0) = theta3;
+  thetas_vec(1) = theta4;
+  thetas_vec(2) = theta3 * theta4;
+  thetas_vec(3) = pow(theta3, 2);
+  thetas_vec(4) = pow(theta4, 2);
+
+  Eigen::Matrix<long double, 3, 1> vec12;
+  vec12(0) = J2_hat_;
+  vec12(1) = -m2_ * L1_ * l2_ * cos(theta2);
+  vec12(2) = 0.5 * pow(m2_ * l2_, 2) * L1_ * sin(2.0 * theta2);
+
+  Eigen::Matrix<long double, 3, 1> vec22;
+  vec22(0) = -m2_ * L1_ * l2_ * cos(theta2);
+  vec22(1) = J0_hat_ + J2_hat_ * pow(sin(theta2), 2);
+  vec22(2) = -m2_ * l2_ * sin(theta2) * (J0_hat_ + J2_hat_ * pow(sin(theta2), 2));
+
+  Eigen::Matrix<long double, 3, 1> taus_g_vec;
+  taus_g_vec(0) = tau1_;
+  taus_g_vec(1) = tau2_;
+  taus_g_vec(2) = g_;
+
+  long double denominator =
+    J0_hat_ * J2_hat_ + pow(J2_hat_ * sin(theta2), 2) - pow(m2_ * L1_ * l2_ * cos(theta2), 2);
+
+  auto nominator1 = (vec11.transpose() * thetas_vec + vec12.transpose() * taus_g_vec);
+  auto nominator2 = (vec21.transpose() * thetas_vec + vec22.transpose() * taus_g_vec);
+
+  Eigen::Vector4d dy;
+  dy(0) = theta3;
+  dy(1) = theta4;
+  dy(2) = nominator1(0) / denominator;
+  dy(3) = nominator2(0) / denominator;
+
+  return dy;
+}
+
+Eigen::Vector4d SimulationNode::integrate_rk4(Eigen::Vector4d y_n)
+{
+  // y_n+1 = y_n + 1/6(k1+2k2+2k3+k4)dt
+  // t_n+1 = t_n + dt
+
+  // k1 = F(y_n)
+  // k2 = F(y_n + dt*k1/2)
+  // k3 = F(y_n + dt*k2/2)
+  // k4 = F(y_n + dt*k3)
+
+  Eigen::Vector4d k1 = F(y_n);
+  Eigen::Vector4d k2 = F(y_n + (dt_ / 2.0) * k1);
+  Eigen::Vector4d k3 = F(y_n + (dt_ / 2.0) * k2);
+  Eigen::Vector4d k4 = F(y_n + dt_ * k3);
+
+  Eigen::Vector4d y_n1 = y_n + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt_ / 6.0;
+  return y_n1;
+}
+
+void SimulationNode::Simulate2()
+{
+  Eigen::Vector4d y_n;
+  y_n(0) = theta1_;
+  y_n(1) = theta2_;
+  y_n(2) = dtheta1_;
+  y_n(3) = dtheta2_;
+
+  Eigen::Vector4d y_n1 = integrate_rk4(y_n);
+  theta1_ = y_n1(0);
+  theta2_ = y_n1(1);
+  dtheta1_ = y_n1(2);
+  dtheta2_ = y_n1(3);
+
+  PublishJointStates();
+
+  // treat disturbance as impulse and set it back to 0.
+  // tau2_ = 0.0;
+
+  current_time_ += dt_;
 }
 
 void SimulationNode::PublishJointStates()
 {
   sensor_msgs::msg::JointState joint_state_msg;
-  joint_state_msg.header.stamp = this->get_clock()->now();
+
+  joint_state_msg.header.stamp.sec = current_time_;
+  joint_state_msg.header.stamp.nanosec = (current_time_ - (int)current_time_) * 1000000000.0;
 
   joint_state_msg.name.push_back("joint1");
   joint_state_msg.position.push_back(theta1_);
