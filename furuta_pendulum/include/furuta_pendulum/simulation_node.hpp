@@ -31,7 +31,7 @@ private:
 
   long double theta1_, theta2_;
   long double dtheta1_, dtheta2_;
-  long double ddtheta1_, ddtheta2_;
+  long double ddtheta1_ = 0.0, ddtheta2_ = 0.0;
 
   long double tau1_, tau2_;
 

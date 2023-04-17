@@ -21,16 +21,12 @@ SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
   this->declare_parameter("initial_conditions.theta2", 0.0);
   this->declare_parameter("initial_conditions.dtheta1", 0.0);
   this->declare_parameter("initial_conditions.dtheta2", 0.0);
-  this->declare_parameter("initial_conditions.ddtheta1", 0.0);
-  this->declare_parameter("initial_conditions.ddtheta2", 0.0);
   this->declare_parameter("initial_conditions.tau1", 0.0);
   this->declare_parameter("initial_conditions.tau2", 0.0);
   theta1_ = this->get_parameter("initial_conditions.theta1").as_double();
   theta2_ = this->get_parameter("initial_conditions.theta2").as_double();
   dtheta1_ = this->get_parameter("initial_conditions.dtheta1").as_double();
   dtheta2_ = this->get_parameter("initial_conditions.dtheta2").as_double();
-  ddtheta1_ = this->get_parameter("initial_conditions.ddtheta1").as_double();
-  ddtheta2_ = this->get_parameter("initial_conditions.ddtheta2").as_double();
   tau1_ = this->get_parameter("initial_conditions.tau1").as_double();
   tau2_ = this->get_parameter("initial_conditions.tau2").as_double();
 
