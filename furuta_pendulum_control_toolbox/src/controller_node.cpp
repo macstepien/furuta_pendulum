@@ -50,8 +50,7 @@ public:
       std::string workingDirectory =
         "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/config";
 
-      std::string configFile = workingDirectory + "/solver_furuta_pendulum.info";
-      std::string costFunctionFile = workingDirectory + "/cost_furuta_pendulum.info";
+      std::string configFile = workingDirectory + "/nloc_config.info";
 
       std::shared_ptr<IPSystem> ipSystem(new IPSystem());
 
@@ -61,11 +60,11 @@ public:
 
       std::shared_ptr<ct::optcon::TermQuadratic<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>>
         termQuadInterm(new ct::optcon::TermQuadratic<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>);
-      termQuadInterm->loadConfigFile(costFunctionFile, "term0", verbose);
+      termQuadInterm->loadConfigFile(configFile, "term0", verbose);
 
       std::shared_ptr<ct::optcon::TermQuadratic<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>>
         termQuadFinal(new ct::optcon::TermQuadratic<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>);
-      termQuadFinal->loadConfigFile(costFunctionFile, "term1", verbose);
+      termQuadFinal->loadConfigFile(configFile, "term1", verbose);
 
       std::shared_ptr<
         ct::optcon::CostFunctionAnalytical<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>>
@@ -79,10 +78,10 @@ public:
       RobotState_t xf;
 
       ct::core::loadScalar(configFile, "timeHorizon", timeHorizon);
-      ct::core::loadMatrix(costFunctionFile, "K_init", fbD);
+      ct::core::loadMatrix(configFile, "K_init", fbD);
       RobotState_t::state_vector_t xftemp, x0temp;
-      ct::core::loadMatrix(costFunctionFile, "x_0", x0temp);
-      ct::core::loadMatrix(costFunctionFile, "term1.weights.x_des", xftemp);
+      ct::core::loadMatrix(configFile, "x_0", x0temp);
+      ct::core::loadMatrix(configFile, "term1.weights.x_des", xftemp);
       x0.fromStateVector(x0temp);
       xf.fromStateVector(xftemp);
 

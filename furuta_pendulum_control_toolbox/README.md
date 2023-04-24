@@ -1,26 +1,57 @@
 
-https://ethz-adrl.github.io/ct/ct_doc/doc/html/rbd_tut_modelling.html
+## Setup
 
-Generating kindsl
-https://github.com/leggedrobotics/urdf2robcogen
+Based on [tutorial from control_toolbox](https://ethz-adrl.github.io/ct/ct_doc/doc/html/rbd_tut_modelling.html).
 
+### Generating dtdsl and kindsl
+[urdf2robcogen](https://github.com/leggedrobotics/urdf2robcogen) is used. Clone this to repos into your ROS1 workspace:
+
+```
 git clone https://github.com/leggedrobotics/urdf2robcogen.git
-git clone  https://github.com/ANYbotics/kindr_ros.git
-rosrun urdf2robcogen urdf2robcogen_script FurutaPendulum /home/roomac/catkin_ws/src/roomac_ros/furuta_pendulum.urdf
+git clone https://github.com/ANYbotics/kindr_ros.git
+```
+Build and then run following command to generate `dtdsl` and `kindsl`:
+```
+rosrun urdf2robcogen urdf2robcogen_script FurutaPendulum /PATH_TO_URDF/furuta_pendulum.urdf
+```
+### Generating code
 
-https://robcogenteam.bitbucket.io/binary.html
-https://robcogenteam.bitbucket.io/usage.html
-
+[RobCoGen](https://robcogenteam.bitbucket.io/usage.html) is used in this step. First install dependency:
+```
 sudo apt install maxima
+```
 
-! has to bo version 0.4ad.0
-https://github.com/ethz-adrl/control-toolbox/issues/166
-Simply removing a "/" sign from the framework.properties configuration resolved this issue, like:
-generator.maxima.libs.path = ../etc/maxima-libs (do NOT use "/" at the end).
+Then download version `0.4ad.0` of RobCoGen from [this page](https://robcogenteam.bitbucket.io/binary.html). 
 
-./robcogen.sh /home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/model/FurutaPendulum.kindsl /home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/model/FurutaPendulum.dtdsl
-# you may now input 1, 4, and 28 to exit
+Then, before generating code, it is necessary to fix some problems.
+First ons is described in this [github issue](https://github.com/ethz-adrl/control-toolbox/issues/166), as in the issue I removed a "/" sign from the framework.properties (`generator.maxima.libs.path = ../etc/maxima-libs`, without "/" at the end).
 
+<!-- Fix:
+fatal error: iit/rbd/scalar_traits.h: No such file or directory
+    5 | #include <iit/rbd/scalar_traits.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~ -->
+Now install `iit`:
+```
+cd /PATH_TO_ROBCOGEN/robcogen-0.4ad.0/etc/cpp-iitrbd
+sudo ./install.sh 
+```
+
+Install dependencies (based on `install_deps.sh` control_toolbox, without running `install_cmake.sh`, as it caused problems with ROS2 building):
+```
+sudo apt-get update
+sudo apt install liblapack-dev libeigen3-dev coinor-libipopt-dev libboost-all-dev libomp-dev clang python3 python3-dev python3-numpy python3-matplotlib
+```
+Then navigate to your control_toolbox directory and:
+```
+cd ct
+sudo ./install_cppadcg.sh
+```
+
+Finally to generate code run:
+```
+./robcogen.sh /PATH_TO_KINDSL/FurutaPendulum.kindsl /PATH_TO_DTDSL/FurutaPendulum.dtdsl
+```
+You should see following menu:
 ```
  0 - CTDSL      - The coordinate transforms description file .ctdsl
 
@@ -62,54 +93,14 @@ generator.maxima.libs.path = ../etc/maxima-libs (do NOT use "/" at the end).
 What would you like to generate? Please enter the integer code:
 ```
 
-Fix:
-fatal error: iit/rbd/scalar_traits.h: No such file or directory
-    5 | #include <iit/rbd/scalar_traits.h>
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+Now select option 1, then 4 and 28 to exit. Model sources will be generated in the `robcogen-0.4ad.0/run/gen_code` directory.
 
-cd ~/ros2_ws/robcogen-0.5.2/etc/cpp-iitrbd
-sudo ./install.sh 
+## Building
 
-! in tmp it is generated for newer 0.5 version
-<!-- /tmp/gen$ cp -r cpp/ /home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/include/furuta_pendulum/ -->
-maciej@maciej:~/ros2_ws/robcogen-0.4ad.0/run/gen_code$ cp -r cpp ~/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/include/furuta_pendulum/
-
-#!/bin/bash
-
-sudo apt-get update
-
-## get lapack
-yes Y | sudo apt-get install liblapack-dev
-
-## get eigen3
-yes Y | sudo apt-get install libeigen3-dev
-
-
-## get IPOPT
-yes Y | sudo apt-get install coinor-libipopt-dev
-
-## get boost
-yes Y | sudo apt-get install libboost-all-dev
-
-## get open mp
-yes Y | sudo apt install libomp-dev
-
-## get clang
-yes Y | sudo apt install clang
-
-## get python 3 and related python packages
-yes Y | sudo apt install python3 python3-dev python3-numpy python3-matplotlib
-
-## get CppAD and CppADCodeGen
-sudo ./install_cppadcg.sh
-
-
-!!!!!!!!Important dont run ## get cmake sudo ./install_cmake.sh
-
-
-For some reason, it works correctly only in RelWithDebInfo
-
+For some reason, it works correctly only in `RelWithDebInfo`
+```
 colcon build --symlink-install --packages-select furuta_pendulum_control_toolbox --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+```
 
 in Release i got: 
 ```

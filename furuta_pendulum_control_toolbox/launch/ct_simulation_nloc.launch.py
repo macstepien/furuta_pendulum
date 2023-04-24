@@ -59,7 +59,7 @@ def generate_launch_description():
 
     furuta_pendulum_simulation_node = Node(
         package="furuta_pendulum_control_toolbox",
-        executable="furuta_pendulum_nloc_ros_node",
+        executable="ct_furuta_pendulum_nloc_ros_node",
     )
 
     actions = [

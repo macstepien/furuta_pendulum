@@ -27,40 +27,34 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-# add_executable(ct_test src/ct_test.cpp)
-# target_link_libraries(ct_test ct_core)
+add_executable(ct_furuta_pendulum_nloc src/ct_furuta_pendulum_nloc.cpp)
+target_link_libraries(ct_furuta_pendulum_nloc ct_core ct_rbd ct_models)
 
-# add_executable(NLOC_MPC src/NLOC_MPC.cpp)
-# target_link_libraries(NLOC_MPC ct_core ct_rbd ct_models)
+add_executable(ct_furuta_pendulum_lqr src/ct_furuta_pendulum_lqr.cpp)
+target_link_libraries(ct_furuta_pendulum_lqr ct_core ct_rbd ct_models)
 
-add_executable(furuta_pendulum_nloc src/furuta_pendulum_nloc.cpp)
-target_link_libraries(furuta_pendulum_nloc ct_core ct_rbd ct_models)
-
-add_executable(furuta_pendulum_lqr src/furuta_pendulum_lqr.cpp)
-target_link_libraries(furuta_pendulum_lqr ct_core ct_rbd ct_models)
-
-add_executable(simulate_furuta_pendulum src/simulate_furuta_pendulum.cpp)
-target_link_libraries(simulate_furuta_pendulum ct_core ct_rbd)
+add_executable(ct_furuta_pendulum_simulation src/ct_furuta_pendulum_simulation.cpp)
+target_link_libraries(ct_furuta_pendulum_simulation ct_core ct_rbd)
 
 install(
-  TARGETS simulate_furuta_pendulum furuta_pendulum_lqr furuta_pendulum_nloc
+  TARGETS ct_furuta_pendulum_simulation ct_furuta_pendulum_lqr ct_furuta_pendulum_nloc
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-add_library(simulate_furuta_pendulum_ros SHARED 
-  src/simulate_furuta_pendulum_ros_node.cpp)
+add_library(ct_furuta_pendulum_simulation_ros SHARED 
+  src/ct_furuta_pendulum_simulation_ros_node.cpp)
 
-ament_target_dependencies(simulate_furuta_pendulum_ros 
+ament_target_dependencies(ct_furuta_pendulum_simulation_ros 
   ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd)
-rclcpp_components_register_nodes(simulate_furuta_pendulum_ros
+rclcpp_components_register_nodes(ct_furuta_pendulum_simulation_ros
   "furuta_pendulum_control_toolbox::CtSimulationNode")
-rclcpp_components_register_node(simulate_furuta_pendulum_ros
+rclcpp_components_register_node(ct_furuta_pendulum_simulation_ros
   PLUGIN "furuta_pendulum_control_toolbox::CtSimulationNode"
-  EXECUTABLE simulate_furuta_pendulum_ros_node
+  EXECUTABLE ct_furuta_pendulum_simulation_ros_node
 )
 
 install(
-  TARGETS simulate_furuta_pendulum_ros
+  TARGETS ct_furuta_pendulum_simulation_ros
   LIBRARY DESTINATION lib
 )
 
@@ -79,11 +73,11 @@ install(
   LIBRARY DESTINATION lib
 )
 
-add_executable(furuta_pendulum_nloc_ros_node src/furuta_pendulum_nloc_ros_node.cpp)
-ament_target_dependencies(furuta_pendulum_nloc_ros_node ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd ct_models)
+add_executable(ct_furuta_pendulum_nloc_ros_node src/ct_furuta_pendulum_nloc_ros_node.cpp)
+ament_target_dependencies(ct_furuta_pendulum_nloc_ros_node ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd ct_models)
 
 install(
-  TARGETS furuta_pendulum_nloc_ros_node
+  TARGETS ct_furuta_pendulum_nloc_ros_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY

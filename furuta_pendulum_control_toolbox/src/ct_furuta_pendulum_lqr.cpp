@@ -57,7 +57,7 @@ int main()
 
   // load the weighting matrices
   ct::optcon::TermQuadratic<STATE_DIM, REAL_CONTROL_DIM> quadraticCost;
-  quadraticCost.loadConfigFile(workingDirectory + "/lqr_cost.info", "termLQR");
+  quadraticCost.loadConfigFile(workingDirectory + "/lqr_config.info", "termLQR");
   auto Q = quadraticCost.stateSecondDerivative(x, real_u, t);    // x, u and t can be arbitrary here
   auto R = quadraticCost.controlSecondDerivative(x, real_u, t);  // x, u and t can be arbitrary here
   // design the LQR controller

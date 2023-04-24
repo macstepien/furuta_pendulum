@@ -28,11 +28,11 @@ public:
     std::shared_ptr<CONTROLLED_SYSTEM> controlled_system,
     ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc)
   : Node("furuta_pendulum_nloc_simulation_ros_node"),
-    mpc_(mpc),
     sim_dt_(sim_dt),
     control_dt_(control_dt),
     x0_(x0),
-    system_(controlled_system)
+    system_(controlled_system),
+    mpc_(mpc)
   {
     system_->getController(controller_);
     controller_.reset(new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
@@ -85,15 +85,18 @@ public:
 private:
   double current_sim_time_ = 0.0;
 
+  Time sim_dt_;
+  Time control_dt_;
+
+  StateVector<STATE_DIM> x0_;
+  StateVector<STATE_DIM> x_;
+
+  std::shared_ptr<CONTROLLED_SYSTEM> system_;
+  std::shared_ptr<Controller<STATE_DIM, CONTROL_DIM, SCALAR>> controller_;
+
   std::unique_ptr<Integrator<STATE_DIM>> integrator_;
   ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc_;
   ct::core::Time controller_ts_;
-  Time sim_dt_;
-  Time control_dt_;
-  std::shared_ptr<CONTROLLED_SYSTEM> system_;
-  std::shared_ptr<Controller<STATE_DIM, CONTROL_DIM, SCALAR>> controller_;
-  StateVector<STATE_DIM> x0_;
-  StateVector<STATE_DIM> x_;
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
   rclcpp::TimerBase::SharedPtr simulation_timer_;

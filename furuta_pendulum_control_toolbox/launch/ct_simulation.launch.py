@@ -63,12 +63,12 @@ def generate_launch_description():
         [
             FindPackageShare("furuta_pendulum_control_toolbox"),
             "config",
-            "simulation.yaml",
+            "ct_simulation.yaml",
         ]
     )
     furuta_pendulum_simulation_node = Node(
         package="furuta_pendulum_control_toolbox",
-        executable="simulate_furuta_pendulum_ros_node",
+        executable="ct_furuta_pendulum_simulation_ros_node",
         parameters=[simulation_params],
     )
 
