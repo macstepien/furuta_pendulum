@@ -10,7 +10,7 @@
 
 int main()
 {
-  std::string workingDirectory =
+  std::string working_directory =
     "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/config";
 
   // obtain the state dimension
@@ -57,7 +57,7 @@ int main()
 
   // load the weighting matrices
   ct::optcon::TermQuadratic<STATE_DIM, REAL_CONTROL_DIM> quadraticCost;
-  quadraticCost.loadConfigFile(workingDirectory + "/lqr_config.info", "termLQR");
+  quadraticCost.loadConfigFile(working_directory + "/lqr_config.info", "termLQR");
   auto Q = quadraticCost.stateSecondDerivative(x, real_u, t);    // x, u and t can be arbitrary here
   auto R = quadraticCost.controlSecondDerivative(x, real_u, t);  // x, u and t can be arbitrary here
   // design the LQR controller

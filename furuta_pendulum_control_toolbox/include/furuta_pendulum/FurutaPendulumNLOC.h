@@ -95,8 +95,7 @@ public:
   //! initialize fixed-base robot with a directly interpolated state trajectory and corresponding ID torques
   void initializeDirectInterpolation(
     const RobotState_t & x0, const RobotState_t & xf, const core::Time & tf, const int N,
-    ct::core::ControlVectorArray<NJOINTS, SCALAR> & u_array,
-    ct::core::StateVectorArray<STATE_DIM, SCALAR> & x_array,
+    ControlVectorArray & u_array, ct::core::StateVectorArray<STATE_DIM, SCALAR> & x_array,
     FeedbackMatrix K = FeedbackMatrix::Zero());
 
   bool runIteration();

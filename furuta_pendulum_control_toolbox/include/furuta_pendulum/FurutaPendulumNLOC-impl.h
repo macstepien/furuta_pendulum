@@ -102,7 +102,7 @@ void FurutaPendulumNLOC<FURUTA_PENDULUM_SYSTEM>::initializeDirectInterpolation(
   const RobotState_t & x0, const RobotState_t & xf, const core::Time & tf, const int N,
   FeedbackMatrix K)
 {
-  ct::core::ControlVectorArray<NJOINTS, SCALAR> uff_array;
+  ControlVectorArray uff_array;
   ct::core::StateVectorArray<STATE_DIM, SCALAR> x_array;
 
   initializeDirectInterpolation(x0, xf, tf, N, uff_array, x_array, K);
@@ -111,8 +111,8 @@ void FurutaPendulumNLOC<FURUTA_PENDULUM_SYSTEM>::initializeDirectInterpolation(
 template <class FURUTA_PENDULUM_SYSTEM>
 void FurutaPendulumNLOC<FURUTA_PENDULUM_SYSTEM>::initializeDirectInterpolation(
   const RobotState_t & x0, const RobotState_t & xf, const core::Time & tf, const int N,
-  ct::core::ControlVectorArray<NJOINTS, SCALAR> & uff_array,
-  ct::core::StateVectorArray<STATE_DIM, SCALAR> & x_array, FeedbackMatrix K)
+  ControlVectorArray & uff_array, ct::core::StateVectorArray<STATE_DIM, SCALAR> & x_array,
+  FeedbackMatrix K)
 {
   uff_array.resize(N);
   x_array.resize(N + 1);
@@ -127,7 +127,9 @@ void FurutaPendulumNLOC<FURUTA_PENDULUM_SYSTEM>::initializeDirectInterpolation(
       (xf.joints().toImplementation() - x0.joints().toImplementation()) * SCALAR(i) / SCALAR(N);
 
     if (i < N) {
-      uff_torque = system_->computeIDTorques(state_temp.joints());
+      auto torques = system_->computeIDTorques(state_temp.joints());
+      uff_torque(0) = torques(0);
+
       if (ACTUATOR_STATE_DIM > 0)  // if there are actuator dynamics
       {
         uff_array[i].setZero();  // todo compute this from act.state
@@ -139,8 +141,12 @@ void FurutaPendulumNLOC<FURUTA_PENDULUM_SYSTEM>::initializeDirectInterpolation(
 
     if (i > 0 && ACTUATOR_STATE_DIM > 0) {
       // direct interpolation for actuator state may not make sense. Improve using actuator model
+      ct::core::ControlVector<NJOINTS, SCALAR> torques;
+      torques(0) = uff_torque(0);
+      torques(1) = 0.0;
+
       state_temp.actuatorState() =
-        system_->getActuatorDynamics()->computeStateFromOutput(state_temp.joints(), uff_torque);
+        system_->getActuatorDynamics()->computeStateFromOutput(state_temp.joints(), torques);
     }
 
     x_array[i] = state_temp.toStateVector();
