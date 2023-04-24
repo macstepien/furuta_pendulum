@@ -27,8 +27,8 @@ def generate_launch_description():
     )
 
     furuta_pendulum_controller_node = Node(
-        package="furuta_pendulum",
-        executable="lqr_controller_node",
+        package="furuta_pendulum_de",
+        executable="lqr_with_swingup_controller_node",
         parameters=[controller_params, pendulum_params],
     )
 
