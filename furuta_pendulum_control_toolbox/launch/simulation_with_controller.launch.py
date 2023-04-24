@@ -16,7 +16,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("furuta_pendulum"),
+                    FindPackageShare("furuta_pendulum_de"),
                     "launch",
                     "simulation.launch.py",
                 ]
