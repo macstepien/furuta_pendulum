@@ -20,7 +20,7 @@ def generate_launch_description():
 
     pendulum_params = PathJoinSubstitution(
         [
-            FindPackageShare("furuta_pendulum_de"),
+            FindPackageShare("furuta_pendulum_description"),
             "config",
             "pendulum_parameters.yaml",
         ]
