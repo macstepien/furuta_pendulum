@@ -1,4 +1,4 @@
-#include <furuta_pendulum_de/simulation_node.hpp>
+#include <furuta_pendulum_de/de_simulation_node.hpp>
 
 #include <chrono>
 #include <memory>
@@ -14,7 +14,7 @@
 namespace furuta_pendulum_de
 {
 
-SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
+DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
 : Node("furuta_pendulum_simulation_node", options)
 {
   this->declare_parameter("initial_conditions.theta1", 0.0);
@@ -75,17 +75,17 @@ SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
 
   joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
   simulation_timer_ = this->create_wall_timer(
-    std::chrono::duration<double>(dt_), std::bind(&SimulationNode::Simulate2, this));
+    std::chrono::duration<double>(dt_), std::bind(&DeSimulationNode::Simulate2, this));
 
   effort_sub_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
-    "effort_control", 10, std::bind(&SimulationNode::SetEffortCb, this, std::placeholders::_1));
+    "effort_control", 10, std::bind(&DeSimulationNode::SetEffortCb, this, std::placeholders::_1));
 
   rviz_disturbance_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>(
     "clicked_point", 10,
-    std::bind(&SimulationNode::RvizDisturbanceCb, this, std::placeholders::_1));
+    std::bind(&DeSimulationNode::RvizDisturbanceCb, this, std::placeholders::_1));
 }
 
-void SimulationNode::Simulate()
+void DeSimulationNode::Simulate()
 {
   // based on https://www.hindawi.com/journals/jcse/2011/528341/
 
@@ -138,7 +138,7 @@ void SimulationNode::Simulate()
   current_time_ += dt_;
 }
 
-Eigen::Vector4d SimulationNode::F(Eigen::Vector4d y)
+Eigen::Vector4d DeSimulationNode::F(Eigen::Vector4d y)
 {
   // based on https://www.hindawi.com/journals/jcse/2011/528341/
 
@@ -202,7 +202,7 @@ Eigen::Vector4d SimulationNode::F(Eigen::Vector4d y)
   return dy;
 }
 
-Eigen::Vector4d SimulationNode::integrate_rk4(Eigen::Vector4d y_n)
+Eigen::Vector4d DeSimulationNode::integrate_rk4(Eigen::Vector4d y_n)
 {
   // y_n+1 = y_n + 1/6(k1+2k2+2k3+k4)dt
   // t_n+1 = t_n + dt
@@ -221,7 +221,7 @@ Eigen::Vector4d SimulationNode::integrate_rk4(Eigen::Vector4d y_n)
   return y_n1;
 }
 
-void SimulationNode::Simulate2()
+void DeSimulationNode::Simulate2()
 {
   Eigen::Vector4d y_n;
   y_n(0) = theta1_;
@@ -243,7 +243,7 @@ void SimulationNode::Simulate2()
   current_time_ += dt_;
 }
 
-void SimulationNode::PublishJointStates()
+void DeSimulationNode::PublishJointStates()
 {
   sensor_msgs::msg::JointState joint_state_msg;
 
@@ -265,4 +265,4 @@ void SimulationNode::PublishJointStates()
 
 // Register the component with class_loader
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_de::SimulationNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_de::DeSimulationNode)

@@ -23,31 +23,31 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS}
 )
 
-add_library(simulation SHARED 
-  src/simulation_node.cpp)
-ament_target_dependencies(simulation ${PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(simulation "furuta_pendulum_de::SimulationNode")
-rclcpp_components_register_node(simulation
-  PLUGIN "furuta_pendulum_de::SimulationNode"
-  EXECUTABLE simulation_node
+add_library(de_simulation SHARED
+  src/de_simulation_node.cpp)
+ament_target_dependencies(de_simulation ${PACKAGE_INCLUDE_DEPENDS})
+rclcpp_components_register_nodes(de_simulation "furuta_pendulum_de::DeSimulationNode")
+rclcpp_components_register_node(de_simulation
+  PLUGIN "furuta_pendulum_de::DeSimulationNode"
+  EXECUTABLE de_simulation_node
 )
 
 install(
-  TARGETS simulation
+  TARGETS de_simulation
   LIBRARY DESTINATION lib
 )
 
-add_library(lqr_controller SHARED 
-  src/controller_node.cpp)
-ament_target_dependencies(lqr_controller ${PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(lqr_controller "furuta_pendulum_de::ControllerNode")
-rclcpp_components_register_node(lqr_controller
-  PLUGIN "furuta_pendulum_de::ControllerNode"
-  EXECUTABLE lqr_controller_node
+add_library(lqr_with_swingup_controller SHARED 
+  src/lqr_with_swingup_controller_node.cpp)
+ament_target_dependencies(lqr_with_swingup_controller ${PACKAGE_INCLUDE_DEPENDS})
+rclcpp_components_register_nodes(lqr_with_swingup_controller "furuta_pendulum_de::LqrWithSwingupControllerNode")
+rclcpp_components_register_node(lqr_with_swingup_controller
+  PLUGIN "furuta_pendulum_de::LqrWithSwingupControllerNode"
+  EXECUTABLE lqr_with_swingup_controller_node
 )
 
 install(
-  TARGETS lqr_controller
+  TARGETS lqr_with_swingup_controller
   LIBRARY DESTINATION lib
 )
 

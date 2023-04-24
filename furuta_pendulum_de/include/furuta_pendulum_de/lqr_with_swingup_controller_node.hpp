@@ -1,5 +1,5 @@
-#ifndef FURUTA_PENDULUM_DE_CONTROLLER_NODE_HPP_
-#define FURUTA_PENDULUM_DE_CONTROLLER_NODE_HPP_
+#ifndef FURUTA_PENDULUM_DE_LQR_WITH_SWINGUP_CONTROLLER_NODE_HPP_
+#define FURUTA_PENDULUM_DE_LQR_WITH_SWINGUP_CONTROLLER_NODE_HPP_
 
 #include <Eigen/Dense>
 
@@ -9,10 +9,10 @@
 
 namespace furuta_pendulum_de
 {
-class ControllerNode : public rclcpp::Node
+class LqrWithSwingupControllerNode : public rclcpp::Node
 {
 public:
-  ControllerNode(const rclcpp::NodeOptions & options);
+  LqrWithSwingupControllerNode(const rclcpp::NodeOptions & options);
 
 private:
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_sub_;

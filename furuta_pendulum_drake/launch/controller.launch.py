@@ -14,7 +14,7 @@ def generate_launch_description():
         [
             FindPackageShare("furuta_pendulum_drake"),
             "config",
-            "controller.yaml",
+            "lqr_with_swingup_controller.yaml",
         ]
     )
 

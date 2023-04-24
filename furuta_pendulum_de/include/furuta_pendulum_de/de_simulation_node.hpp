@@ -1,5 +1,5 @@
-#ifndef FURUTA_PENDULUM_DE_SIMULATION_NODE_HPP_
-#define FURUTA_PENDULUM_DE_SIMULATION_NODE_HPP_
+#ifndef FURUTA_PENDULUM_DE_DE_SIMULATION_NODE_HPP_
+#define FURUTA_PENDULUM_DE_DE_SIMULATION_NODE_HPP_
 
 #include <algorithm>
 
@@ -12,10 +12,10 @@
 
 namespace furuta_pendulum_de
 {
-class SimulationNode : public rclcpp::Node
+class DeSimulationNode : public rclcpp::Node
 {
 public:
-  SimulationNode(const rclcpp::NodeOptions & options);
+  DeSimulationNode(const rclcpp::NodeOptions & options);
 
 private:
   static constexpr long double g_ = 9.80665;

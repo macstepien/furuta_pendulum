@@ -14,7 +14,7 @@ def generate_launch_description():
         [
             FindPackageShare("furuta_pendulum_de"),
             "config",
-            "controller.yaml",
+            "lqr_with_swingup_controller.yaml",
         ]
     )
 
@@ -28,7 +28,7 @@ def generate_launch_description():
 
     furuta_pendulum_controller_node = Node(
         package="furuta_pendulum_de",
-        executable="lqr_controller_node",
+        executable="lqr_with_swingup_controller_node",
         parameters=[controller_params, pendulum_params],
     )
 
