@@ -24,7 +24,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("furuta_pendulum"),
+                    FindPackageShare("furuta_pendulum_de"),
                     "launch",
                     "description.launch.py",
                 ]
@@ -34,7 +34,7 @@ def generate_launch_description():
 
     ign_config_file = PathJoinSubstitution(
         [
-            FindPackageShare("furuta_pendulum"),
+            FindPackageShare("furuta_pendulum_de"),
             "config",
             "furuta_pendulum_ignition.config",
         ]

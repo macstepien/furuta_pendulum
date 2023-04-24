@@ -1,5 +1,5 @@
-#ifndef FURUTA_PENDULUM_CONTROLLER_NODE_HPP_
-#define FURUTA_PENDULUM_CONTROLLER_NODE_HPP_
+#ifndef FURUTA_PENDULUM_DE_CONTROLLER_NODE_HPP_
+#define FURUTA_PENDULUM_DE_CONTROLLER_NODE_HPP_
 
 #include <Eigen/Dense>
 
@@ -7,7 +7,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 
-namespace furuta_pendulum
+namespace furuta_pendulum_de
 {
 class ControllerNode : public rclcpp::Node
 {
@@ -33,6 +33,6 @@ private:
   double LqrControl(sensor_msgs::msg::JointState::SharedPtr current_state);
   double SwingupControl(sensor_msgs::msg::JointState::SharedPtr current_state);
 };
-}  // namespace furuta_pendulum
+}  // namespace furuta_pendulum_de
 
 #endif

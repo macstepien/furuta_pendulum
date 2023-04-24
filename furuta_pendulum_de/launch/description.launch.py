@@ -27,7 +27,7 @@ def load_yaml(package_name, directory_name, file_name):
 
 def generate_launch_description():
     pendulum_parameters = load_yaml(
-        "furuta_pendulum", "config", "pendulum_parameters.yaml"
+        "furuta_pendulum_de", "config", "pendulum_parameters.yaml"
     )["/**"]["ros__parameters"]
 
     robot_description_content = Command(
@@ -36,7 +36,7 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [
-                    FindPackageShare("furuta_pendulum"),
+                    FindPackageShare("furuta_pendulum_de"),
                     "urdf",
                     "furuta_pendulum.urdf.xacro",
                 ]

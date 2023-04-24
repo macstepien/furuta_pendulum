@@ -1,4 +1,4 @@
-#include <furuta_pendulum/simulation_node.hpp>
+#include <furuta_pendulum_de/simulation_node.hpp>
 
 #include <chrono>
 #include <memory>
@@ -11,7 +11,7 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 
-namespace furuta_pendulum
+namespace furuta_pendulum_de
 {
 
 SimulationNode::SimulationNode(const rclcpp::NodeOptions & options)
@@ -261,8 +261,8 @@ void SimulationNode::PublishJointStates()
   joint_state_pub_->publish(joint_state_msg);
 }
 
-}  // namespace furuta_pendulum
+}  // namespace furuta_pendulum_de
 
 // Register the component with class_loader
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum::SimulationNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_de::SimulationNode)

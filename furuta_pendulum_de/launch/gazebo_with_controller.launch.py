@@ -15,9 +15,9 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("furuta_pendulum"),
+                    FindPackageShare("furuta_pendulum_de"),
                     "launch",
-                    "simulation.launch.py",
+                    "gazebo.launch.py",
                 ]
             )
         ),
@@ -26,13 +26,13 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("furuta_pendulum"),
+                    FindPackageShare("furuta_pendulum_de"),
                     "launch",
                     "controller.launch.py",
                 ]
             )
         ),
     )
-    actions = [simulation_launch, TimerAction(period=2.0, actions=[controller_launch])]
+    actions = [simulation_launch, TimerAction(period=4.0, actions=[controller_launch])]
 
     return LaunchDescription(actions)

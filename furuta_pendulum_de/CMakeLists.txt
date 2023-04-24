@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(furuta_pendulum)
+project(furuta_pendulum_de)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -26,9 +26,9 @@ include_directories(
 add_library(simulation SHARED 
   src/simulation_node.cpp)
 ament_target_dependencies(simulation ${PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(simulation "furuta_pendulum::SimulationNode")
+rclcpp_components_register_nodes(simulation "furuta_pendulum_de::SimulationNode")
 rclcpp_components_register_node(simulation
-  PLUGIN "furuta_pendulum::SimulationNode"
+  PLUGIN "furuta_pendulum_de::SimulationNode"
   EXECUTABLE simulation_node
 )
 
@@ -40,9 +40,9 @@ install(
 add_library(lqr_controller SHARED 
   src/controller_node.cpp)
 ament_target_dependencies(lqr_controller ${PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(lqr_controller "furuta_pendulum::ControllerNode")
+rclcpp_components_register_nodes(lqr_controller "furuta_pendulum_de::ControllerNode")
 rclcpp_components_register_node(lqr_controller
-  PLUGIN "furuta_pendulum::ControllerNode"
+  PLUGIN "furuta_pendulum_de::ControllerNode"
   EXECUTABLE lqr_controller_node
 )
 

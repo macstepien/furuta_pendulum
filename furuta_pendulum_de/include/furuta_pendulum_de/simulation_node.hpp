@@ -1,5 +1,5 @@
-#ifndef FURUTA_PENDULUM_SIMULATION_NODE_HPP_
-#define FURUTA_PENDULUM_SIMULATION_NODE_HPP_
+#ifndef FURUTA_PENDULUM_DE_SIMULATION_NODE_HPP_
+#define FURUTA_PENDULUM_DE_SIMULATION_NODE_HPP_
 
 #include <algorithm>
 
@@ -10,7 +10,7 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 
-namespace furuta_pendulum
+namespace furuta_pendulum_de
 {
 class SimulationNode : public rclcpp::Node
 {
@@ -74,6 +74,6 @@ private:
   Eigen::Vector4d integrate_rk4(Eigen::Vector4d y_n);
 };
 
-}  // namespace furuta_pendulum
+}  // namespace furuta_pendulum_de
 
 #endif

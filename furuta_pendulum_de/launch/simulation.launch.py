@@ -33,7 +33,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("furuta_pendulum"),
+                    FindPackageShare("furuta_pendulum_de"),
                     "launch",
                     "description.launch.py",
                 ]
@@ -42,12 +42,12 @@ def generate_launch_description():
     )
 
     pendulum_parameters = load_yaml(
-        "furuta_pendulum", "config", "pendulum_parameters.yaml"
+        "furuta_pendulum_de", "config", "pendulum_parameters.yaml"
     )["/**"]["ros__parameters"]
 
     rviz_config = PathJoinSubstitution(
         [
-            FindPackageShare("furuta_pendulum"),
+            FindPackageShare("furuta_pendulum_de"),
             "rviz",
             "furuta_pendulum.rviz",
         ]
@@ -61,13 +61,13 @@ def generate_launch_description():
 
     simulation_params = PathJoinSubstitution(
         [
-            FindPackageShare("furuta_pendulum"),
+            FindPackageShare("furuta_pendulum_de"),
             "config",
             "simulation.yaml",
         ]
     )
     furuta_pendulum_simulation_node = Node(
-        package="furuta_pendulum",
+        package="furuta_pendulum_de",
         executable="simulation_node",
         parameters=[simulation_params, pendulum_parameters],
     )

@@ -173,7 +173,7 @@
     <gazebo>
       <plugin filename="ign_ros2_control-system"
         name="ign_ros2_control::IgnitionROS2ControlPlugin">
-        <parameters>$(find furuta_pendulum)/config/furuta_pendulum_ros2_control.yaml</parameters>
+        <parameters>$(find furuta_pendulum_de)/config/furuta_pendulum_ros2_control.yaml</parameters>
         <ros>
           <remapping>/forward_effort_controller/commands:=/effort_control</remapping>
         </ros>

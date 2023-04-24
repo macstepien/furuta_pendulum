@@ -1,4 +1,4 @@
-#include <furuta_pendulum/controller_node.hpp>
+#include <furuta_pendulum_de/controller_node.hpp>
 
 #include <chrono>
 #include <memory>
@@ -9,7 +9,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 
-namespace furuta_pendulum
+namespace furuta_pendulum_de
 {
 
 ControllerNode::ControllerNode(const rclcpp::NodeOptions & options)
@@ -79,8 +79,8 @@ double ControllerNode::SwingupControl(sensor_msgs::msg::JointState::SharedPtr cu
   }
 }
 
-}  // namespace furuta_pendulum
+}  // namespace furuta_pendulum_de
 
 // Register the component with class_loader
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum::ControllerNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_de::ControllerNode)
