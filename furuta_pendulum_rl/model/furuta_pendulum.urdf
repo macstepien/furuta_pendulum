@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!-- URDF used for generating xml model -->
 <robot name="furuta_pendulum">
   <material name="grey">
     <color rgba="0.8 0.8 0.8 1.0" />
