@@ -13,4 +13,5 @@ wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-de
 unzip libtorch-cxx11-abi-shared-with-deps-2.0.0+cpu.zip
 
 Add to .bashrc:
-export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/home/maciej/libtorch
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/home/${user}/libtorch
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/maciej/libtorch/lib/
