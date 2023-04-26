@@ -7,6 +7,7 @@ endif()
 
 set(PACKAGE_INCLUDE_DEPENDS
   ament_cmake
+  ament_index_cpp
 )
 
 foreach(Dependency IN ITEMS ${PACKAGE_INCLUDE_DEPENDS})
@@ -15,10 +16,8 @@ endforeach()
 
 find_package(drake CONFIG REQUIRED PATHS /opt/drake)
 
-add_executable(cart_pole_example_urdf_lqr src/cart_pole_example_urdf_lqr.cpp)
-target_link_libraries(cart_pole_example_urdf_lqr drake::drake)
-
 add_executable(furuta_pendulum_urdf_lqr src/furuta_pendulum_urdf_lqr.cpp)
+ament_target_dependencies(furuta_pendulum_urdf_lqr ament_index_cpp)
 target_link_libraries(furuta_pendulum_urdf_lqr drake::drake)
 
 install(
@@ -29,63 +28,8 @@ install(
 install(DIRECTORY
   config
   launch
+  urdf
   DESTINATION share/${PROJECT_NAME}
 )
 
 ament_package()
-
-# set(PACKAGE_INCLUDE_DEPENDS
-#   ament_cmake
-#   Eigen3
-#   rclcpp
-#   rclcpp_components
-#   std_msgs
-#   sensor_msgs
-# )
-
-# foreach(Dependency IN ITEMS ${PACKAGE_INCLUDE_DEPENDS})
-#   find_package(${Dependency} REQUIRED)
-# endforeach()
-
-# include_directories(
-#   include
-#   ${EIGEN3_INCLUDE_DIRS}
-# )
-
-# add_library(simulation SHARED 
-#   src/simulation_node.cpp)
-# ament_target_dependencies(simulation ${PACKAGE_INCLUDE_DEPENDS})
-# rclcpp_components_register_nodes(simulation "furuta_pendulum::SimulationNode")
-# rclcpp_components_register_node(simulation
-#   PLUGIN "furuta_pendulum::SimulationNode"
-#   EXECUTABLE simulation_node
-# )
-
-# install(
-#   TARGETS simulation
-#   LIBRARY DESTINATION lib
-# )
-
-# add_library(controller SHARED 
-#   src/controller_node.cpp)
-# ament_target_dependencies(controller ${PACKAGE_INCLUDE_DEPENDS})
-# rclcpp_components_register_nodes(controller "furuta_pendulum::ControllerNode")
-# rclcpp_components_register_node(controller
-#   PLUGIN "furuta_pendulum::ControllerNode"
-#   EXECUTABLE controller_node
-# )
-
-# install(
-#   TARGETS controller
-#   LIBRARY DESTINATION lib
-# )
-
-# install(DIRECTORY
-#   config
-#   launch
-#   rviz
-#   urdf
-#   DESTINATION share/${PROJECT_NAME}
-# )
-
-# ament_package()

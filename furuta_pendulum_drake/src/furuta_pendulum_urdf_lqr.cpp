@@ -1,6 +1,9 @@
-#include <iostream>
 #include <chrono>
+#include <filesystem>
+#include <iostream>
 #include <thread>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <drake/systems/framework/event.h>
 #include <drake/common/drake_assert.h>
@@ -94,11 +97,12 @@ private:
   }
 };
 
-static const char * const kFurutaPendulumUrdfPath =
-  "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_drake/urdf/furuta_pendulum.urdf";
-
 void DoMain()
 {
+  std::string furuta_pendulum_urdf_path =
+    std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_drake")) /
+    "urdf" / "furuta_pendulum.urdf";
+
   const double kTargetRealtimeRate = 1.0;
   const double kSimulationTime = 50.0;
   const double kMaxTimeStep = 0.001;
@@ -110,7 +114,7 @@ void DoMain()
   auto [furuta_pendulum, scene_graph] =
     drake::multibody::AddMultibodyPlantSceneGraph(&builder, kMaxTimeStep);
   drake::multibody::Parser(&furuta_pendulum, &scene_graph)
-    .AddModelFromFile(kFurutaPendulumUrdfPath);
+    .AddModelFromFile(furuta_pendulum_urdf_path);
 
   // auto & joint1 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint1");
   // auto & joint2 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint2");
