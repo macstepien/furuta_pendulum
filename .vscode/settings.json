@@ -3,13 +3,13 @@
   "python.formatting.provider": "black",
   "python.autoComplete.extraPaths": [
     "/opt/ros/humble/lib/python3.10/site-packages",
-    "/home/maciej/.mujoco/mujoco210",
-    "/home/maciej/.local/lib/python3.10/site-packages"
+    "~/.mujoco/mujoco210",
+    "~/.local/lib/python3.10/site-packages"
   ],
   "python.analysis.extraPaths": [
     "/opt/ros/humble/lib/python3.10/site-packages",
-    "/home/maciej/.mujoco/mujoco210",
-    "/home/maciej/.local/lib/python3.10/site-packages"
+    "~/.mujoco/mujoco210",
+    "~/.local/lib/python3.10/site-packages"
   ],
   "ros.distro": "humble",
   "C_Cpp.errorSquiggles": "enabled",
