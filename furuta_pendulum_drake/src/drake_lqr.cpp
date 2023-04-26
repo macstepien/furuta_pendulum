@@ -23,38 +23,34 @@
 #include <drake/systems/primitives/constant_vector_source.h>
 #include <drake/systems/primitives/linear_system.h>
 
-namespace drake
-{
-namespace examples
-{
-namespace multibody
-{
-namespace furuta_pendulum
-{
-namespace
+namespace furuta_pendulum_drake
 {
 
 template <typename T>
-class FurutaPendulumSwingUpController : public systems::LeafSystem<T>
+class FurutaPendulumSwingUpController : public drake::systems::LeafSystem<T>
 {
 public:
-  explicit FurutaPendulumSwingUpController(const systems::BasicVector<T> & params)
+  explicit FurutaPendulumSwingUpController(const drake::systems::BasicVector<T> & params)
   {
-    this->DeclareVectorInputPort(systems::kUseDefaultName, systems::BasicVector<T>(4));
-    this->DeclareVectorInputPort(systems::kUseDefaultName, systems::BasicVector<T>(1));
+    this->DeclareVectorInputPort(
+      drake::systems::kUseDefaultName, drake::systems::BasicVector<T>(4));
+    this->DeclareVectorInputPort(
+      drake::systems::kUseDefaultName, drake::systems::BasicVector<T>(1));
     this->DeclareVectorOutputPort(
-      systems::kUseDefaultName, systems::BasicVector<T>(1),
+      drake::systems::kUseDefaultName, drake::systems::BasicVector<T>(1),
       &FurutaPendulumSwingUpController::CalcTau);
     this->DeclareNumericParameter(params);
   }
 
 private:
-  void CalcTau(const systems::Context<T> & context, systems::BasicVector<T> * output) const
+  void CalcTau(
+    const drake::systems::Context<T> & context, drake::systems::BasicVector<T> * output) const
   {
-    const auto * state = this->template EvalVectorInput<systems::BasicVector>(context, 0);
-    const auto * lqr_output = this->template EvalVectorInput<systems::BasicVector>(context, 1);
-    const systems::BasicVector<T> & params =
-      this->template GetNumericParameter<systems::BasicVector>(context, 0);
+    const auto * state = this->template EvalVectorInput<drake::systems::BasicVector>(context, 0);
+    const auto * lqr_output =
+      this->template EvalVectorInput<drake::systems::BasicVector>(context, 1);
+    const drake::systems::BasicVector<T> & params =
+      this->template GetNumericParameter<drake::systems::BasicVector>(context, 0);
 
     const T theta2 = state[0][1] - M_PI;
     const T u_max = params[3];
@@ -63,14 +59,12 @@ private:
       output[0][0] = lqr_output[0][0];
       output[0][1] = 0.0;
     } else {
-      using std::pow;
-
       const T g = params[0];
       const T m2 = params[1];
       const T l2 = params[2];
 
       const T dtheta2 = state[0][3];
-      const T E = 0.5 * m2 * pow(l2, 2) * pow(dtheta2, 2) + m2 * g * l2 * cos(theta2);
+      const T E = 0.5 * m2 * std::pow(l2, 2) * std::pow(dtheta2, 2) + m2 * g * l2 * cos(theta2);
       const T E0 = m2 * g * l2;
 
       double x = (E - E0) * dtheta2 * cos(theta2);
@@ -86,7 +80,9 @@ private:
   }
 };
 
-void DoMain()
+}  // namespace furuta_pendulum_drake
+
+int main()
 {
   std::string furuta_pendulum_urdf_path =
     std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_drake")) /
@@ -96,9 +92,13 @@ void DoMain()
   const double kSimulationTime = 50.0;
   const double kMaxTimeStep = 0.001;
 
-  systems::BasicVector<double> params(Eigen::Vector4d({9.80665, 0.075, 0.148, 1.0}));
+  const double g = 9.80665;
+  const double m2 = 0.075;
+  const double l2 = 0.148;
+  const double u_max = 1.0;
+  drake::systems::BasicVector<double> params(Eigen::Vector4d({g, m2, l2, u_max}));
 
-  systems::DiagramBuilder<double> builder;
+  drake::systems::DiagramBuilder<double> builder;
 
   auto [furuta_pendulum, scene_graph] =
     drake::multibody::AddMultibodyPlantSceneGraph(&builder, kMaxTimeStep);
@@ -130,7 +130,8 @@ void DoMain()
   const int furuta_pendulum_actuation_port = 3;
   // Set nominal torque to zero.
   furuta_pendulum_context->FixInputPort(
-    furuta_pendulum_actuation_port, Value<systems::BasicVector<double>>(Eigen::VectorXd::Zero(1)));
+    furuta_pendulum_actuation_port,
+    drake::Value<drake::systems::BasicVector<double>>(Eigen::VectorXd::Zero(1)));
   // furuta_pendulum.get_actuation_input_port().FixValue(furuta_pendulum_context.get(), 0.0);
 
   // Set nominal state to the upright fixed point.
@@ -145,10 +146,10 @@ void DoMain()
   Q(2, 2) = 1.0;
   Q(3, 3) = 1.0;
   // Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2, 2);
-  Vector1d R = Vector1d::Constant(1.0);
+  drake::Vector1d R = drake::Vector1d::Constant(1.0);
   Eigen::MatrixXd N;
 
-  auto lqr = builder.AddSystem(systems::controllers::LinearQuadraticRegulator(
+  auto lqr = builder.AddSystem(drake::systems::controllers::LinearQuadraticRegulator(
     furuta_pendulum, *furuta_pendulum_context, Q, R, N, furuta_pendulum_actuation_port));
 
   std::cout << "D: " << lqr->D() << std::endl;
@@ -157,7 +158,8 @@ void DoMain()
   // -------------
 
   // Swing up
-  auto controller = builder.AddSystem<FurutaPendulumSwingUpController>(params);
+  auto controller =
+    builder.AddSystem<furuta_pendulum_drake::FurutaPendulumSwingUpController>(params);
   controller->set_name("controller");
 
   // ----------------
@@ -171,15 +173,16 @@ void DoMain()
   // builder.Connect(furuta_pendulum.get_state_output_port(), lqr->get_input_port());
   // builder.Connect(lqr->get_output_port(), furuta_pendulum.get_actuation_input_port());
 
-  geometry::MeshcatVisualizerd::AddToBuilder(
-    &builder, scene_graph, std::make_shared<geometry::Meshcat>());
+  drake::geometry::MeshcatVisualizerd::AddToBuilder(
+    &builder, scene_graph, std::make_shared<drake::geometry::Meshcat>());
 
   auto diagram = builder.Build();
 
   // Create a context for this system:
-  std::unique_ptr<systems::Context<double>> diagram_context = diagram->CreateDefaultContext();
+  std::unique_ptr<drake::systems::Context<double>> diagram_context =
+    diagram->CreateDefaultContext();
   diagram->SetDefaultContext(diagram_context.get());
-  systems::Context<double> & furuta_pendulum_context_2 =
+  drake::systems::Context<double> & furuta_pendulum_context_2 =
     diagram->GetMutableSubsystemContext(furuta_pendulum, diagram_context.get());
 
   Eigen::VectorXd positions = Eigen::VectorXd::Zero(2);
@@ -190,22 +193,12 @@ void DoMain()
 
   std::this_thread::sleep_for(std::chrono::duration<double>(5.0));
   std::cout << "Starting simulation" << std::endl;
-  systems::Simulator<double> simulator(*diagram, std::move(diagram_context));
+  drake::systems::Simulator<double> simulator(*diagram, std::move(diagram_context));
 
   simulator.set_publish_every_time_step(true);
   simulator.set_target_realtime_rate(kTargetRealtimeRate);
   simulator.Initialize();
   simulator.AdvanceTo(kSimulationTime);
-}
 
-}  // namespace
-}  // namespace furuta_pendulum
-}  // namespace multibody
-}  // namespace examples
-}  // namespace drake
-
-int main()
-{
-  drake::examples::multibody::furuta_pendulum::DoMain();
   return 0;
 }
