@@ -42,6 +42,7 @@ install(
 
 install(DIRECTORY
   launch
+  model
   trained_agents
   DESTINATION share/${PROJECT_NAME}
 )

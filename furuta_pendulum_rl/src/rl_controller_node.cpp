@@ -1,10 +1,13 @@
 #include <memory>
+#include <filesystem>
 
 #include <torch/script.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 namespace furuta_pendulum_rl
 {
@@ -15,8 +18,8 @@ public:
   : Node("furuta_pendulum_rl_controller_node", options)
   {
     std::string model_path =
-      "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_rl/trained_agents/"
-      "furuta_pendulum_full.pt";
+      std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_rl")) /
+      "trained_agents" / "furuta_pendulum_full.pt";
 
     try {
       module_ = torch::jit::load(model_path);

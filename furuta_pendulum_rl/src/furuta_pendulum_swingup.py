@@ -1,9 +1,13 @@
+import os
+
 import numpy as np
 import math
 
 from gym import utils
 from gym.envs.mujoco import MujocoEnv
 from gym.spaces import Box
+
+from ament_index_python.packages import get_package_share_directory
 
 
 # Based on inverted pendulum example world from gym
@@ -25,7 +29,11 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
 
         MujocoEnv.__init__(
             self,
-            "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_rl/model/furuta_pendulum.xml",
+            os.path.join(
+                get_package_share_directory("furuta_pendulum_rl"),
+                "model",
+                "furuta_pendulum.xml",
+            ),
             40,
             observation_space=observation_space,
             **kwargs,
