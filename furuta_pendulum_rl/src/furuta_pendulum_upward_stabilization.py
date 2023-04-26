@@ -16,8 +16,6 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             "human",
             "rgb_array",
             "depth_array",
-            # "single_rgb_array",
-            # "single_depth_array",
         ],
         "render_fps": 25,
     }
@@ -37,25 +35,30 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             observation_space=observation_space,
             **kwargs,
         )
+        self._init_pos_high = 0.01
+        self._init_pos_low = -0.01
+        self._init_vel_high = 0.01
+        self._init_vel_low = -0.01
 
-        # self.action_space = spaces.Discrete(3)
-        # self.frame_skip = 1
+        self._angle_threshold = 0.2
+        self._reward = 1.0
 
     def step(self, action):
-        reward = 1.0
         self.do_simulation(action, self.frame_skip)
         ob = self._get_obs()
-        terminated = bool(not np.isfinite(ob).all() or (np.abs(ob[1]) > 0.2))
+        terminated = bool(
+            not np.isfinite(ob).all() or (np.abs(ob[1]) > self._angle_threshold)
+        )
         if self.render_mode == "human":
             self.render()
-        return ob, reward, terminated, False, {}
+        return ob, self._reward, terminated, False, {}
 
     def reset_model(self):
         qpos = self.init_qpos + self.np_random.uniform(
-            size=self.model.nq, low=-0.01, high=0.01
+            size=self.model.nq, low=self._init_pos_low, high=self._init_pos_high
         )
         qvel = self.init_qvel + self.np_random.uniform(
-            size=self.model.nv, low=-0.01, high=0.01
+            size=self.model.nv, low=self._init_vel_low, high=self._init_vel_high
         )
         self.set_state(qpos, qvel)
         return self._get_obs()
