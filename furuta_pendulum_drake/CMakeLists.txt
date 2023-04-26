@@ -16,12 +16,12 @@ endforeach()
 
 find_package(drake CONFIG REQUIRED PATHS /opt/drake)
 
-add_executable(furuta_pendulum_urdf_lqr src/furuta_pendulum_urdf_lqr.cpp)
-ament_target_dependencies(furuta_pendulum_urdf_lqr ament_index_cpp)
-target_link_libraries(furuta_pendulum_urdf_lqr drake::drake)
+add_executable(drake_lqr src/drake_lqr.cpp)
+ament_target_dependencies(drake_lqr ament_index_cpp)
+target_link_libraries(drake_lqr drake::drake)
 
 install(
-  TARGETS furuta_pendulum_urdf_lqr
+  TARGETS drake_lqr
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
