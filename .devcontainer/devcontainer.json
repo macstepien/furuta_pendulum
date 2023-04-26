@@ -1,6 +1,5 @@
 {
     "dockerFile": "Dockerfile",
-    // "image": "husarion/rosbot-xl:humble-simulation",
     "runArgs": [
         "--network=host",
         "--ipc=host",
@@ -15,20 +14,20 @@
         "--env=NVIDIA_DRIVER_CAPABILITIES=all",
         "--env=RMW_IMPLEMENTATION=rmw_cyclonedds_cpp",
     ],
-    // assuming that directory structure on host is ros2_ws/src/rosbot_xl_ros
+    // assuming that directory structure on host is ros2_ws/src/furuta_pendulum
     // when mounting whole workspace it won't be necessary to rebuild it every time
     "workspaceMount": "src=${localWorkspaceFolder}/../..,dst=/home/maciej/ros2_ws/,type=bind",
     "workspaceFolder": "/home/maciej/ros2_ws/src/furuta_pendulum",
     "extensions": [
-		"aaron-bond.better-comments",
-		"ms-vscode.cpptools",
-		"twxs.cmake",
-		"eamodio.gitlens",
-		"ms-python.vscode-pylance",
-		"ms-python.python",
-		"ms-iot.vscode-ros",
-		"smilerobotics.urdf",
-		"redhat.vscode-yaml"
-	],
+        "aaron-bond.better-comments",
+        "ms-vscode.cpptools",
+        "twxs.cmake",
+        "eamodio.gitlens",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-iot.vscode-ros",
+        "smilerobotics.urdf",
+        "redhat.vscode-yaml"
+    ],
     "remoteUser": "maciej",
 }
