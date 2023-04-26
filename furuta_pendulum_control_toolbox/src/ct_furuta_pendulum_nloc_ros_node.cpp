@@ -1,9 +1,10 @@
 // Based on NLOC_MPC example from control_toolbox library
 // https://github.com/ethz-adrl/control-toolbox/blob/v3.0.2/ct_models/examples/mpc/InvertedPendulum/NLOC_MPC.cpp
 
-#include <chrono>
-#include <memory>
 #include <algorithm>
+#include <chrono>
+#include <filesystem>
+#include <memory>
 
 #include <Eigen/Dense>
 
@@ -11,6 +12,8 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <ct/rbd/rbd.h>
 
@@ -28,10 +31,9 @@ int main(int argc, char * argv[])
 {
   const bool verbose = true;
   try {
-    std::string working_directory =
-      "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/config";
-
-    std::string config_file = working_directory + "/nloc_config.info";
+    std::string config_file = std::filesystem::path(ament_index_cpp::get_package_share_directory(
+                                "furuta_pendulum_control_toolbox")) /
+                              "config" / "nloc_config.info";
 
     std::shared_ptr<FPSystem> fp_system(new FPSystem());
 

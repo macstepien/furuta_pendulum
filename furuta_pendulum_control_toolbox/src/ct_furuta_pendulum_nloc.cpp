@@ -1,7 +1,12 @@
 // Based on NLOC_MPC example from control_toolbox library
 // https://github.com/ethz-adrl/control-toolbox/blob/v3.0.2/ct_models/examples/mpc/InvertedPendulum/NLOC_MPC.cpp
 
+#include <filesystem>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
 #include <ct/rbd/rbd.h>
+
 #include <furuta_pendulum/FurutaPendulum.h>
 #include <furuta_pendulum/FurutaPendulumSystem.h>
 #include <furuta_pendulum/FurutaPendulumNLOC.h>
@@ -61,10 +66,9 @@ int main()
 {
   const bool verbose = true;
   try {
-    std::string working_directory =
-      "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/config";
-
-    std::string config_file = working_directory + "/nloc_config.info";
+    std::string config_file = std::filesystem::path(ament_index_cpp::get_package_share_directory(
+                                "furuta_pendulum_control_toolbox")) /
+                              "config" / "nloc_config.info";
 
     std::shared_ptr<FPSystem> fp_system(new FPSystem());
 

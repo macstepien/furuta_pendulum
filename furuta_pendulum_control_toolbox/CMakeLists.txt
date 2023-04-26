@@ -28,9 +28,11 @@ include_directories(
 )
 
 add_executable(ct_furuta_pendulum_nloc src/ct_furuta_pendulum_nloc.cpp)
+ament_target_dependencies(ct_furuta_pendulum_nloc ament_index_cpp)
 target_link_libraries(ct_furuta_pendulum_nloc ct_core ct_rbd ct_models)
 
 add_executable(ct_furuta_pendulum_lqr src/ct_furuta_pendulum_lqr.cpp)
+ament_target_dependencies(ct_furuta_pendulum_lqr ament_index_cpp)
 target_link_libraries(ct_furuta_pendulum_lqr ct_core ct_rbd ct_models)
 
 add_executable(ct_furuta_pendulum_simulation src/ct_furuta_pendulum_simulation.cpp)

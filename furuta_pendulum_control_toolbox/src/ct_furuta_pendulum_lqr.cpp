@@ -1,6 +1,10 @@
 // Based on NLOC_MPC example from control_toolbox library
 // https://github.com/ethz-adrl/control-toolbox/blob/v3.0.2/ct_models/examples/mpc/InvertedPendulum/NLOC_MPC.cpp
 
+#include <filesystem>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
 #include <ct/optcon/optcon.h>
 #include <ct/rbd/rbd.h>
 
@@ -10,8 +14,9 @@
 
 int main()
 {
-  std::string working_directory =
-    "/home/maciej/ros2_ws/src/furuta_pendulum/furuta_pendulum_control_toolbox/config";
+  std::string config_file = std::filesystem::path(ament_index_cpp::get_package_share_directory(
+                              "furuta_pendulum_control_toolbox")) /
+                            "config" / "lqr_config.info";
 
   // obtain the state dimension
   const size_t STATE_DIM =
@@ -57,7 +62,7 @@ int main()
 
   // load the weighting matrices
   ct::optcon::TermQuadratic<STATE_DIM, REAL_CONTROL_DIM> quadraticCost;
-  quadraticCost.loadConfigFile(working_directory + "/lqr_config.info", "termLQR");
+  quadraticCost.loadConfigFile(config_file, "termLQR");
   auto Q = quadraticCost.stateSecondDerivative(x, real_u, t);    // x, u and t can be arbitrary here
   auto R = quadraticCost.controlSecondDerivative(x, real_u, t);  // x, u and t can be arbitrary here
   // design the LQR controller
