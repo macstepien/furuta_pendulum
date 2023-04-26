@@ -2,12 +2,25 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>furuta_pendulum_bringup</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="maciej@todo.todo">maciej</maintainer>
-  <license>TODO: License declaration</license>
+  <version>0.0.1</version>
+
+  <description>Bringup package containing launch files for simulation with controllers</description>
+
+  <maintainer email="macorobots@gmail.com">Maciej Stępień</maintainer>
+  <license>GPLv3</license>
+
+  <author email="macorobots@gmail.com">Maciej Stępień</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>furuta_pendulum_control_toolbox</exec_depend>
+  <exec_depend>furuta_pendulum_de</exec_depend>
+  <exec_depend>furuta_pendulum_drake</exec_depend>
+  <exec_depend>furuta_pendulum_rl</exec_depend>
+  <exec_depend>furuta_pendulum_gazebo</exec_depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
