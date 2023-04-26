@@ -56,21 +56,13 @@ private:
     const systems::BasicVector<T> & params =
       this->template GetNumericParameter<systems::BasicVector>(context, 0);
 
-    // const T theta2 = fmod(state[0][1], 2.0 * M_PI) + 2.0 * M_PI - M_PI;
     const T theta2 = state[0][1] - M_PI;
     const T u_max = params[3];
 
     if (fabs(theta2) < 0.7) {
-      // std::cout << "lqr" << std::endl;
-      // output[0][0] = std::clamp(lqr_output[0][0], -u_max, u_max);
       output[0][0] = lqr_output[0][0];
-      // output[0][1] = lqr_output[0][1];
-      // output[0][0] = 0.0;
       output[0][1] = 0.0;
     } else {
-      // std::cout << "swingup" << std::endl;
-      // std::cout << "swingup: " << fabs(theta2 - M_PI) << std::endl;
-
       using std::pow;
 
       const T g = params[0];
@@ -82,14 +74,11 @@ private:
       const T E0 = m2 * g * l2;
 
       double x = (E - E0) * dtheta2 * cos(theta2);
-      if (E < E0) {
-        if (x > 0.0) {
-          output[0][0] = -u_max;
-        } else {
-          output[0][0] = u_max;
-        }
+
+      if (x > 0.0) {
+        output[0][0] = -u_max;
       } else {
-        output[0][0] = 0.05;
+        output[0][0] = u_max;
       }
 
       output[0][1] = 0.0;
