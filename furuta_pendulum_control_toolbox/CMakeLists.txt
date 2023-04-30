@@ -22,9 +22,14 @@ foreach(Dependency IN ITEMS ${PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
+find_package(blasfeo QUIET)
+find_package(hpipm QUIET)
+
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${blasfeo_INCLUDE_DIRS}
+  ${hpipm_INCLUDE_DIRS}
 )
 
 add_executable(ct_furuta_pendulum_nloc src/ct_furuta_pendulum_nloc.cpp)

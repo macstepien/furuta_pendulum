@@ -23,8 +23,8 @@ ilqr
     maxDefectSum 1e-5
     nThreads 1
     nThreadsEigen 1
-    ;locp_solver HPIPM_SOLVER
-    locp_solver GNRICCATI_SOLVER
+    locp_solver HPIPM_SOLVER
+    ;locp_solver GNRICCATI_SOLVER
     nlocp_algorithm GNMS
     printSummary true
     debugPrint false
