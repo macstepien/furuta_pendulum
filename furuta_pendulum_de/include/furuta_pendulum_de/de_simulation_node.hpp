@@ -49,7 +49,6 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr rviz_disturbance_sub_;
 
   void Simulate();
-  void Simulate2();
 
   void PublishJointStates();
 
@@ -59,7 +58,7 @@ private:
       SetTorque(msg->data[0]);
     }
     // Ignore disturbance from effort command
-    SetDisturbance(msg->data[1]);
+    // SetDisturbance(msg->data[1]);
   }
   void RvizDisturbanceCb(geometry_msgs::msg::PointStamped::SharedPtr) { SetDisturbance(-10.0); }
 

@@ -75,7 +75,7 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
 
   joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
   simulation_timer_ = this->create_wall_timer(
-    std::chrono::duration<double>(dt_), std::bind(&DeSimulationNode::Simulate2, this));
+    std::chrono::duration<double>(dt_), std::bind(&DeSimulationNode::Simulate, this));
 
   effort_sub_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
     "effort_control", 10, std::bind(&DeSimulationNode::SetEffortCb, this, std::placeholders::_1));
@@ -83,59 +83,6 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
   rviz_disturbance_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>(
     "clicked_point", 10,
     std::bind(&DeSimulationNode::RvizDisturbanceCb, this, std::placeholders::_1));
-}
-
-void DeSimulationNode::Simulate()
-{
-  // based on https://www.hindawi.com/journals/jcse/2011/528341/
-
-  Eigen::Matrix2d inertia_matrix;
-  inertia_matrix(0, 0) = J0_hat_ + J2_hat_ * pow(sin(theta2_), 2);
-  inertia_matrix(0, 1) = m2_ * L1_ * l2_ * cos(theta2_);
-  inertia_matrix(1, 0) = inertia_matrix(0, 1);
-  inertia_matrix(1, 1) = J2_hat_;
-
-  Eigen::Matrix2d viscous_damping_centripetal_coriolis;
-  viscous_damping_centripetal_coriolis(0, 0) = b1_ + 0.5 * dtheta2_ * J2_hat_ * sin(2.0 * theta2_);
-  viscous_damping_centripetal_coriolis(0, 1) =
-    0.5 * dtheta2_ * J2_hat_ * sin(2.0 * theta2_) - m2_ * L1_ * l2_ * sin(theta2_) * dtheta2_;
-  viscous_damping_centripetal_coriolis(1, 0) = -0.5 * dtheta1_ * J2_hat_ * sin(2.0 * theta2_);
-  viscous_damping_centripetal_coriolis(1, 1) = b2_;
-
-  Eigen::Vector2d dtheta;
-  dtheta(0) = dtheta1_;
-  dtheta(1) = dtheta2_;
-
-  Eigen::Vector2d gravity_torque;
-  gravity_torque(0) = 0.0;
-  gravity_torque(1) = g_ * m2_ * l2_ * sin(theta2_);
-
-  Eigen::Vector2d input_torque;
-  input_torque(0) = tau1_;
-  input_torque(1) = tau2_;
-
-  Eigen::Vector2d ddtheta =
-    inertia_matrix.inverse() *
-    (viscous_damping_centripetal_coriolis * dtheta - gravity_torque + input_torque);
-
-  ddtheta1_ = ddtheta(0);
-  ddtheta2_ = ddtheta(1);
-
-  dtheta1_ = dtheta1_ + ddtheta1_ * dt_;
-  dtheta2_ = dtheta2_ + ddtheta2_ * dt_;
-
-  // dtheta1_ = std::clamp(dtheta1_ + ddtheta1_ * dt_, -max_velocity_, max_velocity_);
-  // dtheta2_ = std::clamp(dtheta2_ + ddtheta2_ * dt_, -max_velocity_, max_velocity_);
-
-  theta1_ += dtheta1_ * dt_;
-  theta2_ += dtheta2_ * dt_;
-
-  PublishJointStates();
-
-  // treat disturbance as impulse and set it back to 0.
-  tau2_ = 0.0;
-
-  current_time_ += dt_;
 }
 
 Eigen::Vector4d DeSimulationNode::F(Eigen::Vector4d y)
@@ -221,7 +168,7 @@ Eigen::Vector4d DeSimulationNode::integrate_rk4(Eigen::Vector4d y_n)
   return y_n1;
 }
 
-void DeSimulationNode::Simulate2()
+void DeSimulationNode::Simulate()
 {
   Eigen::Vector4d y_n;
   y_n(0) = theta1_;
@@ -238,7 +185,7 @@ void DeSimulationNode::Simulate2()
   PublishJointStates();
 
   // treat disturbance as impulse and set it back to 0.
-  // tau2_ = 0.0;
+  tau2_ = 0.0;
 
   current_time_ += dt_;
 }
