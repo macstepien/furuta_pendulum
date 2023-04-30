@@ -18,7 +18,7 @@ def generate_launch_description():
                 [
                     FindPackageShare("furuta_pendulum_de"),
                     "launch",
-                    "simulation.launch.py",
+                    "de_simulation.launch.py",
                 ]
             )
         ),

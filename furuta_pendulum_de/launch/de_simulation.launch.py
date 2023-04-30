@@ -68,7 +68,7 @@ def generate_launch_description():
     )
     furuta_pendulum_simulation_node = Node(
         package="furuta_pendulum_de",
-        executable="simulation_node",
+        executable="de_simulation_node",
         parameters=[simulation_params, pendulum_parameters],
     )
 
