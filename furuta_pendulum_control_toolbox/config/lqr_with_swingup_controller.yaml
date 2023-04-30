@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    K: [-3.19943e-17, 19.1822, -1.0, 4.35556]
+    K: [-6.86903e-15, 19.1822, -1.0, 4.35556]
 
     # absolute maximum command value that is used in swing up
     u_max: 3.0
