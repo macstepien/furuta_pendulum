@@ -93,48 +93,49 @@ Eigen::Vector4d DeSimulationNode::F(Eigen::Vector4d y)
   // theta4 = dtheta2
   // dtheta3 = ddtheta1
   // dtheta4 = ddtheta2
-  double theta1 = y(0);
+
+  // double theta1 = y(0);
   double theta2 = y(1);
   double theta3 = y(2);
   double theta4 = y(3);
 
-  Eigen::Matrix<long double, 5, 1> vec11;
+  Eigen::Matrix<double, 5, 1> vec11;
   vec11(0) = -J2_hat_ * b1_;
   vec11(1) = m2_ * L1_ * l2_ * cos(theta2) * b2_;
   vec11(2) = -pow(J2_hat_, 2) * sin(2.0 * theta2);
   vec11(3) = -0.5 * J2_hat_ * m2_ * L1_ * l2_ * cos(theta2) * sin(2.0 * theta2);
   vec11(4) = J2_hat_ * m2_ * L1_ * l2_ * sin(theta2);
 
-  Eigen::Matrix<long double, 5, 1> vec21;
+  Eigen::Matrix<double, 5, 1> vec21;
   vec21(0) = m2_ * L1_ * l2_ * cos(theta2) * b1_;
   vec21(1) = -b2_ * (J0_hat_ + J2_hat_ * pow(sin(theta2), 2));
   vec21(2) = m2_ * L1_ * l2_ * J2_hat_ * cos(theta2) * sin(2.0 * theta2);
   vec21(3) = -0.5 * sin(2.0 * theta2) * (J0_hat_ * J2_hat_ + pow(J2_hat_ * sin(theta2), 2));
   vec21(4) = -0.5 * pow(m2_ * L1_ * l2_, 2) * sin(2.0 * theta2);
 
-  Eigen::Matrix<long double, 5, 1> thetas_vec;
+  Eigen::Matrix<double, 5, 1> thetas_vec;
   thetas_vec(0) = theta3;
   thetas_vec(1) = theta4;
   thetas_vec(2) = theta3 * theta4;
   thetas_vec(3) = pow(theta3, 2);
   thetas_vec(4) = pow(theta4, 2);
 
-  Eigen::Matrix<long double, 3, 1> vec12;
+  Eigen::Matrix<double, 3, 1> vec12;
   vec12(0) = J2_hat_;
   vec12(1) = -m2_ * L1_ * l2_ * cos(theta2);
   vec12(2) = 0.5 * pow(m2_ * l2_, 2) * L1_ * sin(2.0 * theta2);
 
-  Eigen::Matrix<long double, 3, 1> vec22;
+  Eigen::Matrix<double, 3, 1> vec22;
   vec22(0) = -m2_ * L1_ * l2_ * cos(theta2);
   vec22(1) = J0_hat_ + J2_hat_ * pow(sin(theta2), 2);
   vec22(2) = -m2_ * l2_ * sin(theta2) * (J0_hat_ + J2_hat_ * pow(sin(theta2), 2));
 
-  Eigen::Matrix<long double, 3, 1> taus_g_vec;
+  Eigen::Matrix<double, 3, 1> taus_g_vec;
   taus_g_vec(0) = tau1_;
   taus_g_vec(1) = tau2_;
   taus_g_vec(2) = g_;
 
-  long double denominator =
+  double denominator =
     J0_hat_ * J2_hat_ + pow(J2_hat_ * sin(theta2), 2) - pow(m2_ * L1_ * l2_ * cos(theta2), 2);
 
   auto numerator1 = (vec11.transpose() * thetas_vec + vec12.transpose() * taus_g_vec);
@@ -151,14 +152,6 @@ Eigen::Vector4d DeSimulationNode::F(Eigen::Vector4d y)
 
 Eigen::Vector4d DeSimulationNode::integrate_rk4(Eigen::Vector4d y_n)
 {
-  // y_n+1 = y_n + 1/6(k1+2k2+2k3+k4)dt
-  // t_n+1 = t_n + dt
-
-  // k1 = F(y_n)
-  // k2 = F(y_n + dt*k1/2)
-  // k3 = F(y_n + dt*k2/2)
-  // k4 = F(y_n + dt*k3)
-
   Eigen::Vector4d k1 = F(y_n);
   Eigen::Vector4d k2 = F(y_n + (dt_ / 2.0) * k1);
   Eigen::Vector4d k3 = F(y_n + (dt_ / 2.0) * k2);

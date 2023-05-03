@@ -18,30 +18,30 @@ public:
   DeSimulationNode(const rclcpp::NodeOptions & options);
 
 private:
-  static constexpr long double g_ = 9.80665;
-  long double dt_;
+  static constexpr double g_ = 9.80665;
+  double dt_;
 
   // Mechanical System parameters
-  long double J0_hat_, J2_hat_;
+  double J0_hat_, J2_hat_;
 
-  long double m1_, m2_;
-  long double l1_, l2_;
-  long double L1_, L2_;
-  long double b1_, b2_;
+  double m1_, m2_;
+  double l1_, l2_;
+  double L1_, L2_;
+  double b1_, b2_;
 
-  long double theta1_, theta2_;
-  long double dtheta1_, dtheta2_;
-  long double ddtheta1_ = 0.0, ddtheta2_ = 0.0;
+  double theta1_, theta2_;
+  double dtheta1_, dtheta2_;
+  double ddtheta1_ = 0.0, ddtheta2_ = 0.0;
 
-  long double tau1_, tau2_;
+  double tau1_, tau2_;
 
-  long double max_torque_;
-  long double max_velocity_;
+  double max_torque_;
+  double max_velocity_;
 
   // Motor parameters
-  long double L_, R_, Km_;
+  double L_, R_, Km_;
 
-  long double current_time_ = 0.0;
+  double current_time_ = 0.0;
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
   rclcpp::TimerBase::SharedPtr simulation_timer_;
@@ -63,8 +63,8 @@ private:
   void RvizDisturbanceCb(geometry_msgs::msg::PointStamped::SharedPtr) { SetDisturbance(-10.0); }
 
   // void SetTorque(double torque) { tau1_ = std::clamp(torque, -max_torque_, max_torque_); }
-  void SetTorque(long double torque) { tau1_ = torque; }
-  void SetDisturbance(long double disturbance)
+  void SetTorque(double torque) { tau1_ = torque; }
+  void SetDisturbance(double disturbance)
   {
     tau2_ = disturbance;
     // tau2_ = std::clamp(disturbance, -max_torque_, max_torque_);
