@@ -71,6 +71,29 @@ public:
       input_box_constraints->addIntermediateConstraint(control_input_bound, verbose);
       input_box_constraints->initialize();
 
+      // State constraints
+      Eigen::VectorXi sp_state(FPSystem::STATE_DIM);
+      sp_state << 0, 1, 0, 1;
+      Eigen::VectorXd x_lb(2);
+      Eigen::VectorXd x_ub(2);
+      x_lb.setConstant(-10.0);
+      x_ub = -x_lb;
+      // constraint terms
+      std::shared_ptr<ct::optcon::StateConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
+        state_bound(new ct::optcon::StateConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>(
+          x_lb, x_ub, sp_state));
+      state_bound->setName("state_bound");
+
+      // input box constraint constraint container
+      std::shared_ptr<
+        ct::optcon::ConstraintContainerAnalytical<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
+        state_box_constraints(new ct::optcon::ConstraintContainerAnalytical<
+                              FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>());
+
+      // add and initialize constraint terms
+      state_box_constraints->addIntermediateConstraint(state_bound, verbose);
+      state_box_constraints->initialize();
+
       // NLOC settings
       ct::optcon::NLOptConSettings nloc_settings;
       nloc_settings.load(config_file, verbose, "ilqr");
@@ -109,6 +132,7 @@ public:
       ct::optcon::ContinuousOptConProblem<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>
         opt_con_problem(time_horizon, x0.toStateVector(), fp_system, new_cost, linear_system);
       opt_con_problem.setInputBoxConstraints(input_box_constraints);
+      opt_con_problem.setStateBoxConstraints(state_box_constraints);
 
       FurutaPendulumNLOCSystem nloc_solver(
         new_cost, nloc_settings, fp_system, verbose, linear_system);
