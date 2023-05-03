@@ -8,86 +8,103 @@
 
 #include "declarations.h"
 
-namespace iit {
-namespace FurutaPendulum {
+namespace iit
+{
+namespace FurutaPendulum
+{
 /**
  * This namespace encloses classes and functions related to the Dynamics
  * of the robot FurutaPendulum.
  */
-namespace dyn {
+namespace dyn
+{
 
 using InertiaMatrix = iit::rbd::InertiaMatrixDense;
 
-namespace tpl {
+namespace tpl
+{
 
 template <typename TRAIT>
-class InertiaProperties {
-    public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+class InertiaProperties
+{
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        typedef typename TRAIT::Scalar Scalar;
-        typedef iit::rbd::Core<Scalar> CoreS;
-        typedef iit::rbd::tpl::InertiaMatrixDense<Scalar> IMatrix;
-        typedef typename CoreS::Vector3 Vec3d;
+  typedef typename TRAIT::Scalar Scalar;
+  typedef iit::rbd::Core<Scalar> CoreS;
+  typedef iit::rbd::tpl::InertiaMatrixDense<Scalar> IMatrix;
+  typedef typename CoreS::Vector3 Vec3d;
 
-        InertiaProperties();
-        ~InertiaProperties();
-        const IMatrix& getTensor_arm1() const;
-        const IMatrix& getTensor_arm2() const;
-        Scalar getMass_arm1() const;
-        Scalar getMass_arm2() const;
-        const Vec3d& getCOM_arm1() const;
-        const Vec3d& getCOM_arm2() const;
-        Scalar getTotalMass() const;
+  InertiaProperties();
+  ~InertiaProperties();
+  const IMatrix & getTensor_arm1() const;
+  const IMatrix & getTensor_arm2() const;
+  Scalar getMass_arm1() const;
+  Scalar getMass_arm2() const;
+  const Vec3d & getCOM_arm1() const;
+  const Vec3d & getCOM_arm2() const;
+  Scalar getTotalMass() const;
 
-    private:
-
-        IMatrix tensor_arm1;
-        IMatrix tensor_arm2;
-        Vec3d com_arm1;
-        Vec3d com_arm2;
+private:
+  IMatrix tensor_arm1;
+  IMatrix tensor_arm2;
+  Vec3d com_arm1;
+  Vec3d com_arm2;
 };
 
 template <typename TRAIT>
-inline InertiaProperties<TRAIT>::~InertiaProperties() {}
-
-template <typename TRAIT>
-inline const typename InertiaProperties<TRAIT>::IMatrix& InertiaProperties<TRAIT>::getTensor_arm1() const {
-    return this->tensor_arm1;
-}
-template <typename TRAIT>
-inline const typename InertiaProperties<TRAIT>::IMatrix& InertiaProperties<TRAIT>::getTensor_arm2() const {
-    return this->tensor_arm2;
-}
-template <typename TRAIT>
-inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getMass_arm1() const {
-    return this->tensor_arm1.getMass();
-}
-template <typename TRAIT>
-inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getMass_arm2() const {
-    return this->tensor_arm2.getMass();
-}
-template <typename TRAIT>
-inline const typename InertiaProperties<TRAIT>::Vec3d& InertiaProperties<TRAIT>::getCOM_arm1() const {
-    return this->com_arm1;
-}
-template <typename TRAIT>
-inline const typename InertiaProperties<TRAIT>::Vec3d& InertiaProperties<TRAIT>::getCOM_arm2() const {
-    return this->com_arm2;
+inline InertiaProperties<TRAIT>::~InertiaProperties()
+{
 }
 
 template <typename TRAIT>
-inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getTotalMass() const {
-    return 0.3 + 0.075;
+inline const typename InertiaProperties<TRAIT>::IMatrix & InertiaProperties<TRAIT>::getTensor_arm1()
+  const
+{
+  return this->tensor_arm1;
+}
+template <typename TRAIT>
+inline const typename InertiaProperties<TRAIT>::IMatrix & InertiaProperties<TRAIT>::getTensor_arm2()
+  const
+{
+  return this->tensor_arm2;
+}
+template <typename TRAIT>
+inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getMass_arm1() const
+{
+  return this->tensor_arm1.getMass();
+}
+template <typename TRAIT>
+inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getMass_arm2() const
+{
+  return this->tensor_arm2.getMass();
+}
+template <typename TRAIT>
+inline const typename InertiaProperties<TRAIT>::Vec3d & InertiaProperties<TRAIT>::getCOM_arm1()
+  const
+{
+  return this->com_arm1;
+}
+template <typename TRAIT>
+inline const typename InertiaProperties<TRAIT>::Vec3d & InertiaProperties<TRAIT>::getCOM_arm2()
+  const
+{
+  return this->com_arm2;
 }
 
+template <typename TRAIT>
+inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getTotalMass() const
+{
+  return 0.3 + 0.075;
 }
+
+}  // namespace tpl
 
 using InertiaProperties = tpl::InertiaProperties<rbd::DoubleTrait>;
 
-}
-}
-}
+}  // namespace dyn
+}  // namespace FurutaPendulum
+}  // namespace iit
 
 #include "inertia_properties.impl.h"
 

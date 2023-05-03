@@ -29,10 +29,9 @@ int main()
     dynamics(
       new ct::rbd::FixBaseFDSystem<ct::rbd::FurutaPendulum::tpl::Dynamics<ct::core::ADCGScalar>>);
 
-  // create an Auto-Differentiation Linearizer with code generation on the quadrotor model
-  ct::core::ADCodegenLinearizer<STATE_DIM, CONTROL_DIM> adLinearizer(dynamics);
+  ct::core::ADCodegenLinearizer<STATE_DIM, CONTROL_DIM> ad_linearizer(dynamics);
   // compile the linearized model just-in-time
-  adLinearizer.compileJIT();
+  ad_linearizer.compileJIT();
   // define the linearization point around steady state
   ct::core::StateVector<STATE_DIM> x;
   x.setZero();
@@ -41,8 +40,8 @@ int main()
   u.setZero();
   double t = 0.0;
   // compute the linearization around the nominal state using the Auto-Diff Linearizer
-  auto A = adLinearizer.getDerivativeState(x, u, t);
-  auto B = adLinearizer.getDerivativeControl(x, u, t);
+  auto A = ad_linearizer.getDerivativeState(x, u, t);
+  auto B = ad_linearizer.getDerivativeControl(x, u, t);
 
   std::cout << B << std::endl;
   std::cout << B(0) << std::endl;
@@ -61,17 +60,18 @@ int main()
   real_u.setZero();
 
   // load the weighting matrices
-  ct::optcon::TermQuadratic<STATE_DIM, REAL_CONTROL_DIM> quadraticCost;
-  quadraticCost.loadConfigFile(config_file, "termLQR");
-  auto Q = quadraticCost.stateSecondDerivative(x, real_u, t);    // x, u and t can be arbitrary here
-  auto R = quadraticCost.controlSecondDerivative(x, real_u, t);  // x, u and t can be arbitrary here
+  ct::optcon::TermQuadratic<STATE_DIM, REAL_CONTROL_DIM> quadratic_cost;
+  quadratic_cost.loadConfigFile(config_file, "termLQR");
+  auto Q = quadratic_cost.stateSecondDerivative(x, real_u, t);  // x, u and t can be arbitrary here
+  auto R =
+    quadratic_cost.controlSecondDerivative(x, real_u, t);  // x, u and t can be arbitrary here
   // design the LQR controller
-  ct::optcon::LQR<STATE_DIM, REAL_CONTROL_DIM> lqrSolver;
+  ct::optcon::LQR<STATE_DIM, REAL_CONTROL_DIM> lqr_solver;
   ct::core::FeedbackMatrix<STATE_DIM, REAL_CONTROL_DIM> K;
   std::cout << "A: " << std::endl << A << std::endl << std::endl;
   std::cout << "B: " << std::endl << real_B << std::endl << std::endl;
   std::cout << "Q: " << std::endl << Q << std::endl << std::endl;
   std::cout << "R: " << std::endl << R << std::endl << std::endl;
-  lqrSolver.compute(Q, R, A, real_B, K);
+  lqr_solver.compute(Q, R, A, real_B, K);
   std::cout << "LQR gain matrix:" << std::endl << K << std::endl;
 }

@@ -10,58 +10,61 @@
 #include "jacobians.h"
 #include <iit/rbd/traits/TraitSelector.h>
 
+namespace iit
+{
+namespace FurutaPendulum
+{
 
-namespace iit {
-namespace FurutaPendulum {
-
-namespace tpl {
+namespace tpl
+{
 
 template <typename SCALAR>
-struct Traits {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+struct Traits
+{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    typedef SCALAR S;
+  typedef SCALAR S;
 
-    typedef typename FurutaPendulum::JointIdentifiers JointID;
-    typedef typename FurutaPendulum::LinkIdentifiers  LinkID;
-    typedef typename iit::rbd::tpl::TraitSelector<SCALAR>::Trait Trait;
+  typedef typename FurutaPendulum::JointIdentifiers JointID;
+  typedef typename FurutaPendulum::LinkIdentifiers LinkID;
+  typedef typename iit::rbd::tpl::TraitSelector<SCALAR>::Trait Trait;
 
-    typedef typename FurutaPendulum::tpl::JointState<SCALAR> JointState;
+  typedef typename FurutaPendulum::tpl::JointState<SCALAR> JointState;
 
+  typedef typename FurutaPendulum::tpl::HomogeneousTransforms<Trait> HomogeneousTransforms;
+  typedef typename FurutaPendulum::tpl::MotionTransforms<Trait> MotionTransforms;
+  typedef typename FurutaPendulum::tpl::ForceTransforms<Trait> ForceTransforms;
+  typedef typename FurutaPendulum::tpl::Jacobians<Trait> Jacobians;
 
+  typedef typename iit::FurutaPendulum::dyn::tpl::InertiaProperties<Trait> InertiaProperties;
+  typedef typename iit::FurutaPendulum::dyn::tpl::ForwardDynamics<Trait> FwdDynEngine;
+  typedef typename iit::FurutaPendulum::dyn::tpl::InverseDynamics<Trait> InvDynEngine;
+  typedef typename iit::FurutaPendulum::dyn::tpl::JSIM<Trait> JSIM;
 
-    typedef typename FurutaPendulum::tpl::HomogeneousTransforms<Trait> HomogeneousTransforms;
-    typedef typename FurutaPendulum::tpl::MotionTransforms<Trait> MotionTransforms;
-    typedef typename FurutaPendulum::tpl::ForceTransforms<Trait> ForceTransforms;
-    typedef typename FurutaPendulum::tpl::Jacobians<Trait> Jacobians;
+  static const int joints_count = FurutaPendulum::jointsCount;
+  static const int links_count = FurutaPendulum::linksCount;
+  static const bool floating_base = false;
 
-    typedef typename iit::FurutaPendulum::dyn::tpl::InertiaProperties<Trait> InertiaProperties;
-    typedef typename iit::FurutaPendulum::dyn::tpl::ForwardDynamics<Trait> FwdDynEngine;
-    typedef typename iit::FurutaPendulum::dyn::tpl::InverseDynamics<Trait> InvDynEngine;
-    typedef typename iit::FurutaPendulum::dyn::tpl::JSIM<Trait> JSIM;
-
-    static const int joints_count = FurutaPendulum::jointsCount;
-    static const int links_count  = FurutaPendulum::linksCount;
-    static const bool floating_base = false;
-
-    static inline const JointID* orderedJointIDs();
-    static inline const LinkID*  orderedLinkIDs();
+  static inline const JointID * orderedJointIDs();
+  static inline const LinkID * orderedLinkIDs();
 };
 
 template <typename SCALAR>
-inline const typename Traits<SCALAR>::JointID*  Traits<SCALAR>::orderedJointIDs() {
-    return FurutaPendulum::orderedJointIDs;
+inline const typename Traits<SCALAR>::JointID * Traits<SCALAR>::orderedJointIDs()
+{
+  return FurutaPendulum::orderedJointIDs;
 }
 template <typename SCALAR>
-inline const typename Traits<SCALAR>::LinkID*  Traits<SCALAR>::orderedLinkIDs() {
-    return FurutaPendulum::orderedLinkIDs;
+inline const typename Traits<SCALAR>::LinkID * Traits<SCALAR>::orderedLinkIDs()
+{
+  return FurutaPendulum::orderedLinkIDs;
 }
 
-}
+}  // namespace tpl
 
-typedef tpl::Traits<double> Traits; // default instantiation - backward compatibility...
+typedef tpl::Traits<double> Traits;  // default instantiation - backward compatibility...
 
-}
-}
+}  // namespace FurutaPendulum
+}  // namespace iit
 
 #endif

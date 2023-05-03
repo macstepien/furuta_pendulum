@@ -410,7 +410,7 @@ It has to be build in release mode: `Release`
 colcon build --symlink-install --packages-select furuta_pendulum_control_toolbox --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-in Release i got: 
+Otherwise Release I got error: 
 ```
 waiting 1 second for begin
 furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Block<XprType, BlockRows, BlockCols, InnerPanel>::Block(XprType&, Eigen::Index, Eigen::Index, Eigen::Index, Eigen::Index) [with XprType = Eigen::Matrix<double, 1, 1, 0, 1, 1>; int BlockRows = 2; int BlockCols = 1; bool InnerPanel = false; Eigen::Index = long int]: Assertion `startRow >= 0 && blockRows >= 0 && startRow <= xpr.rows() - blockRows && startCol >= 0 && blockCols >= 0 && startCol <= xpr.cols() - blockCols' failed.
@@ -423,7 +423,7 @@ furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Blo
 `ct_demo_simulation` - simple simulation of furuta pendulum with some hardcoded initial state, state trajectories are then plotted. Its main purpose is initial verification of generated model
 `ros2 run furuta_pendulum_control_toolbox ct_demo_simulation`
 
-`ct_demo_simulation_node` - similar to previouse one, but this time initial state is read from parameters, and results are published in `joint_state` message, which can be later used to visualize model in RViz. Used for further model verification.
+`ct_demo_simulation_node` - similar to previous one, but this time initial state is read from parameters, and results are published in `joint_state` message, which can be later used to visualize model in RViz. Used for further model verification.
 `ros2 launch furuta_pendulum_control_toolbox ct_simulation.launch.py`
 
 `ct_lqr` - linearizes system and calculates LQR gains, which can be later used in the `lqr_with_swing_up_controller`

@@ -37,10 +37,10 @@ else:
     i = 0
     while True:
         action, _states = model.predict(obs)
-        obs, rewards, dones, info, _ = env.step(action)
+        obs, rewards, done, info, _ = env.step(action)
         # if i % 2 == 0:
         env.render()
         i += 1
-        # if dones or i > max_episode_steps:
+        # if done or i > max_episode_steps:
         if i > max_episode_steps:
             break

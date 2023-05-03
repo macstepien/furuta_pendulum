@@ -3,28 +3,28 @@
 
 #include "dynamics_parameters.h"
 
-namespace iit {
-namespace FurutaPendulum {
-namespace dyn {
+namespace iit
+{
+namespace FurutaPendulum
+{
+namespace dyn
+{
 
 class DefaultParamsGetter : public RuntimeParamsGetter
 {
-    public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        DefaultParamsGetter() {
-            resetDefaults();
-        }
-        ~DefaultParamsGetter() {};
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  DefaultParamsGetter() { resetDefaults(); }
+  ~DefaultParamsGetter(){};
 
-    public:
-        void resetDefaults() {
-        }
+public:
+  void resetDefaults() {}
 
-    private:
-        RuntimeInertiaParams values;
+private:
+  RuntimeInertiaParams values;
 };
 
-}
-}
-}
+}  // namespace dyn
+}  // namespace FurutaPendulum
+}  // namespace iit
 #endif

@@ -4,8 +4,10 @@
 #include "inertia_properties.h"
 #include "transforms.h"
 
-namespace iit {
-namespace FurutaPendulum {
+namespace iit
+{
+namespace FurutaPendulum
+{
 
 /** \name Center of mass calculation
  * Computes the Center Of Mass (COM) position of the whole robot, in
@@ -24,8 +26,7 @@ namespace FurutaPendulum {
  *         in base coordinates
  */
 iit::rbd::Vector3d getWholeBodyCOM(
-    const dyn::InertiaProperties& inertia,
-    const HomogeneousTransforms& transforms);
+  const dyn::InertiaProperties & inertia, const HomogeneousTransforms & transforms);
 /**
  * \param inertia the inertia properties of the links of the robot
  * \param q the joint status vector describing the configuration of the robot
@@ -34,12 +35,10 @@ iit::rbd::Vector3d getWholeBodyCOM(
  *         in base coordinates
  */
 iit::rbd::Vector3d getWholeBodyCOM(
-    const dyn::InertiaProperties& inertia,
-    const JointState& q,
-    HomogeneousTransforms& transforms);
+  const dyn::InertiaProperties & inertia, const JointState & q, HomogeneousTransforms & transforms);
 ///@}
 
-}
-}
+}  // namespace FurutaPendulum
+}  // namespace iit
 
 #endif

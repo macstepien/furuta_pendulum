@@ -1,8 +1,10 @@
 termLQR
 {
     name "state cost quadratic"
-    kind "quadratic"   
-    type 0              ; 0 = intermediate, 1 = final
+    kind "quadratic"
+
+    ; 0 = intermediate, 1 = final
+    type 0
 
     weights
     {

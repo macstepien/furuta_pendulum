@@ -12,9 +12,12 @@
 #include "transforms.h"
 #include "link_data_map.h"
 
-namespace iit {
-namespace FurutaPendulum {
-namespace dyn {
+namespace iit
+{
+namespace FurutaPendulum
+{
+namespace dyn
+{
 
 /**
  * The Inverse Dynamics routine for the robot FurutaPendulum.
@@ -32,41 +35,43 @@ namespace dyn {
  *
  * Whenever present, the external forces parameter is a set of external
  * wrenches acting on the robot links. Each wrench must be expressed in
- * the reference frame of the link it is excerted on.
+ * the reference frame of the link it is exerted on.
  */
 
-namespace tpl {
+namespace tpl
+{
 
 template <typename TRAIT>
-class InverseDynamics {
+class InverseDynamics
+{
 public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    typedef typename TRAIT::Scalar Scalar;
+  typedef typename TRAIT::Scalar Scalar;
 
-    typedef iit::rbd::Core<Scalar> CoreS;
+  typedef iit::rbd::Core<Scalar> CoreS;
 
-    typedef typename CoreS::ForceVector Force;
-    typedef typename CoreS::VelocityVector Velocity;
-    typedef typename CoreS::VelocityVector Acceleration;
-    typedef typename CoreS::Matrix66 Matrix66s;
-    typedef iit::rbd::tpl::InertiaMatrixDense<Scalar> InertiaMatrix;
-    typedef iit::FurutaPendulum::tpl::JointState<Scalar> JointState;
-    typedef LinkDataMap<Force> ExtForces;
-    typedef iit::FurutaPendulum::tpl::MotionTransforms<TRAIT> MTransforms;
-    typedef InertiaProperties<TRAIT> IProperties;
+  typedef typename CoreS::ForceVector Force;
+  typedef typename CoreS::VelocityVector Velocity;
+  typedef typename CoreS::VelocityVector Acceleration;
+  typedef typename CoreS::Matrix66 Matrix66s;
+  typedef iit::rbd::tpl::InertiaMatrixDense<Scalar> InertiaMatrix;
+  typedef iit::FurutaPendulum::tpl::JointState<Scalar> JointState;
+  typedef LinkDataMap<Force> ExtForces;
+  typedef iit::FurutaPendulum::tpl::MotionTransforms<TRAIT> MTransforms;
+  typedef InertiaProperties<TRAIT> IProperties;
 
 public:
-    /**
+  /**
      * Default constructor
      * \param in the inertia properties of the links
      * \param tr the container of all the spatial motion transforms of
      *     the robot FurutaPendulum, which will be used by this instance
      *     to compute inverse-dynamics.
      */
-    InverseDynamics(IProperties& in, MTransforms& tr);
+  InverseDynamics(IProperties & in, MTransforms & tr);
 
-    /** \name Inverse dynamics
+  /** \name Inverse dynamics
      * The full Newton-Euler algorithm for the inverse dynamics of this robot.
      *
      * \param[out] jForces the joint force vector required to achieve the desired accelerations
@@ -76,39 +81,37 @@ public:
      * \param[in] fext the external forces acting on the links; this parameters
      *            defaults to zero
      */
-    ///@{
-    void id(
-        JointState& jForces,
-        const JointState& q, const JointState& qd, const JointState& qdd,
-        const ExtForces& fext = zeroExtForces);
-    void id(
-        JointState& jForces,
-        const JointState& qd, const JointState& qdd,
-        const ExtForces& fext = zeroExtForces);
-    ///@}
+  ///@{
+  void id(
+    JointState & jForces, const JointState & q, const JointState & qd, const JointState & qdd,
+    const ExtForces & fext = zeroExtForces);
+  void id(
+    JointState & jForces, const JointState & qd, const JointState & qdd,
+    const ExtForces & fext = zeroExtForces);
+  ///@}
 
-    /** \name Gravity terms
+  /** \name Gravity terms
      * The joint forces (linear or rotational) required to compensate
      * for the effect of gravity, in a specific configuration.
      */
-    ///@{
-    void G_terms(JointState& jForces, const JointState& q);
-    void G_terms(JointState& jForces);
-    ///@}
+  ///@{
+  void G_terms(JointState & jForces, const JointState & q);
+  void G_terms(JointState & jForces);
+  ///@}
 
-    /** \name Centrifugal and Coriolis terms
+  /** \name Centrifugal and Coriolis terms
      * The forces (linear or rotational) acting on the joints due to centrifugal and
      * Coriolis effects, for a specific configuration.
      */
-    ///@{
-    void C_terms(JointState& jForces, const JointState& q, const JointState& qd);
-    void C_terms(JointState& jForces, const JointState& qd);
-    ///@}
-    /** Updates all the kinematics transforms used by the inverse dynamics routine. */
-    void setJointStatus(const JointState& q) const;
+  ///@{
+  void C_terms(JointState & jForces, const JointState & q, const JointState & qd);
+  void C_terms(JointState & jForces, const JointState & qd);
+  ///@}
+  /** Updates all the kinematics transforms used by the inverse dynamics routine. */
+  void setJointStatus(const JointState & q) const;
 
 public:
-    /** \name Getters
+  /** \name Getters
      * These functions return various spatial quantities used internally
      * by the inverse dynamics routines, like the spatial acceleration
      * of the links.
@@ -124,78 +127,78 @@ public:
      * without being updated nor reset (for example, the spatial velocity
      * of the links is unaffected by the computation of the gravity terms).
      */
-    ///@{
-    const Velocity& getVelocity_arm1() const { return arm1_v; }
-    const Acceleration& getAcceleration_arm1() const { return arm1_a; }
-    const Force& getForce_arm1() const { return arm1_f; }
-    const Velocity& getVelocity_arm2() const { return arm2_v; }
-    const Acceleration& getAcceleration_arm2() const { return arm2_a; }
-    const Force& getForce_arm2() const { return arm2_f; }
-    ///@}
+  ///@{
+  const Velocity & getVelocity_arm1() const { return arm1_v; }
+  const Acceleration & getAcceleration_arm1() const { return arm1_a; }
+  const Force & getForce_arm1() const { return arm1_f; }
+  const Velocity & getVelocity_arm2() const { return arm2_v; }
+  const Acceleration & getAcceleration_arm2() const { return arm2_a; }
+  const Force & getForce_arm2() const { return arm2_f; }
+  ///@}
 protected:
-    void firstPass(const JointState& qd, const JointState& qdd, const ExtForces& fext);
-    void secondPass(JointState& jForces);
+  void firstPass(const JointState & qd, const JointState & qdd, const ExtForces & fext);
+  void secondPass(JointState & jForces);
 
 private:
-    IProperties* inertiaProps;
-    MTransforms* xm;
-private:
-    Matrix66s vcross; // support variable
-    // Link 'arm1' :
-    const InertiaMatrix& arm1_I;
-    Velocity      arm1_v;
-    Acceleration  arm1_a;
-    Force         arm1_f;
-    // Link 'arm2' :
-    const InertiaMatrix& arm2_I;
-    Velocity      arm2_v;
-    Acceleration  arm2_a;
-    Force         arm2_f;
-
+  IProperties * inertiaProps;
+  MTransforms * xm;
 
 private:
-    static const ExtForces zeroExtForces;
+  Matrix66s vcross;  // support variable
+  // Link 'arm1' :
+  const InertiaMatrix & arm1_I;
+  Velocity arm1_v;
+  Acceleration arm1_a;
+  Force arm1_f;
+  // Link 'arm2' :
+  const InertiaMatrix & arm2_I;
+  Velocity arm2_v;
+  Acceleration arm2_a;
+  Force arm2_f;
+
+private:
+  static const ExtForces zeroExtForces;
 };
 
 template <typename TRAIT>
-inline void InverseDynamics<TRAIT>::setJointStatus(const JointState& q) const
+inline void InverseDynamics<TRAIT>::setJointStatus(const JointState & q) const
 {
-    (xm->fr_arm1_X_fr_base_link)(q);
-    (xm->fr_arm2_X_fr_arm1)(q);
+  (xm->fr_arm1_X_fr_base_link)(q);
+  (xm->fr_arm2_X_fr_arm1)(q);
 }
 
 template <typename TRAIT>
-inline void InverseDynamics<TRAIT>::G_terms(JointState& jForces, const JointState& q)
+inline void InverseDynamics<TRAIT>::G_terms(JointState & jForces, const JointState & q)
 {
-    setJointStatus(q);
-    G_terms(jForces);
+  setJointStatus(q);
+  G_terms(jForces);
 }
 
 template <typename TRAIT>
-inline void InverseDynamics<TRAIT>::C_terms(JointState& jForces, const JointState& q, const JointState& qd)
+inline void InverseDynamics<TRAIT>::C_terms(
+  JointState & jForces, const JointState & q, const JointState & qd)
 {
-    setJointStatus(q);
-    C_terms(jForces, qd);
+  setJointStatus(q);
+  C_terms(jForces, qd);
 }
 
 template <typename TRAIT>
 inline void InverseDynamics<TRAIT>::id(
-    JointState& jForces,
-    const JointState& q, const JointState& qd, const JointState& qdd,
-    const ExtForces& fext)
+  JointState & jForces, const JointState & q, const JointState & qd, const JointState & qdd,
+  const ExtForces & fext)
 {
-    setJointStatus(q);
-    id(jForces, qd, qdd, fext);
+  setJointStatus(q);
+  id(jForces, qd, qdd, fext);
 }
 
-}
+}  // namespace tpl
 
 typedef tpl::InverseDynamics<rbd::DoubleTrait> InverseDynamics;
 
-}
-}
+}  // namespace dyn
+}  // namespace FurutaPendulum
 
-}
+}  // namespace iit
 
 #include "inverse_dynamics.impl.h"
 

@@ -10,98 +10,106 @@
 #include <iit/rbd/robcogen_commons.h>
 #include <iit/rbd/traits/DoubleTrait.h>
 
+namespace iit
+{
+namespace FurutaPendulum
+{
+namespace dyn
+{
 
-namespace iit {
-namespace FurutaPendulum {
-namespace dyn {
-
-namespace tpl {
+namespace tpl
+{
 
 /**
  * The type of the Joint Space Inertia Matrix (JSIM) of the robot FurutaPendulum.
  */
 template <typename TRAIT>
-class JSIM : public iit::rbd::StateDependentMatrix<iit::FurutaPendulum::tpl::JointState<typename TRAIT::Scalar>, 2, 2, JSIM<TRAIT>>
+class JSIM : public iit::rbd::StateDependentMatrix<
+               iit::FurutaPendulum::tpl::JointState<typename TRAIT::Scalar>, 2, 2, JSIM<TRAIT>>
 {
-    public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    private:
-        typedef iit::rbd::StateDependentMatrix<iit::FurutaPendulum::tpl::JointState<typename TRAIT::Scalar>, 2, 2, JSIM<TRAIT>> Base;
-    public:
-        typedef typename TRAIT::Scalar Scalar;
-        typedef typename iit::FurutaPendulum::tpl::JointState<Scalar> JointState;
-        typedef iit::rbd::Core<Scalar> CoreS;
-        typedef typename Base::Index Index;
-        typedef typename iit::rbd::PlainMatrix<Scalar, 2, 2> MatrixType;
-        typedef InertiaProperties<TRAIT> IProperties;
-        typedef iit::FurutaPendulum::tpl::ForceTransforms<TRAIT> FTransforms;
-        typedef iit::rbd::tpl::InertiaMatrixDense<Scalar> InertiaMatrix;
-        typedef typename CoreS::ForceVector ForceVector;
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+private:
+  typedef iit::rbd::StateDependentMatrix<
+    iit::FurutaPendulum::tpl::JointState<typename TRAIT::Scalar>, 2, 2, JSIM<TRAIT>>
+    Base;
 
-    public:
-        JSIM(IProperties&, FTransforms&);
-        ~JSIM() {}
+public:
+  typedef typename TRAIT::Scalar Scalar;
+  typedef typename iit::FurutaPendulum::tpl::JointState<Scalar> JointState;
+  typedef iit::rbd::Core<Scalar> CoreS;
+  typedef typename Base::Index Index;
+  typedef typename iit::rbd::PlainMatrix<Scalar, 2, 2> MatrixType;
+  typedef InertiaProperties<TRAIT> IProperties;
+  typedef iit::FurutaPendulum::tpl::ForceTransforms<TRAIT> FTransforms;
+  typedef iit::rbd::tpl::InertiaMatrixDense<Scalar> InertiaMatrix;
+  typedef typename CoreS::ForceVector ForceVector;
 
-        const JSIM& update(const JointState&);
+public:
+  JSIM(IProperties &, FTransforms &);
+  ~JSIM() {}
 
+  const JSIM & update(const JointState &);
 
-        /**
+  /**
          * Computes and saves the matrix L of the L^T L factorization of this JSIM.
          */
-        void computeL();
-        /**
+  void computeL();
+  /**
          * Computes and saves the inverse of this JSIM.
          * This function assumes that computeL() has been called already, since it
          * uses L to compute the inverse. The algorithm takes advantage of the branch
          * induced sparsity of the robot, if any.
          */
-        void computeInverse();
-        /**
+  void computeInverse();
+  /**
          * Returns an unmodifiable reference to the matrix L. See also computeL()
          */
-        const MatrixType& getL() const;
-        /**
+  const MatrixType & getL() const;
+  /**
          * Returns an unmodifiable reference to the inverse of this JSIM
          */
-        const MatrixType& getInverse() const;
+  const MatrixType & getInverse() const;
 
-    protected:
-        /**
+protected:
+  /**
          * Computes and saves the inverse of the matrix L. See also computeL()
          */
-        void computeLInverse();
-    private:
-        IProperties& linkInertias;
-        FTransforms* frcTransf;
+  void computeLInverse();
 
-        // The composite-inertia tensor for each link
-        InertiaMatrix arm1_Ic;
-        const InertiaMatrix& arm2_Ic;
-        InertiaMatrix Ic_spare;
+private:
+  IProperties & linkInertias;
+  FTransforms * frcTransf;
 
-        MatrixType L;
-        MatrixType Linv;
-        MatrixType inverse;
+  // The composite-inertia tensor for each link
+  InertiaMatrix arm1_Ic;
+  const InertiaMatrix & arm2_Ic;
+  InertiaMatrix Ic_spare;
+
+  MatrixType L;
+  MatrixType Linv;
+  MatrixType inverse;
 };
 
 template <typename TRAIT>
-inline const typename JSIM<TRAIT>::MatrixType& JSIM<TRAIT>::getL() const {
-    return L;
+inline const typename JSIM<TRAIT>::MatrixType & JSIM<TRAIT>::getL() const
+{
+  return L;
 }
 
 template <typename TRAIT>
-inline const typename JSIM<TRAIT>::MatrixType& JSIM<TRAIT>::getInverse() const {
-    return inverse;
+inline const typename JSIM<TRAIT>::MatrixType & JSIM<TRAIT>::getInverse() const
+{
+  return inverse;
 }
 
-
-}
+}  // namespace tpl
 
 typedef tpl::JSIM<rbd::DoubleTrait> JSIM;
 
-}
-}
-}
+}  // namespace dyn
+}  // namespace FurutaPendulum
+}  // namespace iit
 
 #include "jsim.impl.h"
 

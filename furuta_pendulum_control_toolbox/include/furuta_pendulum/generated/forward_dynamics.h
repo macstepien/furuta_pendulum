@@ -10,9 +10,12 @@
 #include "inertia_properties.h"
 #include "link_data_map.h"
 
-namespace iit {
-namespace FurutaPendulum {
-namespace dyn {
+namespace iit
+{
+namespace FurutaPendulum
+{
+namespace dyn
+{
 
 /**
  * The Forward Dynamics routine for the robot FurutaPendulum.
@@ -26,40 +29,42 @@ namespace dyn {
  * call to setJointStatus()), so that it would be useless to compute them again.
  */
 
-namespace tpl {
+namespace tpl
+{
 
 template <typename TRAIT>
-class ForwardDynamics {
+class ForwardDynamics
+{
 public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    // Convenient type aliases:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  // Convenient type aliases:
 
-    typedef typename TRAIT::Scalar Scalar;
+  typedef typename TRAIT::Scalar Scalar;
 
-    typedef iit::rbd::Core<Scalar> CoreS;
+  typedef iit::rbd::Core<Scalar> CoreS;
 
-    typedef typename CoreS::ForceVector Force;
-    typedef typename CoreS::VelocityVector Velocity;
-    typedef typename CoreS::VelocityVector Acceleration;
-    typedef typename CoreS::Column6D Column6DS;
-    typedef typename CoreS::Matrix66 Matrix66S;
-    typedef LinkDataMap<Force> ExtForces;
-    typedef typename iit::FurutaPendulum::tpl::JointState<Scalar> JointState;
-    typedef iit::FurutaPendulum::tpl::MotionTransforms<TRAIT> MTransforms;
+  typedef typename CoreS::ForceVector Force;
+  typedef typename CoreS::VelocityVector Velocity;
+  typedef typename CoreS::VelocityVector Acceleration;
+  typedef typename CoreS::Column6D Column6DS;
+  typedef typename CoreS::Matrix66 Matrix66S;
+  typedef LinkDataMap<Force> ExtForces;
+  typedef typename iit::FurutaPendulum::tpl::JointState<Scalar> JointState;
+  typedef iit::FurutaPendulum::tpl::MotionTransforms<TRAIT> MTransforms;
 
 public:
-    /**
+  /**
      * Default constructor
      * \param in the inertia properties of the links
      * \param tr the container of all the spatial motion transforms of
      *     the robot FurutaPendulum, which will be used by this instance
      *     to compute the dynamics.
      */
-    ForwardDynamics(InertiaProperties<TRAIT>& in, MTransforms& tr);
-    /** \name Forward dynamics
+  ForwardDynamics(InertiaProperties<TRAIT> & in, MTransforms & tr);
+  /** \name Forward dynamics
      * The Articulated-Body-Algorithm to compute the joint accelerations
      */ ///@{
-    /**
+  /**
      * \param qdd the joint accelerations vector (output parameter).
      * \param q the joint status vector
      * \param qd the joint velocities vector
@@ -68,73 +73,73 @@ public:
      *              expressed in the reference frame of the link it is
      *              exerted on.
      */
-    void fd(
-        JointState& qdd, // output parameter
-        const JointState& q, const JointState& qd, const JointState& tau, const ExtForces& fext = zeroExtForces);
-    void fd(
-        JointState& qdd, // output parameter
-        const JointState& qd, const JointState& tau, const ExtForces& fext = zeroExtForces);
-    ///@}
+  void fd(
+    JointState & qdd,  // output parameter
+    const JointState & q, const JointState & qd, const JointState & tau,
+    const ExtForces & fext = zeroExtForces);
+  void fd(
+    JointState & qdd,  // output parameter
+    const JointState & qd, const JointState & tau, const ExtForces & fext = zeroExtForces);
+  ///@}
 
-    /** Updates all the kinematics transforms used by this instance. */
-    void setJointStatus(const JointState& q) const;
+  /** Updates all the kinematics transforms used by this instance. */
+  void setJointStatus(const JointState & q) const;
 
 private:
-    InertiaProperties<TRAIT>* inertiaProps;
-    MTransforms* motionTransforms;
+  InertiaProperties<TRAIT> * inertiaProps;
+  MTransforms * motionTransforms;
 
-    Matrix66S vcross; // support variable
-    Matrix66S Ia_r;   // support variable, articulated inertia in the case of a revolute joint
+  Matrix66S vcross;  // support variable
+  Matrix66S Ia_r;    // support variable, articulated inertia in the case of a revolute joint
 
-    // Link 'arm1' :
-    Matrix66S arm1_AI;
-    Velocity arm1_a;
-    Velocity arm1_v;
-    Velocity arm1_c;
-    Force    arm1_p;
+  // Link 'arm1' :
+  Matrix66S arm1_AI;
+  Velocity arm1_a;
+  Velocity arm1_v;
+  Velocity arm1_c;
+  Force arm1_p;
 
-    Column6DS arm1_U;
-    Scalar arm1_D;
-    Scalar arm1_u;
-    // Link 'arm2' :
-    Matrix66S arm2_AI;
-    Velocity arm2_a;
-    Velocity arm2_v;
-    Velocity arm2_c;
-    Force    arm2_p;
+  Column6DS arm1_U;
+  Scalar arm1_D;
+  Scalar arm1_u;
+  // Link 'arm2' :
+  Matrix66S arm2_AI;
+  Velocity arm2_a;
+  Velocity arm2_v;
+  Velocity arm2_c;
+  Force arm2_p;
 
-    Column6DS arm2_U;
-    Scalar arm2_D;
-    Scalar arm2_u;
+  Column6DS arm2_U;
+  Scalar arm2_D;
+  Scalar arm2_u;
+
 private:
-    static const ExtForces zeroExtForces;
+  static const ExtForces zeroExtForces;
 };
 
 template <typename TRAIT>
-inline void ForwardDynamics<TRAIT>::setJointStatus(const JointState& q) const {
-    (motionTransforms-> fr_arm1_X_fr_base_link)(q);
-    (motionTransforms-> fr_arm2_X_fr_arm1)(q);
+inline void ForwardDynamics<TRAIT>::setJointStatus(const JointState & q) const
+{
+  (motionTransforms->fr_arm1_X_fr_base_link)(q);
+  (motionTransforms->fr_arm2_X_fr_arm1)(q);
 }
 
 template <typename TRAIT>
 inline void ForwardDynamics<TRAIT>::fd(
-    JointState& qdd,
-    const JointState& q,
-    const JointState& qd,
-    const JointState& tau,
-    const ExtForces& fext/* = zeroExtForces */)
+  JointState & qdd, const JointState & q, const JointState & qd, const JointState & tau,
+  const ExtForces & fext /* = zeroExtForces */)
 {
-    setJointStatus(q);
-    fd(qdd, qd, tau, fext);
+  setJointStatus(q);
+  fd(qdd, qd, tau, fext);
 }
 
-}
+}  // namespace tpl
 
 typedef tpl::ForwardDynamics<iit::rbd::DoubleTrait> ForwardDynamics;
 
-}
-}
-}
+}  // namespace dyn
+}  // namespace FurutaPendulum
+}  // namespace iit
 
 #include "forward_dynamics.impl.h"
 

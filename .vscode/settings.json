@@ -90,5 +90,10 @@
     "typeinfo": "cpp",
     "variant": "cpp",
     "valarray": "cpp"
-  }
+  },
+  "cSpell.words": [
+    "dtheta",
+    "furuta",
+    "udev"
+  ]
 }

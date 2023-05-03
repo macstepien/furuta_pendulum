@@ -1,16 +1,19 @@
 #ifndef _FURUTAPENDULUM_RUNTIME_INERTIA_PARAMETERS_
 #define _FURUTAPENDULUM_RUNTIME_INERTIA_PARAMETERS_
 
-namespace iit {
-namespace FurutaPendulum {
-namespace dyn {
+namespace iit
+{
+namespace FurutaPendulum
+{
+namespace dyn
+{
 /**
  * \defgroup dynparams Dynamics-parameters
  * Facilities related to the parameters of the inertia properties of the
  * robot FurutaPendulum.
  *
  * Inertia parameters are non-constants used in the robot model, where the
- * inertia properties (mass, center of mass, intertia tensor) of the links
+ * inertia properties (mass, center of mass, inertia tensor) of the links
  * are specified. Since the value of such parameters must be resolved
  * at runtime, we sometimes refer to them as "runtime parameters", "runtime
  * dynamics parameters", "runtime inertia parameters", etc.
@@ -21,23 +24,25 @@ namespace dyn {
  * fields of the inertia properties.
  */
 
-    /**
+/**
      * A container for the set of non-constant inertia parameters of the robot FurutaPendulum
      * \ingroup dynparams
      */
-    struct RuntimeInertiaParams {
-    };
+struct RuntimeInertiaParams
+{
+};
 
-    /**
+/**
      * The interface for classes that can compute the actual value of the
      * non-constant inertia parameters of the robot FurutaPendulum.
      * \ingroup dynparams
      */
-    class RuntimeParamsGetter {
-        public:
-    };
+class RuntimeParamsGetter
+{
+public:
+};
 
-}
-}
-}
+}  // namespace dyn
+}  // namespace FurutaPendulum
+}  // namespace iit
 #endif

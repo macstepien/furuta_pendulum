@@ -137,14 +137,14 @@ Eigen::Vector4d DeSimulationNode::F(Eigen::Vector4d y)
   long double denominator =
     J0_hat_ * J2_hat_ + pow(J2_hat_ * sin(theta2), 2) - pow(m2_ * L1_ * l2_ * cos(theta2), 2);
 
-  auto nominator1 = (vec11.transpose() * thetas_vec + vec12.transpose() * taus_g_vec);
-  auto nominator2 = (vec21.transpose() * thetas_vec + vec22.transpose() * taus_g_vec);
+  auto numerator1 = (vec11.transpose() * thetas_vec + vec12.transpose() * taus_g_vec);
+  auto numerator2 = (vec21.transpose() * thetas_vec + vec22.transpose() * taus_g_vec);
 
   Eigen::Vector4d dy;
   dy(0) = theta3;
   dy(1) = theta4;
-  dy(2) = nominator1(0) / denominator;
-  dy(3) = nominator2(0) / denominator;
+  dy(2) = numerator1(0) / denominator;
+  dy(3) = numerator2(0) / denominator;
 
   return dy;
 }
