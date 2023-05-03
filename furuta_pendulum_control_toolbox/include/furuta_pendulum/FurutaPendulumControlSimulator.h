@@ -37,7 +37,6 @@ public:
     controller_.reset(new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
 
     x_ = x0_;
-    // const IntegrationType & intType = IntegrationType::EULERCT;
     integrator_ = std::make_unique<Integrator<STATE_DIM>>(system_, ct::core::RK4);
 
     joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
