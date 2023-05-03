@@ -24,12 +24,11 @@ public:
   using SCALAR = typename CONTROLLED_SYSTEM::SCALAR;
 
   FurutaPendulumControlSimulator(
-    Time sim_dt, Time control_dt, const StateVector<STATE_DIM> & x0,
+    Time sim_dt, const StateVector<STATE_DIM> & x0,
     std::shared_ptr<CONTROLLED_SYSTEM> controlled_system,
     ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc)
   : Node("furuta_pendulum_nloc_simulation_ros_node"),
     sim_dt_(sim_dt),
-    control_dt_(control_dt),
     x0_(x0),
     system_(controlled_system),
     mpc_(mpc)
@@ -86,7 +85,6 @@ private:
   double current_sim_time_ = 0.0;
 
   Time sim_dt_;
-  Time control_dt_;
 
   StateVector<STATE_DIM> x0_;
   StateVector<STATE_DIM> x_;

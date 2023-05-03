@@ -140,9 +140,6 @@ int main(int argc, char * argv[])
     ct::core::Time sim_dt;
     ct::core::loadScalar(config_file, "sim_dt", sim_dt);
 
-    ct::core::Time control_dt;
-    ct::core::loadScalar(config_file, "control_dt", control_dt);
-
     double simulation_time;
     ct::core::loadScalar(config_file, "simulation_time", simulation_time);
 
@@ -151,7 +148,7 @@ int main(int argc, char * argv[])
     rclcpp::init(argc, argv);
 
     rclcpp::spin(std::make_shared<ct::core::FurutaPendulumControlSimulator<FPSystem>>(
-      sim_dt, control_dt, x0.toStateVector(), fp_system, ilqr_mpc));
+      sim_dt, x0.toStateVector(), fp_system, ilqr_mpc));
 
     rclcpp::shutdown();
 
