@@ -1,7 +1,9 @@
-time_horizon 3.0
-sim_dt 0.0025
-control_dt 0.005
-simulation_time 100.0
+time_horizon 2.5
+
+; control toolbox simulation parameters
+sim_dt 0.01
+control_dt 0.01
+simulation_time 3.0
 
 ; 0 = steady state ID, 1 = linear, 2 = integrated with zero control action, 3 = random; 4=zero
 init_type 0
