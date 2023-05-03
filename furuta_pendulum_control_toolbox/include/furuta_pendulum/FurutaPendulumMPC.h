@@ -1,76 +1,75 @@
-// Based on NLOC_MPC example from control_toolbox library
-// https://github.com/ethz-adrl/control-toolbox/blob/v3.0.2/ct_models/examples/mpc/InvertedPendulum/NLOC_MPC.cpp
+#pragma once
 
-#include <filesystem>
-
-#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <memory>
 
 #include <ct/rbd/rbd.h>
+#include <ct/optcon/optcon.h>
 
 #include <furuta_pendulum/FurutaPendulum.h>
 #include <furuta_pendulum/FurutaPendulumSystem.h>
 #include <furuta_pendulum/FurutaPendulumNLOC.h>
 #include <furuta_pendulum/FurutaPendulumNLOC-impl.h>
 
-using PendulumState = ct::rbd::FixBaseRobotState<ct::rbd::FurutaPendulum::Kinematics::NJOINTS>;
-using FPSystem = ct::rbd::FurutaPendulumSystem<ct::rbd::FurutaPendulum::tpl::Dynamics<double>>;
-using FurutaPendulumNLOCSystem = ct::rbd::FurutaPendulumNLOC<FPSystem>;
-class MPCSimulator : public ct::core::ControlSimulator<FPSystem>
+namespace furuta_pendulum_control_toolbox
 {
-public:
-  MPCSimulator(
-    ct::core::Time sim_dt, ct::core::Time control_dt, const PendulumState & x0,
-    std::shared_ptr<FPSystem> ip_system,
-    ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc)
-  : ct::core::ControlSimulator<FPSystem>(sim_dt, control_dt, x0.toStateVector(), ip_system),
-    mpc_(mpc)
-  {
-    controller_.reset(new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
-  }
 
-  void finishSystemIteration(ct::core::Time) override
-  {
-    control_mtx_.lock();
-    system_->setController(controller_);
-    control_mtx_.unlock();
-  }
-
-  void prepareControllerIteration(ct::core::Time sim_time) override
-  {
-    mpc_.prepareIteration(sim_time);
-  }
-  void finishControllerIteration(ct::core::Time sim_time) override
-  {
-    state_mtx_.lock();
-    ct::core::StateVector<STATE_DIM> x_temp = x_;
-    state_mtx_.unlock();
-
-    std::shared_ptr<ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>> new_controller(
-      new ct::core::StateFeedbackController<STATE_DIM, CONTROL_DIM>);
-
-    bool success = mpc_.finishIteration(x_temp, sim_time, *new_controller, controller_ts_);
-
-    if (!success) throw std::runtime_error("Failed to finish MPC iteration.");
-
-    control_mtx_.lock();
-    controller_ = new_controller;
-    control_mtx_.unlock();
-  }
-
-private:
-  ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc_;
-  ct::core::Time controller_ts_;
-};
-
-int main()
+std::unique_ptr<ct::optcon::MPC<ct::optcon::NLOptConSolver<
+  ct::rbd::FurutaPendulumSystem<ct::rbd::FurutaPendulum::tpl::Dynamics<double>>::STATE_DIM,
+  ct::rbd::FurutaPendulumSystem<ct::rbd::FurutaPendulum::tpl::Dynamics<double>>::CONTROL_DIM>>>
+CreateMPCController(std::string config_file, bool verbose = true)
 {
-  const bool verbose = true;
+  using PendulumState = ct::rbd::FixBaseRobotState<ct::rbd::FurutaPendulum::Kinematics::NJOINTS>;
+  using FPSystem = ct::rbd::FurutaPendulumSystem<ct::rbd::FurutaPendulum::tpl::Dynamics<double>>;
+  using FurutaPendulumNLOCSystem = ct::rbd::FurutaPendulumNLOC<FPSystem>;
+
   try {
-    std::string config_file = std::filesystem::path(ament_index_cpp::get_package_share_directory(
-                                "furuta_pendulum_control_toolbox")) /
-                              "config" / "nloc_config.info";
-
     std::shared_ptr<FPSystem> fp_system(new FPSystem());
+
+    // Control signal bounds
+    Eigen::VectorXd u_lb(FPSystem::CONTROL_DIM);
+    Eigen::VectorXd u_ub(FPSystem::CONTROL_DIM);
+    u_lb.setConstant(-4.0);
+    u_ub = -u_lb;
+
+    // constraint terms
+    std::shared_ptr<ct::optcon::ControlInputConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
+      control_input_bound(
+        new ct::optcon::ControlInputConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>(
+          u_lb, u_ub));
+    control_input_bound->setName("control_input_bound");
+
+    // input box constraint constraint container
+    std::shared_ptr<
+      ct::optcon::ConstraintContainerAnalytical<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
+      input_box_constraints(new ct::optcon::ConstraintContainerAnalytical<
+                            FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>());
+
+    // add and initialize constraint terms
+    input_box_constraints->addIntermediateConstraint(control_input_bound, verbose);
+    input_box_constraints->initialize();
+
+    // State constraints
+    Eigen::VectorXi sp_state(FPSystem::STATE_DIM);
+    sp_state << 0, 1, 0, 1;
+    Eigen::VectorXd x_lb(2);
+    Eigen::VectorXd x_ub(2);
+    x_lb.setConstant(-10.0);
+    x_ub = -x_lb;
+    // constraint terms
+    std::shared_ptr<ct::optcon::StateConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
+      state_bound(new ct::optcon::StateConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>(
+        x_lb, x_ub, sp_state));
+    state_bound->setName("state_bound");
+
+    // input box constraint constraint container
+    std::shared_ptr<
+      ct::optcon::ConstraintContainerAnalytical<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
+      state_box_constraints(new ct::optcon::ConstraintContainerAnalytical<
+                            FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>());
+
+    // add and initialize constraint terms
+    state_box_constraints->addIntermediateConstraint(state_bound, verbose);
+    state_box_constraints->initialize();
 
     // NLOC settings
     ct::optcon::NLOptConSettings nloc_settings;
@@ -107,6 +106,8 @@ int main()
 
     ct::optcon::ContinuousOptConProblem<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM> opt_con_problem(
       time_horizon, x0.toStateVector(), fp_system, new_cost, linear_system);
+    opt_con_problem.setInputBoxConstraints(input_box_constraints);
+    opt_con_problem.setStateBoxConstraints(state_box_constraints);
 
     FurutaPendulumNLOCSystem nloc_solver(
       new_cost, nloc_settings, fp_system, verbose, linear_system);
@@ -147,9 +148,6 @@ int main()
       }
     }
 
-    std::cout << "waiting 1 second for begin" << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
     nloc_solver.solve();
     ct::core::StateFeedbackController<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM> initial_solution =
       nloc_solver.getSolution();
@@ -168,27 +166,17 @@ int main()
     mpc_settings.coldStart_ = false;
     mpc_settings.minimumTimeHorizonMpc_ = 3.0;
 
-    ct::optcon::MPC<ct::optcon::NLOptConSolver<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
-      ilqr_mpc(opt_con_problem, ilqr_settings_mpc, mpc_settings);
-    ilqr_mpc.setInitialGuess(initial_solution);
-
-    ct::core::Time sim_dt;
-    ct::core::loadScalar(config_file, "sim_dt", sim_dt);
-
-    ct::core::Time control_dt;
-    ct::core::loadScalar(config_file, "control_dt", control_dt);
-
-    double simulation_time;
-    ct::core::loadScalar(config_file, "simulation_time", simulation_time);
-
-    MPCSimulator mpc_sim(sim_dt, control_dt, x0, fp_system, ilqr_mpc);
-    std::cout << "simulating 3 seconds" << std::endl;
-    mpc_sim.simulate(simulation_time);
-    mpc_sim.finish();
-
-    ilqr_mpc.printMpcSummary();
+    std::unique_ptr<
+      ct::optcon::MPC<ct::optcon::NLOptConSolver<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>>
+      ilqr_mpc = std::make_unique<
+        ct::optcon::MPC<ct::optcon::NLOptConSolver<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>>(
+        opt_con_problem, ilqr_settings_mpc, mpc_settings);
+    ilqr_mpc->setInitialGuess(initial_solution);
+    return ilqr_mpc;
 
   } catch (std::runtime_error & e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
+    throw e;
   }
 }
+}  // namespace furuta_pendulum_control_toolbox

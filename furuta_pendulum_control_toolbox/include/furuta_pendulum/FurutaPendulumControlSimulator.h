@@ -27,7 +27,7 @@ public:
     Time sim_dt, const StateVector<STATE_DIM> & x0,
     std::shared_ptr<CONTROLLED_SYSTEM> controlled_system,
     ct::optcon::MPC<ct::optcon::NLOptConSolver<STATE_DIM, CONTROL_DIM>> & mpc)
-  : Node("furuta_pendulum_nloc_simulation_ros_node"),
+  : Node("ct_furuta_pendulum_simulation_mpc_node"),
     sim_dt_(sim_dt),
     x0_(x0),
     system_(controlled_system),

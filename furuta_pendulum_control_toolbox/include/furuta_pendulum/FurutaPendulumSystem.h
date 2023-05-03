@@ -3,6 +3,9 @@ This file is part of the Control Toolbox (https://github.com/ethz-adrl/control-t
 Licensed under the BSD-2 license (see LICENSE file in main directory)
 **********************************************************************************************************************/
 
+// Modified FixBaseFDSystem.h to work with Furuta Pendulum - control dimension is 1 instead of number of joints
+// only first joint can be controlled
+
 #pragma once
 
 #include <ct/rbd/systems/FixBaseSystemBase.h>

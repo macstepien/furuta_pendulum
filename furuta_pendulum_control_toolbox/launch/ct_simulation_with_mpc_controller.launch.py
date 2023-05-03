@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-import os
-import yaml
-from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.substitutions import (
@@ -14,16 +10,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
-
-def load_yaml(package_name, directory_name, file_name):
-    package_path = get_package_share_directory(package_name)
-    absolute_file_path = os.path.join(package_path, directory_name, file_name)
-    try:
-        with open(absolute_file_path, "r") as file:
-            return yaml.safe_load(file)
-    except EnvironmentError:
-        return None
 
 
 def generate_launch_description():
@@ -38,10 +24,6 @@ def generate_launch_description():
             )
         ),
     )
-
-    pendulum_parameters = load_yaml(
-        "furuta_pendulum_description", "config", "pendulum_parameters.yaml"
-    )["/**"]["ros__parameters"]
 
     rviz_config = PathJoinSubstitution(
         [
@@ -59,7 +41,7 @@ def generate_launch_description():
 
     furuta_pendulum_simulation_node = Node(
         package="furuta_pendulum_control_toolbox",
-        executable="ct_furuta_pendulum_nloc_ros_node",
+        executable="ct_demo_simulation_mpc_node",
     )
 
     actions = [

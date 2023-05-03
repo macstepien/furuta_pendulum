@@ -32,59 +32,59 @@ include_directories(
   ${hpipm_INCLUDE_DIRS}
 )
 
-add_executable(ct_furuta_pendulum_nloc src/ct_furuta_pendulum_nloc.cpp)
-ament_target_dependencies(ct_furuta_pendulum_nloc ament_index_cpp)
-target_link_libraries(ct_furuta_pendulum_nloc ct_core ct_rbd ct_models)
+add_executable(ct_demo_simulation_mpc src/ct_demo_simulation_mpc.cpp)
+ament_target_dependencies(ct_demo_simulation_mpc ament_index_cpp)
+target_link_libraries(ct_demo_simulation_mpc ct_core ct_rbd ct_models)
 
-add_executable(ct_furuta_pendulum_lqr src/ct_furuta_pendulum_lqr.cpp)
-ament_target_dependencies(ct_furuta_pendulum_lqr ament_index_cpp)
-target_link_libraries(ct_furuta_pendulum_lqr ct_core ct_rbd ct_models)
+add_executable(ct_lqr src/ct_lqr.cpp)
+ament_target_dependencies(ct_lqr ament_index_cpp)
+target_link_libraries(ct_lqr ct_core ct_rbd ct_models)
 
-add_executable(ct_furuta_pendulum_simulation src/ct_furuta_pendulum_simulation.cpp)
-target_link_libraries(ct_furuta_pendulum_simulation ct_core ct_rbd)
+add_executable(ct_demo_simulation src/ct_demo_simulation.cpp)
+target_link_libraries(ct_demo_simulation ct_core ct_rbd)
 
 install(
-  TARGETS ct_furuta_pendulum_simulation ct_furuta_pendulum_lqr ct_furuta_pendulum_nloc
+  TARGETS ct_demo_simulation_mpc ct_lqr ct_demo_simulation
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-add_library(ct_furuta_pendulum_simulation_ros SHARED 
-  src/ct_furuta_pendulum_simulation_ros_node.cpp)
+add_library(ct_demo_simulation_ros SHARED 
+  src/ct_demo_simulation_node.cpp)
 
-ament_target_dependencies(ct_furuta_pendulum_simulation_ros 
+ament_target_dependencies(ct_demo_simulation_ros 
   ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd)
-rclcpp_components_register_nodes(ct_furuta_pendulum_simulation_ros
+rclcpp_components_register_nodes(ct_demo_simulation_ros
   "furuta_pendulum_control_toolbox::CtSimulationNode")
-rclcpp_components_register_node(ct_furuta_pendulum_simulation_ros
+rclcpp_components_register_node(ct_demo_simulation_ros
   PLUGIN "furuta_pendulum_control_toolbox::CtSimulationNode"
-  EXECUTABLE ct_furuta_pendulum_simulation_ros_node
+  EXECUTABLE ct_demo_simulation_node
 )
 
 install(
-  TARGETS ct_furuta_pendulum_simulation_ros
+  TARGETS ct_demo_simulation_ros
   LIBRARY DESTINATION lib
 )
 
-add_library(controller SHARED 
-  src/controller_node.cpp)
-ament_target_dependencies(controller 
+add_library(ct_mpc_controller SHARED 
+  src/ct_mpc_controller_node.cpp)
+ament_target_dependencies(ct_mpc_controller 
   ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd)
-rclcpp_components_register_nodes(controller
-  "furuta_pendulum_control_toolbox::CtControllerNode")
-rclcpp_components_register_node(controller
-  PLUGIN "furuta_pendulum_control_toolbox::CtControllerNode"
-  EXECUTABLE controller_node
+rclcpp_components_register_nodes(ct_mpc_controller
+  "furuta_pendulum_control_toolbox::CtMPCControllerNode")
+rclcpp_components_register_node(ct_mpc_controller
+  PLUGIN "furuta_pendulum_control_toolbox::CtMPCControllerNode"
+  EXECUTABLE ct_mpc_controller_node
 )
 install(
-  TARGETS controller
+  TARGETS ct_mpc_controller
   LIBRARY DESTINATION lib
 )
 
-add_executable(ct_furuta_pendulum_nloc_ros_node src/ct_furuta_pendulum_nloc_ros_node.cpp)
-ament_target_dependencies(ct_furuta_pendulum_nloc_ros_node ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd ct_models)
+add_executable(ct_demo_simulation_mpc_node src/ct_demo_simulation_mpc_node.cpp)
+ament_target_dependencies(ct_demo_simulation_mpc_node ${PACKAGE_INCLUDE_DEPENDS} ct_core ct_rbd ct_models)
 
 install(
-  TARGETS ct_furuta_pendulum_nloc_ros_node
+  TARGETS ct_demo_simulation_mpc_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY

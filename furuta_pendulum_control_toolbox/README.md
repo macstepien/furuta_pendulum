@@ -417,3 +417,24 @@ furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Blo
 ```
 
 -DCMAKE_CXX_FLAGS="-march=native -mtune=native -mavx2 -mfma"
+
+## Files
+
+`ct_demo_simulation` - simple simulation of furuta pendulum with some hardcoded initial state, state trajectories are then plotted. Its main purpose is initial verification of generated model
+`ros2 run furuta_pendulum_control_toolbox ct_demo_simulation`
+
+`ct_demo_simulation_node` - similar to previouse one, but this time initial state is read from parameters, and results are published in `joint_state` message, which can be later used to visualize model in RViz. Used for further model verification.
+`ros2 launch furuta_pendulum_control_toolbox ct_simulation.launch.py`
+
+`ct_lqr` - linearizes system and calculates LQR gains, which can be later used in the `lqr_with_swingup_controller`
+`ros2 run furuta_pendulum_control_toolbox ct_lqr`
+`ros2 launch furuta_pendulum_control_toolbox ct_lqr_controller.launch.py`
+
+`ct_demo_simulation_mpc` - first attempt at creating MPC controller for Furuta pendulum. After creating controller, it is then verified using simulation and results are printed.
+`ros2 run furuta_pendulum_control_toolbox ct_demo_simulation_mpc`
+
+`ct_demo_simulation_mpc_node` - it is previous demo, but with publishing `joint_state` messages, so that everything could be visualized in RViz.
+`ros2 launch furuta_pendulum_control_toolbox ct_simulation_with_mpc_controller.launch.py`
+
+`ct_mpc_controller_node` - MPC controller form previous demos, extracted into standalone node. It subscribes to `joint_state` messages (as this time it isn't combined with simulator) and calculates controls.
+`ros2 launch furuta_pendulum_control_toolbox ct_mpc_controller.launch.py`
