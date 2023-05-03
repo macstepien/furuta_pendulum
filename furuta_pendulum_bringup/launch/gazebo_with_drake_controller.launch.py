@@ -29,7 +29,7 @@ def generate_launch_description():
                 [
                     FindPackageShare("furuta_pendulum_drake"),
                     "launch",
-                    "controller.launch.py",
+                    "drake_controller.launch.py",
                 ]
             )
         ),
