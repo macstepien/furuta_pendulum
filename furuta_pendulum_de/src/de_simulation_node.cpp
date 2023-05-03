@@ -182,12 +182,12 @@ void DeSimulationNode::Simulate()
   dtheta1_ = y_n1(2);
   dtheta2_ = y_n1(3);
 
+  current_time_ += dt_;
+
   PublishJointStates();
 
   // treat disturbance as impulse and set it back to 0.
   tau2_ = 0.0;
-
-  current_time_ += dt_;
 }
 
 void DeSimulationNode::PublishJointStates()
