@@ -405,9 +405,9 @@ add_subdirectory(doc)
 
 ## Building
 
-For some reason, it works correctly only in `RelWithDebInfo`
+It has to be build in release mode: `Release`
 ```
-colcon build --symlink-install --packages-select furuta_pendulum_control_toolbox --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+colcon build --symlink-install --packages-select furuta_pendulum_control_toolbox --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 in Release i got: 
@@ -415,3 +415,5 @@ in Release i got:
 waiting 1 second for begin
 furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Block<XprType, BlockRows, BlockCols, InnerPanel>::Block(XprType&, Eigen::Index, Eigen::Index, Eigen::Index, Eigen::Index) [with XprType = Eigen::Matrix<double, 1, 1, 0, 1, 1>; int BlockRows = 2; int BlockCols = 1; bool InnerPanel = false; Eigen::Index = long int]: Assertion `startRow >= 0 && blockRows >= 0 && startRow <= xpr.rows() - blockRows && startCol >= 0 && blockCols >= 0 && startCol <= xpr.cols() - blockCols' failed.
 ```
+
+-DCMAKE_CXX_FLAGS="-march=native -mtune=native -mavx2 -mfma"
