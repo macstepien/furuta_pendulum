@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "cppdbg",
             "cwd": "/",
-            "program": "/home/maciej/ros2_ws/install/furuta_pendulum_control_toolbox/lib/furuta_pendulum_control_toolbox/ct_furuta_pendulum_nloc"
+            "program": "/home/maciej/ros2_ws/install/furuta_pendulum_control_toolbox/lib/furuta_pendulum_control_toolbox/ct_demo_simulation_mpc"
         }
     ]
 }

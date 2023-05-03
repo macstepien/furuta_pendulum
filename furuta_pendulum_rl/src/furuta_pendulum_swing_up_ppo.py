@@ -33,7 +33,7 @@ else:
     env.reset()
     obs = env.reset_model()
     while True:
-        action, _states = model.predict(obs)
+        action, _ = model.predict(obs)
         obs, rewards, done, info, _ = env.step(action)
         env.render()
         if done:

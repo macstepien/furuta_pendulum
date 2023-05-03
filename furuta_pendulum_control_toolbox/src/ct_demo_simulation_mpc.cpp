@@ -68,7 +68,7 @@ int main()
   const bool verbose = true;
   std::string config_file = std::filesystem::path(ament_index_cpp::get_package_share_directory(
                               "furuta_pendulum_control_toolbox")) /
-                            "config" / "nloc_config.info";
+                            "config" / "mpc_config.info";
   try {
     std::unique_ptr<
       ct::optcon::MPC<ct::optcon::NLOptConSolver<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>>
@@ -91,7 +91,7 @@ int main()
     std::shared_ptr<FPSystem> fp_system(new FPSystem());
 
     MPCSimulator mpc_sim(sim_dt, control_dt, x0, fp_system, *ilqr_mpc);
-    std::cout << "simulating 3 seconds" << std::endl;
+    std::cout << "Simulating " << simulation_time << " seconds" << std::endl;
     mpc_sim.simulate(simulation_time);
     mpc_sim.finish();
 

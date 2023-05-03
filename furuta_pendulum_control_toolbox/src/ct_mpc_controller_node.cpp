@@ -44,7 +44,7 @@ public:
     const bool verbose = true;
     std::string config_file = std::filesystem::path(ament_index_cpp::get_package_share_directory(
                                 "furuta_pendulum_control_toolbox")) /
-                              "config" / "nloc_config.info";
+                              "config" / "mpc_config.info";
 
     mpc_ = CreateMPCController(config_file, verbose);
 
