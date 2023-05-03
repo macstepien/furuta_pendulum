@@ -36,9 +36,8 @@ else:
     obs = env.reset_model()
     i = 0
     while True:
-        action, _states = model.predict(obs)
+        action, _ = model.predict(obs)
         obs, rewards, done, info, _ = env.step(action)
-        # if i % 2 == 0:
         env.render()
         i += 1
         # if done or i > max_episode_steps:
