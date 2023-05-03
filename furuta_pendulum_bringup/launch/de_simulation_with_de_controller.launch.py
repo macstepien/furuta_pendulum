@@ -28,7 +28,7 @@ def generate_launch_description():
                 [
                     FindPackageShare("furuta_pendulum_de"),
                     "launch",
-                    "lqr_with_swingup_controller.launch.py",
+                    "lqr_with_swing_up_controller.launch.py",
                 ]
             )
         ),

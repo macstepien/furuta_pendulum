@@ -1,4 +1,4 @@
-#include <furuta_pendulum_de/lqr_with_swingup_controller_node.hpp>
+#include <furuta_pendulum_de/lqr_with_swing_up_controller_node.hpp>
 
 #include <chrono>
 #include <memory>
@@ -12,7 +12,7 @@
 namespace furuta_pendulum_de
 {
 
-LqrWithSwingupControllerNode::LqrWithSwingupControllerNode(const rclcpp::NodeOptions & options)
+LqrWithSwingUpControllerNode::LqrWithSwingUpControllerNode(const rclcpp::NodeOptions & options)
 : Node("furuta_pendulum_controller_node", options)
 {
   this->declare_parameter("K", rclcpp::PARAMETER_DOUBLE_ARRAY);
@@ -34,17 +34,17 @@ LqrWithSwingupControllerNode::LqrWithSwingupControllerNode(const rclcpp::NodeOpt
 
   state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
     "joint_states", 10,
-    std::bind(&LqrWithSwingupControllerNode::StateCb, this, std::placeholders::_1));
+    std::bind(&LqrWithSwingUpControllerNode::StateCb, this, std::placeholders::_1));
   torque_cmd_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>("effort_control", 10);
 }
 
-void LqrWithSwingupControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
+void LqrWithSwingUpControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
 {
   double u = 0.0;
   if (fabs(msg->position[1] - M_PI) < lqr_transition_angle_) {
     u = LqrControl(msg);
   } else {
-    u = SwingupControl(msg);
+    u = SwingUpControl(msg);
   }
 
   std_msgs::msg::Float64MultiArray torque_cmd_msg;
@@ -53,7 +53,7 @@ void LqrWithSwingupControllerNode::StateCb(sensor_msgs::msg::JointState::SharedP
   torque_cmd_pub_->publish(torque_cmd_msg);
 }
 
-double LqrWithSwingupControllerNode::LqrControl(
+double LqrWithSwingUpControllerNode::LqrControl(
   sensor_msgs::msg::JointState::SharedPtr current_state)
 {
   Eigen::Vector4d state_vector;
@@ -65,7 +65,7 @@ double LqrWithSwingupControllerNode::LqrControl(
   return -K_.dot(state_vector);
 }
 
-double LqrWithSwingupControllerNode::SwingupControl(
+double LqrWithSwingUpControllerNode::SwingUpControl(
   sensor_msgs::msg::JointState::SharedPtr current_state)
 {
   // based on http://bulletin.pan.pl/(52-3)153.pdf
@@ -86,4 +86,4 @@ double LqrWithSwingupControllerNode::SwingupControl(
 
 // Register the component with class_loader
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_de::LqrWithSwingupControllerNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_de::LqrWithSwingUpControllerNode)

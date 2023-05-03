@@ -426,7 +426,7 @@ furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Blo
 `ct_demo_simulation_node` - similar to previouse one, but this time initial state is read from parameters, and results are published in `joint_state` message, which can be later used to visualize model in RViz. Used for further model verification.
 `ros2 launch furuta_pendulum_control_toolbox ct_simulation.launch.py`
 
-`ct_lqr` - linearizes system and calculates LQR gains, which can be later used in the `lqr_with_swingup_controller`
+`ct_lqr` - linearizes system and calculates LQR gains, which can be later used in the `lqr_with_swing_up_controller`
 `ros2 run furuta_pendulum_control_toolbox ct_lqr`
 `ros2 launch furuta_pendulum_control_toolbox ct_lqr_controller.launch.py`
 

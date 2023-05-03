@@ -2,9 +2,9 @@
 Packages in this repository can be divided into two subgroups: 
 
 1. Different approaches to solving control problem:
- * **furuta_pendulum_de** - uses manually derived Differential Equations (hence the name) with manually calculated linearization, which is then used for calculating LQR controller with swingup
- * **furuta_pendulum_drake** - in this package the same LQR with swingup approach is used, but this time manually derived equations are replaced. Instead [Drake library](https://drake.mit.edu/) is used to load URDF of pendulum, and solely based on it, linearization is calculated, which is once again used to calculate K gain.  
- * **furuta_pendulum_control_toolbox** - in this approach different library is used - [Control Toolbox](https://github.com/ethz-adrl/control-toolbox). It also automatically derives simulation of the pendulum based on this model (which is in form of code generated based on URDF model). There are two approaches used here, one is the same, as in previous ones - LQR with swingup, but this time Control Toolbox is used to get K. Another aproach uses MPC to get optimal solution.
+ * **furuta_pendulum_de** - uses manually derived Differential Equations (hence the name) with manually calculated linearization, which is then used for calculating LQR controller with swing-up
+ * **furuta_pendulum_drake** - in this package the same LQR with swing-up approach is used, but this time manually derived equations are replaced. Instead [Drake library](https://drake.mit.edu/) is used to load URDF of pendulum, and solely based on it, linearization is calculated, which is once again used to calculate K gain.  
+ * **furuta_pendulum_control_toolbox** - in this approach different library is used - [Control Toolbox](https://github.com/ethz-adrl/control-toolbox). It also automatically derives simulation of the pendulum based on this model (which is in form of code generated based on URDF model). There are two approaches used here, one is the same, as in previous ones - LQR with swing-up, but this time Control Toolbox is used to get K. Another aproach uses MPC to get optimal solution.
  * **furuta_pendulum_rl** - in this package Deep Reinforcement Learnig approach is used. Pendulum is modeled in the Mujoco, which then is used to create Gym environment. It is then used to train agent. Model is then exported and run using C++ controller. 
 
 2. General utility packages:

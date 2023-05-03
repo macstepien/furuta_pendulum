@@ -37,17 +37,17 @@ install(
   LIBRARY DESTINATION lib
 )
 
-add_library(lqr_with_swingup_controller SHARED 
-  src/lqr_with_swingup_controller_node.cpp)
-ament_target_dependencies(lqr_with_swingup_controller ${PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(lqr_with_swingup_controller "furuta_pendulum_de::LqrWithSwingupControllerNode")
-rclcpp_components_register_node(lqr_with_swingup_controller
-  PLUGIN "furuta_pendulum_de::LqrWithSwingupControllerNode"
-  EXECUTABLE lqr_with_swingup_controller_node
+add_library(lqr_with_swing_up_controller SHARED 
+  src/lqr_with_swing_up_controller_node.cpp)
+ament_target_dependencies(lqr_with_swing_up_controller ${PACKAGE_INCLUDE_DEPENDS})
+rclcpp_components_register_nodes(lqr_with_swing_up_controller "furuta_pendulum_de::LqrWithSwingUpControllerNode")
+rclcpp_components_register_node(lqr_with_swing_up_controller
+  PLUGIN "furuta_pendulum_de::LqrWithSwingUpControllerNode"
+  EXECUTABLE lqr_with_swing_up_controller_node
 )
 
 install(
-  TARGETS lqr_with_swingup_controller
+  TARGETS lqr_with_swing_up_controller
   LIBRARY DESTINATION lib
 )
 
