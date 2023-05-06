@@ -1,3 +1,25 @@
+# furuta_pendulum_control_toolbox
+
+## Files
+
+`ct_demo_simulation` - simple simulation of Furuta pendulum with some hardcoded initial state, state trajectories are then plotted. Its main purpose is the initial verification of generated model
+`ros2 run furuta_pendulum_control_toolbox ct_demo_simulation`
+
+`ct_demo_simulation_node` - similar to the previous one, but this time initial state is read from parameters, and results are published in a `joint_state` message, which can be later used to visualize the model in RViz. Used for further model verification.
+`ros2 launch furuta_pendulum_control_toolbox ct_simulation.launch.py`
+
+`ct_lqr` - linearizes system and calculates LQR gains, which can be later used in the `lqr_with_swing_up_controller`
+`ros2 run furuta_pendulum_control_toolbox ct_lqr`
+`ros2 launch furuta_pendulum_control_toolbox ct_lqr_controller.launch.py`
+
+`ct_demo_simulation_mpc` - first attempt at creating an MPC controller for the Furuta pendulum. After creating the controller, it is then verified using simulation and results are printed.
+`ros2 run furuta_pendulum_control_toolbox ct_demo_simulation_mpc`
+
+`ct_demo_simulation_mpc_node` - it is a previous demo, but with publishing `joint_state` messages, so that everything could be visualized in RViz.
+`ros2 launch furuta_pendulum_control_toolbox ct_simulation_with_mpc_controller.launch.py`
+
+`ct_mpc_controller_node` - MPC controller from previous demos, extracted into a standalone node. It subscribes to `joint_state` messages (as this time it isn't combined with the simulator) and calculates controls.
+`ros2 launch furuta_pendulum_control_toolbox ct_mpc_controller.launch.py`
 
 ## Setup
 
@@ -10,7 +32,7 @@ Based on [tutorial from control_toolbox](https://ethz-adrl.github.io/ct/ct_doc/d
 git clone https://github.com/leggedrobotics/urdf2robcogen.git
 git clone https://github.com/ANYbotics/kindr_ros.git
 ```
-Build and then run following command to generate `dtdsl` and `kindsl`:
+Build and then run the following command to generate `dtdsl` and `kindsl`:
 ```
 rosrun urdf2robcogen urdf2robcogen_script FurutaPendulum /PATH_TO_URDF/furuta_pendulum.urdf
 ```
@@ -24,7 +46,7 @@ sudo apt install maxima
 Then download version `0.4ad.0` of RobCoGen from [this page](https://robcogenteam.bitbucket.io/binary.html). 
 
 Then, before generating code, it is necessary to fix some problems.
-First ons is described in this [github issue](https://github.com/ethz-adrl/control-toolbox/issues/166), as in the issue I removed a "/" sign from the framework.properties (`generator.maxima.libs.path = ../etc/maxima-libs`, without "/" at the end).
+First one is described in this [github issue](https://github.com/ethz-adrl/control-toolbox/issues/166), as in the issue I removed a "/" sign from the framework.properties (`generator.maxima.libs.path = ../etc/maxima-libs`, without "/" at the end).
 
 <!-- Fix:
 fatal error: iit/rbd/scalar_traits.h: No such file or directory
@@ -51,7 +73,7 @@ Finally to generate code run:
 ```
 ./robcogen.sh /PATH_TO_KINDSL/FurutaPendulum.kindsl /PATH_TO_DTDSL/FurutaPendulum.dtdsl
 ```
-You should see following menu:
+You should see the following menu:
 ```
  0 - CTDSL      - The coordinate transforms description file .ctdsl
 
@@ -98,7 +120,7 @@ Now select option 1, then 4 and 28 to exit. Model sources will be generated in t
 For bounded problem
 ./install_hpipm.sh
 
-I got problem that blasfeo examples didn't build and I had to disable them in the CMakeLists.txt of blasfeo:
+I got a problem that blasfeo examples didn't build and I had to disable them in the CMakeLists.txt of blasfeo:
 ```
 # set(BLASFEO_EXAMPLES ON CACHE BOOL "Examples enabled")
 set(BLASFEO_EXAMPLES OFF CACHE BOOL "Examples disabled")
@@ -109,9 +131,9 @@ Then I had to modify `ct_models` CMakeLists to add blasfeo and HPIPM.
 cmake_minimum_required (VERSION 3.5)
 
 if(NOT TARGET clang-format)
-	include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/compilerSettings.cmake)
-	include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/explicitTemplateHelpers.cmake)
-	include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/clang-cxx-dev-tools.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/compilerSettings.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/explicitTemplateHelpers.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/clang-cxx-dev-tools.cmake)
 endif()
 include(${CMAKE_CURRENT_SOURCE_DIR}/../ct/cmake/ct-cmake-helpers.cmake)
 
@@ -123,7 +145,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14 -Wall -Wno-unk
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 if(NOT TARGET ${ct_rbd})
-	find_package(ct_rbd REQUIRED)
+  find_package(ct_rbd REQUIRED)
 endif()
 find_package(Boost REQUIRED system filesystem)
 
@@ -405,36 +427,12 @@ add_subdirectory(doc)
 
 ## Building
 
-It has to be build in release mode: `Release`
+It has to be built in release mode: `Release`
 ```
 colcon build --symlink-install --packages-select furuta_pendulum_control_toolbox --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
-
-Otherwise Release I got error: 
+Otherwise I got an error: 
 ```
 waiting 1 second for begin
 furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Block<XprType, BlockRows, BlockCols, InnerPanel>::Block(XprType&, Eigen::Index, Eigen::Index, Eigen::Index, Eigen::Index) [with XprType = Eigen::Matrix<double, 1, 1, 0, 1, 1>; int BlockRows = 2; int BlockCols = 1; bool InnerPanel = false; Eigen::Index = long int]: Assertion `startRow >= 0 && blockRows >= 0 && startRow <= xpr.rows() - blockRows && startCol >= 0 && blockCols >= 0 && startCol <= xpr.cols() - blockCols' failed.
 ```
-
--DCMAKE_CXX_FLAGS="-march=native -mtune=native -mavx2 -mfma"
-
-## Files
-
-`ct_demo_simulation` - simple simulation of furuta pendulum with some hardcoded initial state, state trajectories are then plotted. Its main purpose is initial verification of generated model
-`ros2 run furuta_pendulum_control_toolbox ct_demo_simulation`
-
-`ct_demo_simulation_node` - similar to previous one, but this time initial state is read from parameters, and results are published in `joint_state` message, which can be later used to visualize model in RViz. Used for further model verification.
-`ros2 launch furuta_pendulum_control_toolbox ct_simulation.launch.py`
-
-`ct_lqr` - linearizes system and calculates LQR gains, which can be later used in the `lqr_with_swing_up_controller`
-`ros2 run furuta_pendulum_control_toolbox ct_lqr`
-`ros2 launch furuta_pendulum_control_toolbox ct_lqr_controller.launch.py`
-
-`ct_demo_simulation_mpc` - first attempt at creating MPC controller for Furuta pendulum. After creating controller, it is then verified using simulation and results are printed.
-`ros2 run furuta_pendulum_control_toolbox ct_demo_simulation_mpc`
-
-`ct_demo_simulation_mpc_node` - it is previous demo, but with publishing `joint_state` messages, so that everything could be visualized in RViz.
-`ros2 launch furuta_pendulum_control_toolbox ct_simulation_with_mpc_controller.launch.py`
-
-`ct_mpc_controller_node` - MPC controller form previous demos, extracted into standalone node. It subscribes to `joint_state` messages (as this time it isn't combined with simulator) and calculates controls.
-`ros2 launch furuta_pendulum_control_toolbox ct_mpc_controller.launch.py`
