@@ -146,6 +146,6 @@
   <xacro:odrive_ros2_control
     name="odrive_ros2_control"
     enable_joint0="true"
-    enable_joint1="false" />
+    enable_joint1="true" />
 
 </robot>
