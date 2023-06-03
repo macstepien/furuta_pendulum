@@ -78,6 +78,9 @@ def generate_launch_description():
         executable="ros2_control_node",
         output="both",
         parameters=[robot_description, robot_controllers],
+        remappings=[
+            ("/joint0_effort_controller/commands", "/effort_control"),
+        ],
     )
 
     robot_state_pub_node = Node(
