@@ -54,7 +54,7 @@ private:
 
   void SetEffortCb(std_msgs::msg::Float64MultiArray::SharedPtr msg)
   {
-    if (msg->data.size() > 1) {
+    if (msg->data.size() >= 1) {
       SetTorque(msg->data[0]);
     }
     // Ignore disturbance from effort command
