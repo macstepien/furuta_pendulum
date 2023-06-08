@@ -21,14 +21,14 @@
     <color rgba="0.8 0.8 0.8 1.0" />
   </material>
 
-  <xacro:property name="base_radius" value="0.1" />
+  <xacro:property name="base_radius" value="0.025" />
   <xacro:property name="L2" value="$(arg L2)" />
   <xacro:property name="base_length" value="${L2+0.05}" />
 
-  <xacro:property name="arm1_radius" value="0.02" />
+  <xacro:property name="arm1_radius" value="0.005" />
   <xacro:property name="arm1_length" value="$(arg L1)" />
 
-  <xacro:property name="arm2_radius" value="0.02" />
+  <xacro:property name="arm2_radius" value="0.005" />
   <xacro:property name="arm2_length" value="$(arg L2)" />
 
   <!-- https://www.hindawi.com/journals/jcse/2011/528341/ here this inertias 
