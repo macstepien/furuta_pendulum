@@ -27,7 +27,7 @@ def load_yaml(package_name, directory_name, file_name):
 
 def generate_launch_description():
     pendulum_parameters = load_yaml(
-        "furuta_pendulum_hardware", "config", "pendulum_parameters.yaml"
+        "furuta_pendulum_description", "config", "pendulum_parameters.yaml"
     )["/**"]["ros__parameters"]
 
     robot_description_content = Command(
