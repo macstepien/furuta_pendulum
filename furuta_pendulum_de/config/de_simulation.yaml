@@ -1,8 +1,8 @@
 /**:
   ros__parameters:
-    simulation_dt: 0.001
+    simulation_dt: 0.006666667
     max_torque: 20.0
-    max_velocity: 50.0
+    max_velocity: 20.0
 
     initial_conditions:
       theta1: 0.0
