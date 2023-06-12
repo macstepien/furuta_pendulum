@@ -5,12 +5,16 @@
     # 175Hz, 0.0001 damping
     # K: [-3.76757e-18, 0.545336, -0.020137, 0.0563273]
     # 175Hz, 0.00028 damping
-    K: [-1.97188e-18, 0.590181, -0.0201872, 0.0556876]
+    # K: [-1.97188e-18, 0.590181, -0.0201872, 0.0556876]
+    # 500Hz, 0.0001 damping
+    K: [2.47935e-18, 1.52852, -0.0587845, 0.163093]
+    # 1000Hz, 0.0001 damping
+    # K: [9.09194e-18, 3.01242, -0.117126, 0.324254]
 
-    alpha: 0.95
+    alpha: 1.0
     # absolute maximum command value that is used in swing up
     u_max: 0.1
     # 0.0 angle - upward position. When absolute angle is less than this threshold
     # transition from swing up to LQR
     lqr_transition_angle: 0.5
-    torque_multiplier: 1.7
+    torque_multiplier: 1.0

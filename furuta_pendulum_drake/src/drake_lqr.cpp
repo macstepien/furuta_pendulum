@@ -90,7 +90,7 @@ int main()
 
   const double kTargetRealtimeRate = 1.0;
   const double kSimulationTime = 50.0;
-  const double kMaxTimeStep = 0.005714286;
+  const double kMaxTimeStep = 0.002;
 
   const double g = 9.80665;
   const double m2 = 0.075;
