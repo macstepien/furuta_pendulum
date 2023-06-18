@@ -38,9 +38,6 @@ private:
   double max_torque_;
   double max_velocity_;
 
-  // Motor parameters
-  double L_, R_, Km_;
-
   double current_time_ = 0.0;
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;

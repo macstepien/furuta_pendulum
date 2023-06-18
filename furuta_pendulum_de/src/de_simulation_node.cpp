@@ -41,9 +41,6 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
   this->declare_parameter("L2", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("b1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("b2", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("L", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("R", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("Km", rclcpp::PARAMETER_DOUBLE);
 
   this->declare_parameter("J1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("J2", rclcpp::PARAMETER_DOUBLE);
@@ -59,9 +56,6 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
     L2_ = this->get_parameter("L2").as_double();
     b1_ = this->get_parameter("b1").as_double();
     b2_ = this->get_parameter("b2").as_double();
-    L_ = this->get_parameter("L").as_double();
-    R_ = this->get_parameter("R").as_double();
-    Km_ = this->get_parameter("Km").as_double();
 
     double J1 = this->get_parameter("J1").as_double();
     double J2 = this->get_parameter("J2").as_double();
