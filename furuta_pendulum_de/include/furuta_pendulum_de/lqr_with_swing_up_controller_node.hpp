@@ -35,7 +35,9 @@ private:
 
   double torque_multiplier_;
   double alpha_;
+  double alpha_swingup_;
   double dtheta2_filtered_ = 0.0;
+  double dtheta2_filtered_swingup_ = 0.0;
   double dtheta1_filtered_ = 0.0;
 
   static constexpr double g_ = 9.80665;

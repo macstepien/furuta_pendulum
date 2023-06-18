@@ -37,6 +37,7 @@ LqrWithSwingUpControllerNode::LqrWithSwingUpControllerNode(const rclcpp::NodeOpt
   this->declare_parameter("J2", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("u_max", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("alpha", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("alpha_swingup", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("lqr_transition_angle", rclcpp::PARAMETER_DOUBLE);
 
@@ -51,6 +52,7 @@ LqrWithSwingUpControllerNode::LqrWithSwingUpControllerNode(const rclcpp::NodeOpt
     J2_ = this->get_parameter("J2").as_double();
     J1_ = this->get_parameter("J1").as_double();
     alpha_ = this->get_parameter("alpha").as_double();
+    alpha_swingup_ = this->get_parameter("alpha_swingup").as_double();
     torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
 
     u_max_ = this->get_parameter("u_max").as_double();
@@ -69,6 +71,7 @@ LqrWithSwingUpControllerNode::LqrWithSwingUpControllerNode(const rclcpp::NodeOpt
 void LqrWithSwingUpControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
 {
   dtheta2_filtered_ = alpha_ * msg->velocity[1] + (1.0 - alpha_) * dtheta2_filtered_;
+  dtheta2_filtered_swingup_ = alpha_swingup_ * msg->velocity[1] + (1.0 - alpha_swingup_) * dtheta2_filtered_swingup_;
   dtheta1_filtered_ = alpha_ * msg->velocity[0] + (1.0 - alpha_) * dtheta1_filtered_;
 
   double u = 0.0;
@@ -100,13 +103,13 @@ double LqrWithSwingUpControllerNode::SwingUpControl(
   sensor_msgs::msg::JointState::SharedPtr current_state)
 {
   // based on http://bulletin.pan.pl/(52-3)153.pdf
-  const double dtheta2 = current_state->velocity[1];
-  const double theta2 = current_state->position[1];
+  // const double dtheta2 = current_state->velocity[1];
+  const double theta2 = limit_minus_pi_pi(current_state->position[1] - M_PI);
 
   const double dtheta1 = current_state->velocity[0];
   const double theta1 = current_state->position[0];
 
-  // const double E = 0.5 * m2_ * pow(l2_, 2) * pow(dtheta2, 2) + m2_ * g_ * l2_ * cos(theta2);
+  const double E = 0.5 * m2_ * pow(l2_, 2) * pow(dtheta2_filtered_swingup_, 2) + m2_ * g_ * l2_ * cos(theta2);
 
   // double Ek1 = 0.5 * pow(dtheta1, 2) * (m1_ * pow(l1_, 2) + J1_);
   // double Ep2 = m2_ * g_ * l2_ * (1 - cos(theta2));
@@ -119,26 +122,28 @@ double LqrWithSwingUpControllerNode::SwingUpControl(
   // // double E = Ek1 + Ep2 + Ek2;
   // double E = Ep2 + Ek2;
 
-  // const double E0 = m2_ * g_ * l2_;
-
-  // const double x = (E0 - E) * dtheta2 * (1 - cos(theta2));
+  const double E0 = m2_ * g_ * l2_;
+  const double x = (E0 - E) * dtheta2_filtered_swingup_ * (1-cos(theta2));
+  
   // const double x = -dtheta2 * (cos(theta2));
   // if (x > 0.0) {
   //   return -u_max_ * fabs(E - E0);
   // } else {
   //   return u_max_ * fabs(E - E0);
   // }
-  // if (x > 0.0) {
-  //   return -u_max_;
-  // } else {
-  //   return u_max_;
-  // }
-  // if (fabs(dtheta2) > 0.02) {
-  if (dtheta2_filtered_ * cos(theta2) > 0) {
+  if (x > 0.0) {
     return -u_max_;
   } else {
     return u_max_;
   }
+
+  // if (fabs(dtheta2) > 0.02) {
+  // if (dtheta2_filtered_ * cos(theta2) > 0) {
+  //   return -u_max_;
+  // } else {
+  //   return u_max_;
+  // }
+  
   // if (swing_up_started_) {
   //   double K = u_max_;
   //   return K * pow(cos(theta2), 4) * dtheta2_filtered_ *

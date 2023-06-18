@@ -123,3 +123,10 @@ CMake Error at CMakeLists.txt:28 (message):
   Failed to find libusb-1.0
 
    sudo apt-get install libusb-1.0-0-dev
+
+
+<!-- Resetting encoder counter -->
+odrv0.axis1.encoder.set_linear_count(0)
+
+odrv0.axis0.controller.config.vel_limit = 8.0
+odrv0.axis0.motor.config.current_lim = 14
