@@ -38,8 +38,8 @@ iit::FurutaPendulum::tpl::Jacobians<TRAIT>::Type_fr_base_link_J_fr_arm2::update(
 
   (*this)(0, 1) = c_q_joint1_;
   (*this)(1, 1) = s_q_joint1_;
-  (*this)(3, 0) = (-0.278 * s_q_joint1_);
-  (*this)(4, 0) = (0.278 * c_q_joint1_);
+  (*this)(3, 0) = (-0.09352 * s_q_joint1_);
+  (*this)(4, 0) = (0.09352 * c_q_joint1_);
   return *this;
 }
 template <typename TRAIT>
@@ -87,9 +87,9 @@ iit::FurutaPendulum::tpl::Jacobians<TRAIT>::Type_fr_base_link_J_fr_ee::update(co
 
   (*this)(0, 1) = c_q_joint1_;
   (*this)(1, 1) = s_q_joint1_;
-  (*this)(3, 0) = (((-0.3 * c_q_joint1_) * s_q_joint2_) - (0.278 * s_q_joint1_));
+  (*this)(3, 0) = (((-0.3 * c_q_joint1_) * s_q_joint2_) - (0.09352 * s_q_joint1_));
   (*this)(3, 1) = ((-0.3 * s_q_joint1_) * c_q_joint2_);
-  (*this)(4, 0) = ((0.278 * c_q_joint1_) - ((0.3 * s_q_joint1_) * s_q_joint2_));
+  (*this)(4, 0) = ((0.09352 * c_q_joint1_) - ((0.3 * s_q_joint1_) * s_q_joint2_));
   (*this)(4, 1) = ((0.3 * c_q_joint1_) * c_q_joint2_);
   (*this)(5, 1) = (0.3 * s_q_joint2_);
   return *this;
