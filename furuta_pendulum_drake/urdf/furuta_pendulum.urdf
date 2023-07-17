@@ -72,7 +72,7 @@
     <parent link="arm1" />
     <child link="arm2" />
     <axis xyz="1 0 0" />
-    <dynamics damping="0.0001" />
+    <dynamics damping="1.7905703040590617e-05" />
     <limit effort="4.0" velocity="15.0" />
   </joint>
 
