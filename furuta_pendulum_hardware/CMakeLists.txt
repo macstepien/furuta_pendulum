@@ -6,6 +6,7 @@ find_package(ament_cmake REQUIRED)
 install(DIRECTORY
   config
   launch
+  system_identification
   urdf
   DESTINATION share/${PROJECT_NAME}
 )
