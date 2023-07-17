@@ -124,8 +124,8 @@ What would you like to generate? Please enter the integer code:
 
 Now select option 1, then 4 and 28 to exit. Model sources will be generated in the `robcogen-0.4ad.0/run/gen_code` directory.
 
-For bounded problem
-sudo ./install_hpipm.sh
+For bounded problem it is necessary to `install_hpipm.sh`
+!Warning! Don't use install_hpipm script, it is necessary to look what is done and repeat it manually, because it is necessary to disable blasfeo examples.
 
 I got a problem that blasfeo examples didn't build and I had to disable them in the CMakeLists.txt of blasfeo:
 ```
