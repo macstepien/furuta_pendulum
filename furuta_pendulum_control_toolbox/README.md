@@ -21,6 +21,13 @@
 `ct_mpc_controller_node` - MPC controller from previous demos, extracted into a standalone node. It subscribes to `joint_state` messages (as this time it isn't combined with the simulator) and calculates controls.
 `ros2 launch furuta_pendulum_control_toolbox ct_mpc_controller.launch.py`
 
+## Minimal setup
+Navigate to your control_toolbox directory and:
+```
+cd ct
+sudo ./install_cppadcg.sh
+sudo ./install_hpipm.sh
+```
 ## Setup
 
 Based on [tutorial from control_toolbox](https://ethz-adrl.github.io/ct/ct_doc/doc/html/rbd_tut_modelling.html).
@@ -118,7 +125,7 @@ What would you like to generate? Please enter the integer code:
 Now select option 1, then 4 and 28 to exit. Model sources will be generated in the `robcogen-0.4ad.0/run/gen_code` directory.
 
 For bounded problem
-./install_hpipm.sh
+sudo ./install_hpipm.sh
 
 I got a problem that blasfeo examples didn't build and I had to disable them in the CMakeLists.txt of blasfeo:
 ```
