@@ -130,3 +130,6 @@ odrv0.axis1.encoder.set_linear_count(0)
 
 odrv0.axis0.controller.config.vel_limit = 8.0
 odrv0.axis0.motor.config.current_lim = 14
+
+## Motors
+Max current around 3A.
