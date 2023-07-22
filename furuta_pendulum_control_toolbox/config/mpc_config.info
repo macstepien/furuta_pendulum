@@ -1,5 +1,6 @@
 ; time_horizon 1.5
-time_horizon 1.0
+time_horizon 1.5
+minimum_time_horizon 0.2
 
 ; control toolbox simulation parameters
 sim_dt 0.002
@@ -19,14 +20,14 @@ ilqr
     discretization Forward_euler
     timeVaryingDiscretization false
     ; dt 0.05
-    dt 0.014
+    dt 0.0118
     K_sim 1
     K_shot 1
     epsilon 0e-6
-    max_iterations 50
+    max_iterations 10
     fixedHessianCorrection false
     recordSmallestEigenvalue false
-    min_cost_improvement 1e-7
+    min_cost_improvement 1e-6
     meritFunctionRho 0.0
     maxDefectSum 1e-5
     nThreads 12
@@ -37,12 +38,11 @@ ilqr
     printSummary true
     debugPrint false
 
-
     line_search
     {
         active false ;
         adaptive false ;
-        maxIterations 10 ;
+        maxIterations 5 ;
         alpha_0 1.0 ;
         n_alpha 0.5 ;
         debugPrint false
@@ -69,15 +69,15 @@ term0
     {
       scaling 1.0
       (0,0)   0.0
-      (1,1)   15.0
-      (2,2)   1.0
-      (3,3)   2.0
+      (1,1)   17.0
+      (2,2)   0.5
+      (3,3)   1.5
     }
 
     R
     {
       scaling 1.0
-      (0,0) 1.0
+      (0,0) 0.1
     }
 
     x_des
@@ -104,9 +104,9 @@ term1
     {
       scaling 1.0
       (0,0)   0.0
-      (1,1)   15.0
-      (2,2)   1.0
-      (3,3)   2.0
+      (1,1)   17.0
+      (2,2)   0.5
+      (3,3)   1.5
     }
 
     x_des

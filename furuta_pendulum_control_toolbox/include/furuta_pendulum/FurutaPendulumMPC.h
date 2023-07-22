@@ -170,9 +170,12 @@ CreateMPCController(std::string config_file, bool verbose = true)
     mpc_settings.postTruncation_ = false;
     mpc_settings.measureDelay_ = false;
     mpc_settings.delayMeasurementMultiplier_ = 1.0;
-    mpc_settings.mpc_mode = ct::optcon::MPC_MODE::CONSTANT_RECEDING_HORIZON;
+    mpc_settings.mpc_mode = ct::optcon::MPC_MODE::FIXED_FINAL_TIME_WITH_MIN_TIME_HORIZON;
     mpc_settings.coldStart_ = false;
-    mpc_settings.minimumTimeHorizonMpc_ = 3.0;
+
+    ct::core::Time minimum_time_horizon;
+    ct::core::loadScalar(config_file, "minimum_time_horizon", minimum_time_horizon);
+    mpc_settings.minimumTimeHorizonMpc_ = minimum_time_horizon;
 
     std::unique_ptr<
       ct::optcon::MPC<ct::optcon::NLOptConSolver<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>>
