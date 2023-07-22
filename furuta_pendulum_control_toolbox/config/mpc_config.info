@@ -1,12 +1,17 @@
-time_horizon 2.5
+; time_horizon 0.7
+; time_horizon 1.0
+time_horizon 1.5
 
 ; control toolbox simulation parameters
 sim_dt 0.01
 control_dt 0.01
-simulation_time 3.0
+simulation_time 1.5
 
 ; 0 = steady state ID, 1 = linear, 2 = integrated with zero control action, 3 = random; 4=zero
 init_type 0
+
+control_signal_bound 1.0
+velocity_bound 20.0
 
 ilqr
 {
@@ -14,7 +19,9 @@ ilqr
     useSensitivityIntegrator false
     discretization Forward_euler
     timeVaryingDiscretization false
-    dt 0.005
+    ; dt 0.007
+    ; dt 0.014
+    dt 0.05
     K_sim 1
     K_shot 1
     epsilon 0e-6
@@ -24,8 +31,8 @@ ilqr
     min_cost_improvement 1e-7
     meritFunctionRho 0.0
     maxDefectSum 1e-5
-    nThreads 8
-    nThreadsEigen 8
+    nThreads 12
+    nThreadsEigen 12
     locp_solver HPIPM_SOLVER
     ;locp_solver GNRICCATI_SOLVER
     nlocp_algorithm GNMS
@@ -64,9 +71,9 @@ term0
     {
       scaling 1.0
       (0,0)   0.0
-      (1,1)   10.0
+      (1,1)   15.0
       (2,2)   1.0
-      (3,3)   1.0
+      (3,3)   2.0
     }
 
     R
@@ -99,9 +106,9 @@ term1
     {
       scaling 1.0
       (0,0)   0.0
-      (1,1)   10.0
+      (1,1)   15.0
       (2,2)   1.0
-      (3,3)   1.0
+      (3,3)   2.0
     }
 
     x_des
