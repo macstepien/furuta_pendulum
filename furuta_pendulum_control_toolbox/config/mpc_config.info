@@ -1,17 +1,16 @@
-; time_horizon 0.7
-; time_horizon 1.0
-time_horizon 1.5
+; time_horizon 1.5
+time_horizon 1.0
 
 ; control toolbox simulation parameters
-sim_dt 0.01
+sim_dt 0.002
 control_dt 0.01
-simulation_time 1.5
+simulation_time 10.0
 
 ; 0 = steady state ID, 1 = linear, 2 = integrated with zero control action, 3 = random; 4=zero
 init_type 0
 
-control_signal_bound 1.0
-velocity_bound 20.0
+control_signal_bound 0.43
+velocity_bound 14.0
 
 ilqr
 {
@@ -19,9 +18,8 @@ ilqr
     useSensitivityIntegrator false
     discretization Forward_euler
     timeVaryingDiscretization false
-    ; dt 0.007
-    ; dt 0.014
-    dt 0.05
+    ; dt 0.05
+    dt 0.014
     K_sim 1
     K_shot 1
     epsilon 0e-6

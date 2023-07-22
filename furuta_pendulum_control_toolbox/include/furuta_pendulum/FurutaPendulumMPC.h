@@ -28,7 +28,11 @@ CreateMPCController(std::string config_file, bool verbose = true)
     // Control signal bounds
     Eigen::VectorXd u_lb(FPSystem::CONTROL_DIM);
     Eigen::VectorXd u_ub(FPSystem::CONTROL_DIM);
-    u_lb.setConstant(-4.0);
+
+    double control_signal_bound = 0.0;
+    ct::core::loadScalar(config_file, "control_signal_bound", control_signal_bound);
+
+    u_lb.setConstant(-control_signal_bound);
     u_ub = -u_lb;
 
     // constraint terms
@@ -53,7 +57,11 @@ CreateMPCController(std::string config_file, bool verbose = true)
     sp_state << 0, 1, 0, 1;
     Eigen::VectorXd x_lb(2);
     Eigen::VectorXd x_ub(2);
-    x_lb.setConstant(-10.0);
+
+    double velocity_bound = 0.0;
+    ct::core::loadScalar(config_file, "velocity_bound", velocity_bound);
+
+    x_lb.setConstant(-velocity_bound);
     x_ub = -x_lb;
     // constraint terms
     std::shared_ptr<ct::optcon::StateConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>

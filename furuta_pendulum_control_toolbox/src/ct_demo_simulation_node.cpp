@@ -70,7 +70,7 @@ private:
 
   void Simulate()
   {
-    integrator_->integrate_n_steps(state_, 0, 1, 0.001);
+    integrator_->integrate_n_steps(state_, 0, 1, 0.002);
     PublishJointStates();
   }
 

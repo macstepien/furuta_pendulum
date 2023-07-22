@@ -48,7 +48,7 @@ def generate_launch_description():
     actions = [
         description_launch,
         rviz_node,
-        TimerAction(period=4.0, actions=[furuta_pendulum_simulation_node]),
+        TimerAction(period=2.0, actions=[furuta_pendulum_simulation_node]),
     ]
 
     return LaunchDescription(actions)

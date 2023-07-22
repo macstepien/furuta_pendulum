@@ -39,6 +39,12 @@ class CtMPCControllerNode : public rclcpp::Node
 public:
   CtMPCControllerNode(const rclcpp::NodeOptions & options) : Node("controller_node", options)
   {
+    this->declare_parameter("alpha", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
+
+    alpha_ = this->get_parameter("alpha").as_double();
+    torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
+
     RCLCPP_INFO(this->get_logger(), "Starting calculations");
 
     const bool verbose = true;
@@ -58,16 +64,38 @@ public:
     builtin_interfaces::msg::Time current_time = this->get_clock()->now();
     start_sim_time_ = current_time.sec + 1000000000.0 * current_time.nanosec;
 
+    RCLCPP_INFO(this->get_logger(), "Preparing first iteration");
     mpc_->prepareIteration(0.0);
+    RCLCPP_INFO(this->get_logger(), "Finished preparing first iteration");
   }
+
+  double limit_minus_pi_pi(double angle)
+  {
+    angle = fmod(angle, 2 * M_PI);
+    if (angle > M_PI) {
+      angle = 2 * M_PI - angle;
+    } else if (angle < -M_PI) {
+      angle = 2 * M_PI + angle;
+    }
+    return angle;
+  }
+
+  double dtheta2_filtered_ = 0.0;
+  double dtheta1_filtered_ = 0.0;
+  double alpha_ = 0.0;
+  double torque_multiplier_ = 0.0;
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
+    dtheta1_filtered_ = alpha_ * msg->velocity[0] + (1.0 - alpha_) * dtheta1_filtered_;
+    dtheta2_filtered_ = alpha_ * msg->velocity[1] + (1.0 - alpha_) * dtheta2_filtered_;
+
     ct::core::StateVector<FPSystem::STATE_DIM> x;
     x(0) = msg->position[0];
+    // x(1) = limit_minus_pi_pi(msg->position[1] - M_PI);
     x(1) = msg->position[1];
-    x(2) = msg->velocity[0];
-    x(3) = msg->velocity[1];
+    x(2) = dtheta1_filtered_;
+    x(3) = dtheta2_filtered_;
 
     double current_sim_time =
       msg->header.stamp.sec + 1000000000.0 * msg->header.stamp.nanosec - start_sim_time_;
@@ -87,7 +115,7 @@ public:
     double u = control_action(0);
 
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
-    torque_cmd_msg.data.push_back(u);
+    torque_cmd_msg.data.push_back(u * torque_multiplier_);
     torque_cmd_msg.data.push_back(0.0);
     torque_cmd_pub_->publish(torque_cmd_msg);
 
