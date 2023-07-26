@@ -32,6 +32,13 @@ def generate_launch_description():
         ),
     )
 
+    ign_world_file = PathJoinSubstitution(
+        [
+            FindPackageShare("furuta_pendulum_gazebo"),
+            "config",
+            "empty.sdf",
+        ]
+    )
     ign_config_file = PathJoinSubstitution(
         [
             FindPackageShare("furuta_pendulum_gazebo"),
@@ -40,8 +47,10 @@ def generate_launch_description():
         ]
     )
     ign_config_cfg = LaunchConfiguration("ign_config")
+
     declare_ign_config_arg = DeclareLaunchArgument(
-        "ign_config", default_value=["-r empty.sdf --gui-config ", ign_config_file]
+        "ign_config",
+        default_value=["-r ", ign_world_file, " --gui-config ", ign_config_file],
     )
 
     gz_sim = IncludeLaunchDescription(
