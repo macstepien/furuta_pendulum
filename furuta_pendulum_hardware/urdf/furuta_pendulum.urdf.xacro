@@ -73,7 +73,7 @@
     </inertial>
   </link>
 
-  <joint name="joint1" type="continuous">
+  <joint name="joint0" type="continuous">
     <origin xyz="0.0 0.0 ${base_length+arm1_radius}" rpy="0.0 0.0 0.0" />
     <parent link="base_link" />
     <child link="arm1" />
@@ -107,7 +107,7 @@
     </inertial>
   </link>
 
-  <joint name="joint2" type="continuous">
+  <joint name="joint1" type="continuous">
     <!-- -pi rotation so that for 0 pendulum is downward -->
     <origin xyz="${arm1_length} 0.0 0.0" rpy="${-pi} 0.0 0.0" />
     <parent link="arm1" />

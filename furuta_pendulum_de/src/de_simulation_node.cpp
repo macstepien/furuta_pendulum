@@ -184,11 +184,11 @@ void DeSimulationNode::PublishJointStates()
   joint_state_msg.header.stamp.sec = current_time_;
   joint_state_msg.header.stamp.nanosec = (current_time_ - (int)current_time_) * 1000000000.0;
 
-  joint_state_msg.name.push_back("joint1");
+  joint_state_msg.name.push_back("joint0");
   joint_state_msg.position.push_back(theta1_);
   joint_state_msg.velocity.push_back(dtheta1_);
 
-  joint_state_msg.name.push_back("joint2");
+  joint_state_msg.name.push_back("joint1");
   joint_state_msg.position.push_back(theta2_);
   joint_state_msg.velocity.push_back(dtheta2_);
 

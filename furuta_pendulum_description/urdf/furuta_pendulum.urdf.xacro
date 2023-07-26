@@ -39,7 +39,8 @@
 
 
   <xacro:property name="max_effort" value="4.0" />
-  <xacro:property name="max_velocity" value="15.0" />
+  <xacro:property name="max_velocity_joint0" value="18.0" />
+  <xacro:property name="max_velocity_joint1" value="100.0" />
 
   <link name="world" />
   <joint name="world_to_base_joint" type="fixed">
@@ -73,13 +74,13 @@
     </inertial>
   </link>
 
-  <joint name="joint1" type="continuous">
+  <joint name="joint0" type="continuous">
     <origin xyz="0.0 0.0 ${base_length+arm1_radius}" rpy="0.0 0.0 0.0" />
     <parent link="base_link" />
     <child link="arm1" />
     <axis xyz="0 0 1" />
     <dynamics damping="$(arg b1)" />
-    <limit effort="${max_effort}" velocity="${max_velocity}" />
+    <limit effort="${max_effort}" velocity="${max_velocity_joint0}" />
   </joint>
 
   <link name="arm1">
@@ -107,14 +108,14 @@
     </inertial>
   </link>
 
-  <joint name="joint2" type="continuous">
+  <joint name="joint1" type="continuous">
     <!-- -pi rotation so that for 0 pendulum is downward -->
     <origin xyz="${arm1_length} 0.0 0.0" rpy="${-pi} 0.0 0.0" />
     <parent link="arm1" />
     <child link="arm2" />
     <axis xyz="1 0 0" />
     <dynamics damping="$(arg b2)" />
-    <limit effort="${max_effort}" velocity="${max_velocity}" />
+    <limit effort="${max_effort}" velocity="${max_velocity_joint1}" />
   </joint>
 
   <link name="arm2">
@@ -149,7 +150,7 @@
       </xacro:if>
     </hardware>
 
-    <joint name="joint1">
+    <joint name="joint0">
       <command_interface name="effort">
         <param name="min">${-max_effort}</param>
         <param name="max">${max_effort}</param>
@@ -158,7 +159,7 @@
       <state_interface name="position" />
       <state_interface name="velocity" />
     </joint>
-    <joint name="joint2">
+    <joint name="joint1">
       <command_interface name="effort">
         <param name="min">${-max_effort}</param>
         <param name="max">${max_effort}</param>

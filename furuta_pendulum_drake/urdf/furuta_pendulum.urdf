@@ -36,7 +36,7 @@
     </inertial>
   </link>
 
-  <joint name="joint1" type="continuous">
+  <joint name="joint0" type="continuous">
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.184" />
     <parent link="base_link" />
     <child link="arm1" />
@@ -66,7 +66,7 @@
     </inertial>
   </link>
 
-  <joint name="joint2" type="continuous">
+  <joint name="joint1" type="continuous">
     <!-- -pi rotation so that for 0 pendulum is downward -->
     <origin rpy="-3.141592653589793 0.0 0.0" xyz="0.093525 0.0 0.0" />
     <parent link="arm1" />
@@ -97,15 +97,15 @@
     </inertial>
   </link>
 
-  <transmission name="joint1_trans" type="SimpleTransmission">
-    <actuator name="joint1_actuator" />
-    <joint name="joint1" />
+  <transmission name="joint0_trans" type="SimpleTransmission">
+    <actuator name="joint0_actuator" />
+    <joint name="joint0" />
     <mechanicalReduction>1</mechanicalReduction>
   </transmission>
 
-  <!-- <transmission name="joint2_trans" type="SimpleTransmission">
-    <actuator name="joint2_actuator" />
-    <joint name="joint2" />
+  <!-- <transmission name="joint1_trans" type="SimpleTransmission">
+    <actuator name="joint1_actuator" />
+    <joint name="joint1" />
     <mechanicalReduction>1</mechanicalReduction>
   </transmission> -->
 </robot>

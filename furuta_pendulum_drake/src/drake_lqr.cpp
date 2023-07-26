@@ -112,20 +112,20 @@ int main()
   drake::multibody::Parser(&furuta_pendulum, &scene_graph)
     .AddModelFromFile(furuta_pendulum_urdf_path);
 
+  // auto & joint0 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint0");
   // auto & joint1 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint1");
-  // auto & joint2 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint2");
 
   // double max_position = 10.0;
+  // joint0.set_position_limits(Vector1d(-max_position), Vector1d(max_position));
   // joint1.set_position_limits(Vector1d(-max_position), Vector1d(max_position));
-  // joint2.set_position_limits(Vector1d(-max_position), Vector1d(max_position));
 
   // double max_velocity = 1.0;
+  // joint0.set_velocity_limits(Vector1d(-max_velocity), Vector1d(max_velocity));
   // joint1.set_velocity_limits(Vector1d(-max_velocity), Vector1d(max_velocity));
-  // joint2.set_velocity_limits(Vector1d(-max_velocity), Vector1d(max_velocity));
 
   // double max_acceleration = 1.0;
+  // joint0.set_acceleration_limits(Vector1d(-max_acceleration), Vector1d(max_acceleration));
   // joint1.set_acceleration_limits(Vector1d(-max_acceleration), Vector1d(max_acceleration));
-  // joint2.set_acceleration_limits(Vector1d(-max_acceleration), Vector1d(max_acceleration));
 
   // Now the model is complete.
   furuta_pendulum.Finalize();

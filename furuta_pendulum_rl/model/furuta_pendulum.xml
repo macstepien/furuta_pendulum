@@ -28,12 +28,12 @@
     <body name="arm1" pos="0 0 0.184">
       <inertial pos="0.05415 0 0" quat="0.5 0.5 0.5 0.5" mass="0.040466"
         diaginertia="2.40543e-05 2.40543e-05 1e-06" />
-      <joint name="joint1" pos="0 0 0" axis="0 0 1" damping="0.0001" />
+      <joint name="joint0" pos="0 0 0" axis="0 0 1" damping="0.0001" />
       <geom size="0.005 0.0467625" pos="0.0467625 0 0" quat="0.707107 0 0.707107 0" type="cylinder"
         rgba="0.8 0.8 0.8 1" />
-      <body name="arm2" pos="0.093525 0 0" quat="0 -1 0 0">
+      <body name="arm2" pos="0.093525 0 0" quat="1 0 0 0">
         <inertial pos="0 0 0.096608" mass="0.009801" diaginertia="1.47906e-05 1.47906e-05 1e-06" />
-        <joint name="joint2" pos="0 0 0" axis="1 0 0" damping="1.79057e-05" />
+        <joint name="joint1" pos="0 0 0" axis="1 0 0" damping="1.79057e-05" />
         <geom size="0.005 0.0645" pos="0 0 0.0645" type="cylinder" rgba="0.8 0.8 0.8 1" />
       </body>
     </body>
