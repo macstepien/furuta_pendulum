@@ -18,11 +18,11 @@ public:
   FurutaPendulumOCS2(const rclcpp::NodeOptions & options)
   : Node("furuta_pendulum_ocs2_node", options)
   {
-    dt_ = 0.001;
-    simulation_timer_ = this->create_wall_timer(
-      std::chrono::duration<double>(dt_), std::bind(&FurutaPendulumOCS2::Simulate, this));
+    // dt_ = 0.001;
+    // simulation_timer_ = this->create_wall_timer(
+    //   std::chrono::duration<double>(dt_), std::bind(&FurutaPendulumOCS2::Simulate, this));
 
-    const std::string robotName = "furuta_pendulum";
+    // const std::string robotName = "furuta_pendulum";
 
     std::string taskFile =
       std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_ocs2")) /
@@ -51,14 +51,15 @@ public:
     // dummyFurutaPendulum.subscribeObservers({ballbotDummyVisualization});
 
     // initial state
-    ocs2::SystemObservation initObservation;
-    initObservation.state = furutaPendulumInterface.getInitialState();
-    initObservation.input.setZero(ocs2::furuta_pendulum::INPUT_DIM);
-    initObservation.time = 0.0;
+    // ocs2::SystemObservation initObservation;
+    // initObservation.state = furutaPendulumInterface.getInitialState();
+    // initObservation.input.setZero(ocs2::furuta_pendulum::INPUT_DIM);
+    // initObservation.time = 0.0;
 
     // initial command
-    const ocs2::TargetTrajectories initTargetTrajectories(
-      {initObservation.time}, {initObservation.state}, {initObservation.input});
+    // const ocs2::TargetTrajectories initTargetTrajectories(
+    //   {0.0}, {furutaPendulumInterface.getInitialTarget()},
+    //   {ocs2::vector_t::Zero(ocs2::furuta_pendulum::INPUT_DIM)});
   }
 
 private:

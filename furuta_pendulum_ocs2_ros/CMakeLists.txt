@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.8)
-project(furuta_pendulum_ocs2)
+project(furuta_pendulum_ocs2_ros)
 
 # Generate compile_commands.json for clang tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(AMENT_PACKAGE_DEPENDENCIES
   ament_cmake
+  rclcpp
   ocs2_core
   ocs2_ddp
   ocs2_mpc
+  ocs2_ros_interfaces
   ocs2_robotic_tools
+  furuta_pendulum_ocs2
 )
+
 
 foreach(Dependency IN ITEMS ${AMENT_PACKAGE_DEPENDENCIES})
   find_package(${Dependency} REQUIRED)
@@ -27,28 +31,36 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 ## Build ##
 ###########
 
-# Add directories for all targets
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
 )
 
-# furuta_pendulum interface library
-add_library(${PROJECT_NAME}
-  src/FurutaPendulumInterface.cpp
-  src/dynamics/FurutaPendulumSystemDynamics.cpp
+# Mpc node
+add_executable(furuta_pendulum_mpc
+  src/FurutaPendulumMpcNode.cpp
 )
-# add_dependencies(${PROJECT_NAME}
+# add_dependencies(furuta_pendulum_mpc
 # )
-ament_target_dependencies(${PROJECT_NAME}
-  ${AMENT_PACKAGE_DEPENDENCIES}
+ament_target_dependencies(furuta_pendulum_mpc rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp
 )
-target_link_libraries(${PROJECT_NAME}
-  ${Boost_LIBRARIES}
-  dl
+# target_link_libraries(furuta_pendulum_mpc ${LIBS}
+# )
+
+# Dummy node
+add_executable(furuta_pendulum_dummy_test
+  src/DummyFurutaPendulumNode.cpp
+  src/FurutaPendulumDummyVisualization.cpp
 )
-target_compile_options(${PROJECT_NAME} PUBLIC ${OCS2_CXX_FLAGS})
+# add_dependencies(furuta_pendulum_dummy_test
+# )
+ament_target_dependencies(furuta_pendulum_dummy_test
+rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp
+)
+# target_link_libraries(furuta_pendulum_dummy_test ${LIBS}
+# )
+
 
 #########################
 ###   CLANG TOOLING   ###
@@ -57,8 +69,10 @@ find_package(cmake_clang_tools QUIET)
 if(cmake_clang_tools_FOUND)
   message(STATUS "Running clang tooling.")
   add_clang_tooling(
-    TARGETS ${PROJECT_NAME}
-    SOURCE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/test
+    TARGETS
+        furuta_pendulum_mpc
+        furuta_pendulum_dummy_test
+    SOURCE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include
     CT_HEADER_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
     CT_HEADER_EXCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/generated
     CF_WERROR
@@ -69,17 +83,13 @@ endif(cmake_clang_tools_FOUND)
 ## Install ##
 #############
 
-install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib/${PROJECT_NAME}
-)
-
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION include/${PROJECT_NAME}
 )
-
-install(DIRECTORY config
+install(TARGETS furuta_pendulum_mpc furuta_pendulum_dummy_test
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+install(DIRECTORY launch rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -87,8 +97,7 @@ install(DIRECTORY config
 ## ament specific configuration ##
 ###################################
 
-ament_export_dependencies(${AMENT_PACKAGE_DEPENDENCIES}
-  Boost)
+ament_export_dependencies(Boost ${AMENT_PACKAGE_DEPENDENCIES})
 
 ament_export_include_directories(include
   ${EIGEN3_INCLUDE_DIRS})

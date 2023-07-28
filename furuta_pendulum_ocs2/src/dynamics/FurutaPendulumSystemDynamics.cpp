@@ -39,5 +39,43 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
   return stateDerivative;
 }
 
+// ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
+//   ad_scalar_t time, const ad_vector_t & state, const ad_vector_t & input,
+//   const ad_vector_t & parameters) const
+// {
+//   scalar_t cartMass_ = 1.0;       // [kg]
+//   scalar_t poleMass_ = 1.0;       // [kg]
+//   scalar_t poleLength_ = 1.0;     // [m]
+//   scalar_t maxInput_ = 6.0;       // [N]
+//   scalar_t gravity_ = 9.8;        // [m/s^2]
+//   scalar_t poleHalfLength_ = -1;  // [m]
+//   scalar_t poleMoi_ = -1;         // [kg*m^2]
+//   scalar_t poleSteinerMoi_ = -1;  // [kg*m^2]
+  
+//   poleHalfLength_ = poleLength_ / 2.0;
+//   poleMoi_ = 1.0 / 12.0 * poleMass_ * (poleLength_ * poleLength_);
+//   poleSteinerMoi_ = poleMoi_ + poleMass_ * (poleHalfLength_ * poleHalfLength_);
+
+//   const ad_scalar_t cosTheta = cos(state(0));
+//   const ad_scalar_t sinTheta = sin(state(0));
+
+//   // Inertia tensor
+//   Eigen::Matrix<ad_scalar_t, 2, 2> I;
+//   I << static_cast<ad_scalar_t>(poleSteinerMoi_),
+//     static_cast<ad_scalar_t>(poleMass_ * poleHalfLength_ * cosTheta),
+//     static_cast<ad_scalar_t>(poleMass_ * poleHalfLength_ * cosTheta),
+//     static_cast<ad_scalar_t>(cartMass_ + poleMass_);
+
+//   // RHS
+//   Eigen::Matrix<ad_scalar_t, 2, 1> rhs(
+//     poleMass_ * poleHalfLength_ * gravity_ * sinTheta,
+//     input(0) + poleMass_ * poleHalfLength_ * pow(state(2), 2) * sinTheta);
+
+//   // dxdt
+//   ad_vector_t stateDerivative(STATE_DIM);
+//   stateDerivative << state.tail<2>(), I.inverse() * rhs;
+//   return stateDerivative;
+// }
+
 }  // namespace furuta_pendulum
 }  // namespace ocs2

@@ -8,13 +8,10 @@
 #include <ocs2_ddp/DDP_Settings.h>
 #include <ocs2_mpc/MPC_Settings.h>
 #include <ocs2_oc/rollout/TimeTriggeredRollout.h>
-#include <ocs2_oc/synchronized_module/ReferenceManager.h>
 #include <ocs2_robotic_tools/common/RobotInterface.h>
-#include <ocs2_slp/SlpSettings.h>
-#include <ocs2_sqp/SqpSettings.h>
 
-// Ballbot
-#include "furuta_pendulum_ocs2/dynamics/FurutaPendulumSystemDynamics.h"
+// FurutaPendulum
+#include "furuta_pendulum_ocs2/definitions.h"
 
 namespace ocs2
 {
@@ -44,40 +41,32 @@ public:
    */
   ~FurutaPendulumInterface() override = default;
 
-  const vector_t & getInitialState() { return initialState_; }
+  const vector_t& getInitialState() { return initialState_; }
 
-  slp::Settings & slpSettings() { return slpSettings_; }
+  const vector_t& getInitialTarget() { return xFinal_; }
 
-  sqp::Settings & sqpSettings() { return sqpSettings_; }
+  ddp::Settings& ddpSettings() { return ddpSettings_; }
 
-  ddp::Settings & ddpSettings() { return ddpSettings_; }
+  mpc::Settings& mpcSettings() { return mpcSettings_; }
 
-  mpc::Settings & mpcSettings() { return mpcSettings_; }
+  OptimalControlProblem& optimalControlProblem() { return problem_; }
+  const OptimalControlProblem& getOptimalControlProblem() const override { return problem_; }
 
-  const OptimalControlProblem & getOptimalControlProblem() const override { return problem_; }
+  const RolloutBase& getRollout() const { return *rolloutPtr_; }
 
-  std::shared_ptr<ReferenceManagerInterface> getReferenceManagerPtr() const override
-  {
-    return referenceManagerPtr_;
-  }
+  const Initializer& getInitializer() const override { return *furutaPendulumInitializerPtr_; }
 
-  const RolloutBase & getRollout() const { return *rolloutPtr_; }
-
-  const Initializer & getInitializer() const override { return *furutaPendulumInitializerPtr_; }
-
-private:
+ private:
   ddp::Settings ddpSettings_;
   mpc::Settings mpcSettings_;
-  sqp::Settings sqpSettings_;
-  slp::Settings slpSettings_;
 
   OptimalControlProblem problem_;
-  std::shared_ptr<ReferenceManager> referenceManagerPtr_;
 
   std::unique_ptr<RolloutBase> rolloutPtr_;
   std::unique_ptr<Initializer> furutaPendulumInitializerPtr_;
 
   vector_t initialState_{STATE_DIM};
+  vector_t xFinal_{STATE_DIM};
 };
 
 }  // namespace furuta_pendulum
