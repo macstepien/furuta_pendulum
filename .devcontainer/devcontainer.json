@@ -16,8 +16,8 @@
     ],
     // assuming that directory structure on host is ros2_ws/src/furuta_pendulum
     // when mounting whole workspace it won't be necessary to rebuild it every time
-    "workspaceMount": "src=${localWorkspaceFolder}/../..,dst=~/ros2_ws/,type=bind",
-    "workspaceFolder": "~/ros2_ws/src/furuta_pendulum",
+    "workspaceMount": "src=${localWorkspaceFolder}/../..,dst=/home/pendulum/ros2_ws/,type=bind",
+    "workspaceFolder": "/home/pendulum/ros2_ws/src",
     "extensions": [
         "aaron-bond.better-comments",
         "ms-vscode.cpptools",
@@ -30,5 +30,5 @@
         "redhat.vscode-yaml",
         "streetsidesoftware.code-spell-checker"
     ],
-    "remoteUser": "maciej",
+    "remoteUser": "pendulum",
 }

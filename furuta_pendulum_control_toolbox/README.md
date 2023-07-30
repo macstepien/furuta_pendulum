@@ -46,7 +46,7 @@ sudo apt install maxima
 Then download version `0.4ad.0` of RobCoGen from [this page](https://robcogenteam.bitbucket.io/binary.html). 
 
 Then, before generating code, it is necessary to fix some problems.
-First one is described in this [github issue](https://github.com/ethz-adrl/control-toolbox/issues/166), as in the issue I removed a "/" sign from the framework.properties (`generator.maxima.libs.path = ../etc/maxima-libs`, without "/" at the end).
+First one is described in this [github issue](https://github.com/ethz-adrl/control-toolbox/issues/166), as in the issue I removed a "/" sign from the `./run/framework.properties` (`generator.maxima.libs.path = ../etc/maxima-libs`, without "/" at the end).
 
 <!-- Fix:
 fatal error: iit/rbd/scalar_traits.h: No such file or directory
@@ -55,6 +55,7 @@ fatal error: iit/rbd/scalar_traits.h: No such file or directory
 Now install `iit`:
 ```
 cd /PATH_TO_ROBCOGEN/robcogen-0.4ad.0/etc/cpp-iitrbd
+chmod +x install.sh
 sudo ./install.sh 
 ```
 
@@ -71,6 +72,7 @@ sudo ./install_cppadcg.sh
 
 Finally to generate code run:
 ```
+cd PATH_TO_ROBCOGEN/run
 ./robcogen.sh /PATH_TO_KINDSL/FurutaPendulum.kindsl /PATH_TO_DTDSL/FurutaPendulum.dtdsl
 ```
 You should see the following menu:
@@ -116,9 +118,12 @@ What would you like to generate? Please enter the integer code:
 ```
 
 Now select option 1, then 4 and 28 to exit. Model sources will be generated in the `robcogen-0.4ad.0/run/gen_code` directory.
+Now you have to copy model from `gen_code/cpp/furutapendulum` to the `furuta_pendulum_control_toolbox/include/furuta_pendulum/generated` directory.
 
-For bounded problem
-./install_hpipm.sh
+
+### HPIPM and BLASFEO
+For bounded problem it is necessary to `install_hpipm.sh`
+!Warning! Don't use install_hpipm script, it is necessary to look what is done and repeat it manually, because it is necessary to disable blasfeo examples.
 
 I got a problem that blasfeo examples didn't build and I had to disable them in the CMakeLists.txt of blasfeo:
 ```
@@ -436,3 +441,4 @@ Otherwise I got an error:
 waiting 1 second for begin
 furuta_pendulum_nloc: /usr/include/eigen3/Eigen/src/Core/Block.h:146: Eigen::Block<XprType, BlockRows, BlockCols, InnerPanel>::Block(XprType&, Eigen::Index, Eigen::Index, Eigen::Index, Eigen::Index) [with XprType = Eigen::Matrix<double, 1, 1, 0, 1, 1>; int BlockRows = 2; int BlockCols = 1; bool InnerPanel = false; Eigen::Index = long int]: Assertion `startRow >= 0 && blockRows >= 0 && startRow <= xpr.rows() - blockRows && startCol >= 0 && blockCols >= 0 && startCol <= xpr.cols() - blockCols' failed.
 ```
+Or more recently linker errors.
