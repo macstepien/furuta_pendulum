@@ -1,12 +1,7 @@
 # furuta_pendulum_drake
 
-## Setup
-
-Drake installation:
+Drake installation (should be already done in devcontainer):
 https://drake.mit.edu/apt.html#stable-releases
-
-To have a working executable after installation add to `~/.bashrc`:
-`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/drake/lib/`
 
 ## Usage
 

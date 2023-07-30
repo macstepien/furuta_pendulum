@@ -20,6 +20,7 @@ Packages in this repository can be divided into two subgroups:
  * **furuta_pendulum_gazebo** - simulation config in Gazebo, which uses ros2_control with torque control
 
 ## Building
+Some of the source dependencies are specified in the `*.repos` files, you can use them by calling `vcs import src < src/furuta_pendulum/furuta_pendulum.repos` in the src directory (depending on your build you should additionally import *simulation* or *hardware* dependencies).
 Some packages require installing additional dependencies if they can't be installed easily with rosdep. I usually add them to the devcontainer, but I didn't have time to automate all of them, so you may have to do it manually, for details refer to the README file of each package.
 
 ## Usage
