@@ -61,8 +61,10 @@ public:
     torque_cmd_pub_ =
       this->create_publisher<std_msgs::msg::Float64MultiArray>("effort_control", 10);
 
-    builtin_interfaces::msg::Time current_time = this->get_clock()->now();
-    start_sim_time_ = current_time.sec + 1000000000.0 * current_time.nanosec;
+    rclcpp::Time current_time = this->get_clock()->now();
+    start_sim_time_ = current_time.nanoseconds() / 1000000000.0;
+    // RCLCPP_INFO_STREAM(this->get_logger(), current_time.sec << " " << current_time.nanosec);
+    RCLCPP_INFO_STREAM(this->get_logger(), start_sim_time_);
 
     RCLCPP_INFO(this->get_logger(), "Preparing first iteration");
     mpc_->prepareIteration(0.0);
@@ -84,27 +86,41 @@ public:
   double dtheta1_filtered_ = 0.0;
   double alpha_ = 0.0;
   double torque_multiplier_ = 0.0;
+  bool initial_position_ = false;
+  double initial_joint0_ = 0.0;
+  double initial_joint1_ = 0.0;
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
+    if (!initial_position_) {
+      initial_position_ = true;
+      initial_joint0_ = msg->position[0];
+      initial_joint1_ = msg->position[1];
+    }
+
+    rclcpp::Time current_time = this->get_clock()->now();
+    double current_sim_time = current_time.nanoseconds() / 1000000000.0 - start_sim_time_;
+
     dtheta1_filtered_ = alpha_ * msg->velocity[0] + (1.0 - alpha_) * dtheta1_filtered_;
     dtheta2_filtered_ = alpha_ * msg->velocity[1] + (1.0 - alpha_) * dtheta2_filtered_;
 
     ct::core::StateVector<FPSystem::STATE_DIM> x;
-    x(0) = msg->position[0];
     // x(1) = limit_minus_pi_pi(msg->position[1] - M_PI);
+    // x(0) = msg->position[0] - initial_joint0_;
+    // x(1) = msg->position[1] - initial_joint1_;
+    x(0) = msg->position[0];
     x(1) = msg->position[1];
     x(2) = dtheta1_filtered_;
     x(3) = dtheta2_filtered_;
 
-    double current_sim_time =
-      msg->header.stamp.sec + 1000000000.0 * msg->header.stamp.nanosec - start_sim_time_;
+    double feedback_timestamp =
+      msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0 - start_sim_time_;
 
     std::shared_ptr<ct::core::StateFeedbackController<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
       new_controller(
         new ct::core::StateFeedbackController<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>);
 
-    bool success = mpc_->finishIteration(x, current_sim_time, *new_controller, controller_ts_);
+    bool success = mpc_->finishIteration(x, feedback_timestamp, *new_controller, controller_ts_);
     if (!success) {
       throw std::runtime_error("Failed to finish MPC iteration.");
     }
