@@ -7,6 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(AMENT_PACKAGE_DEPENDENCIES
   ament_cmake
   rclcpp
+  rclcpp_components
   ocs2_core
   ocs2_ddp
   ocs2_mpc
@@ -61,6 +62,20 @@ rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp
 # target_link_libraries(furuta_pendulum_dummy_test ${LIBS}
 # )
 
+add_library(ocs2_test_simulation SHARED 
+  src/FurutaPendulumSimulateTestNode.cpp)
+ament_target_dependencies(ocs2_test_simulation rclcpp furuta_pendulum_ocs2 ocs2_core sensor_msgs rclcpp_components)
+rclcpp_components_register_nodes(ocs2_test_simulation
+  "furuta_pendulum_ocs2_ros::OCS2SimulationNode")
+rclcpp_components_register_node(ocs2_test_simulation
+  PLUGIN "furuta_pendulum_ocs2_ros::OCS2SimulationNode"
+  EXECUTABLE ocs2_test_simulation_node
+)
+install(
+  TARGETS ocs2_test_simulation
+  LIBRARY DESTINATION lib
+)
+
 
 #########################
 ###   CLANG TOOLING   ###
@@ -89,7 +104,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(TARGETS furuta_pendulum_mpc furuta_pendulum_dummy_test
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
-install(DIRECTORY launch rviz
+install(DIRECTORY launch rviz config
   DESTINATION share/${PROJECT_NAME}
 )
 

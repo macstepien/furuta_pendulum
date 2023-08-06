@@ -28,6 +28,7 @@ def generate_launch_description():
         package="rviz2",
         executable="rviz2",
         arguments=["-d", rviz_config],
+        output={"stdout": "log", "stderr": "log"},
     )
 
     actions = [
