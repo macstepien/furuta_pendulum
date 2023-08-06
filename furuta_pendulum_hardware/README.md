@@ -133,3 +133,6 @@ odrv0.axis0.motor.config.current_lim = 14
 
 ## Motors
 Max current around 3A.
+
+<!-- TODO -->
+<!-- echo 0 | sudo tee /sys/bus/usb-serial/devices/ttyUSB0/latency_timer -->
