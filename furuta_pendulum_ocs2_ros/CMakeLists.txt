@@ -62,6 +62,13 @@ rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp
 # target_link_libraries(furuta_pendulum_dummy_test ${LIBS}
 # )
 
+add_executable(furuta_pendulum_mpc_mrt
+  src/FurutaPendulumMpcMrtNode.cpp
+  src/FurutaPendulumDummyVisualization.cpp
+)
+ament_target_dependencies(furuta_pendulum_mpc_mrt rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp
+)
+
 add_library(ocs2_test_simulation SHARED 
   src/FurutaPendulumSimulateTestNode.cpp)
 ament_target_dependencies(ocs2_test_simulation rclcpp furuta_pendulum_ocs2 ocs2_core sensor_msgs rclcpp_components)
@@ -101,7 +108,7 @@ endif(cmake_clang_tools_FOUND)
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION include/${PROJECT_NAME}
 )
-install(TARGETS furuta_pendulum_mpc furuta_pendulum_dummy_test
+install(TARGETS furuta_pendulum_mpc furuta_pendulum_dummy_test furuta_pendulum_mpc_mrt
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 install(DIRECTORY launch rviz config
