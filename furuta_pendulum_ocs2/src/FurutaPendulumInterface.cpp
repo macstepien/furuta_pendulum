@@ -91,10 +91,13 @@ FurutaPendulumInterface::FurutaPendulumInterface(
     return penalty_type::create(boundsConfig);
   };
 
-  double maxInput = 0.43;
+  double controlSignalBound = 0.0;
+  ocs2::loadData::loadCppDataType(taskFile, "control_signal_bound", controlSignalBound);
+
   auto getConstraint = [&]() {
+    // C * x + D * u + e = 0
     constexpr size_t numIneqConstraint = 2;
-    const vector_t e = (vector_t(numIneqConstraint) << maxInput, maxInput).finished();
+    const vector_t e = (vector_t(numIneqConstraint) << controlSignalBound, controlSignalBound).finished();
     const vector_t D = (vector_t(numIneqConstraint) << 1.0, -1.0).finished();
     const matrix_t C = matrix_t::Zero(numIneqConstraint, STATE_DIM);
     return std::make_unique<LinearStateInputConstraint>(e, C, D);
