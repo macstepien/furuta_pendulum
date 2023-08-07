@@ -39,8 +39,8 @@ void FurutaPendulumDummyVisualization::update(const SystemObservation& observati
   joint_state.position.resize(2);
   joint_state.name[0] = "joint0";
   joint_state.name[1] = "joint1";
-  joint_state.position[0] = observation.state(1);
-  joint_state.position[1] = observation.state(0);
+  joint_state.position[0] = observation.state(0);
+  joint_state.position[1] = observation.state(1);
   jointPublisher_->publish(joint_state);
 }
 
