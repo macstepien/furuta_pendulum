@@ -1,5 +1,6 @@
 #include <furuta_pendulum_ocs2/dynamics/FurutaPendulumSystemDynamics.h>
 #include <furuta_pendulum_ocs2/definitions.h>
+#include <furuta_pendulum_ocs2/FurutaPendulumParameters.h>
 
 #include <algorithm>
 #include <chrono>
@@ -52,8 +53,13 @@ public:
     std::string libraryFolder =
       std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_ocs2")) /
       "auto_generated";
-    dynamics_ =
-      std::make_unique<ocs2::furuta_pendulum::FurutaPendulumSystemDynamics>(libraryFolder, false);
+    std::string taskFile =
+      std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_ocs2")) /
+      "config" / "mpc" / "task.info";
+    ocs2::furuta_pendulum::FurutaPendulumParameters furutaPendulumParameters;
+    furutaPendulumParameters.loadSettings(taskFile, "furuta_pendulum_parameters", true);
+    dynamics_ = std::make_unique<ocs2::furuta_pendulum::FurutaPendulumSystemDynamics>(
+      furutaPendulumParameters, libraryFolder, false);
     integrator_ = ocs2::newIntegrator(ocs2::IntegratorType::ODE45_OCS2);
   }
 

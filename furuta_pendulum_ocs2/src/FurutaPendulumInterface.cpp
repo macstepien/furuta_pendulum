@@ -5,6 +5,7 @@
 
 #include "furuta_pendulum_ocs2/FurutaPendulumInterface.h"
 #include "furuta_pendulum_ocs2/dynamics/FurutaPendulumSystemDynamics.h"
+#include "furuta_pendulum_ocs2/FurutaPendulumParameters.h"
 
 #include <ocs2_core/augmented_lagrangian/AugmentedLagrangian.h>
 #include <ocs2_core/constraint/LinearStateInputConstraint.h>
@@ -75,7 +76,9 @@ FurutaPendulumInterface::FurutaPendulumInterface(
   bool recompileLibraries;  // load the flag to generate library files from taskFile
   ocs2::loadData::loadCppDataType(
     taskFile, "furuta_pendulum_interface.recompileLibraries", recompileLibraries);
-  problem_.dynamicsPtr.reset(new FurutaPendulumSystemDynamics(libraryFolder, recompileLibraries));
+  FurutaPendulumParameters furutaPendulumParameters;
+  furutaPendulumParameters.loadSettings(taskFile, "furuta_pendulum_parameters", true);
+  problem_.dynamicsPtr.reset(new FurutaPendulumSystemDynamics(furutaPendulumParameters, libraryFolder, recompileLibraries));
 
   // Rollout
   std::cerr << "Rollout\n";
@@ -97,7 +100,8 @@ FurutaPendulumInterface::FurutaPendulumInterface(
   auto getConstraint = [&]() {
     // C * x + D * u + e = 0
     constexpr size_t numIneqConstraint = 2;
-    const vector_t e = (vector_t(numIneqConstraint) << controlSignalBound, controlSignalBound).finished();
+    const vector_t e =
+      (vector_t(numIneqConstraint) << controlSignalBound, controlSignalBound).finished();
     const vector_t D = (vector_t(numIneqConstraint) << 1.0, -1.0).finished();
     const matrix_t C = matrix_t::Zero(numIneqConstraint, STATE_DIM);
     return std::make_unique<LinearStateInputConstraint>(e, C, D);
