@@ -32,7 +32,8 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
 
   this->declare_parameter("simulation_dt", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("max_torque", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("max_velocity", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("max_velocity_joint0", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("max_velocity_joint1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("m1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("m2", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("l1", rclcpp::PARAMETER_DOUBLE);
@@ -47,7 +48,8 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
   try {
     dt_ = this->get_parameter("simulation_dt").as_double();
     max_torque_ = this->get_parameter("max_torque").as_double();
-    max_velocity_ = this->get_parameter("max_velocity").as_double();
+    max_velocity_joint0_ = this->get_parameter("max_velocity_joint0").as_double();
+    max_velocity_joint1_ = this->get_parameter("max_velocity_joint1").as_double();
     m1_ = this->get_parameter("m1").as_double();
     m2_ = this->get_parameter("m2").as_double();
     l1_ = this->get_parameter("l1").as_double();
@@ -168,6 +170,9 @@ void DeSimulationNode::Simulate()
   theta2_ = y_n1(1);
   dtheta1_ = y_n1(2);
   dtheta2_ = y_n1(3);
+
+  dtheta1_ = std::clamp(dtheta1_, -max_velocity_joint0_, max_velocity_joint0_);
+  dtheta2_ = std::clamp(dtheta2_, -max_velocity_joint1_, max_velocity_joint1_);
 
   current_time_ += dt_;
 

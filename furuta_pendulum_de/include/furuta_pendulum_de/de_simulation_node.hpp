@@ -36,7 +36,8 @@ private:
   double tau1_, tau2_;
 
   double max_torque_;
-  double max_velocity_;
+  double max_velocity_joint0_;
+  double max_velocity_joint1_;
 
   double current_time_ = 0.0;
 
