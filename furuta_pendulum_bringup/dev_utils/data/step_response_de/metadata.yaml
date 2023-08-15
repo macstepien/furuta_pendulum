@@ -1,0 +1,26 @@
+rosbag2_bagfile_information:
+  version: 5
+  storage_identifier: sqlite3
+  duration:
+    nanoseconds: 9999818160
+  starting_time:
+    nanoseconds_since_epoch: 1692089273556092201
+  message_count: 5001
+  topics_with_message_count:
+    - topic_metadata:
+        name: joint_states
+        type: sensor_msgs/msg/JointState
+        serialization_format: cdr
+        offered_qos_profiles: ""
+      message_count: 5001
+  compression_format: ""
+  compression_mode: ""
+  relative_file_paths:
+    - step_response_de_0.db3
+  files:
+    - path: step_response_de_0.db3
+      starting_time:
+        nanoseconds_since_epoch: 1692089273556092201
+      duration:
+        nanoseconds: 9999818160
+      message_count: 5001
