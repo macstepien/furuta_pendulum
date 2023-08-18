@@ -78,7 +78,8 @@ FurutaPendulumInterface::FurutaPendulumInterface(
     taskFile, "furuta_pendulum_interface.recompileLibraries", recompileLibraries);
   FurutaPendulumParameters furutaPendulumParameters;
   furutaPendulumParameters.loadSettings(taskFile, "furuta_pendulum_parameters", true);
-  problem_.dynamicsPtr.reset(new FurutaPendulumSystemDynamics(furutaPendulumParameters, libraryFolder, recompileLibraries));
+  problem_.dynamicsPtr.reset(
+    new FurutaPendulumSystemDynamics(furutaPendulumParameters, libraryFolder, recompileLibraries));
 
   // Rollout
   std::cerr << "Rollout\n";
@@ -89,6 +90,7 @@ FurutaPendulumInterface::FurutaPendulumInterface(
   auto getPenalty = [&]() {
     // one can use either augmented::SlacknessSquaredHingePenalty or augmented::ModifiedRelaxedBarrierPenalty
     using penalty_type = augmented::SlacknessSquaredHingePenalty;
+    // using penalty_type = augmented::ModifiedRelaxedBarrierPenalty;
     penalty_type::Config boundsConfig;
     loadData::loadPenaltyConfig(taskFile, "bounds_penalty_config", boundsConfig, true);
     return penalty_type::create(boundsConfig);
@@ -97,16 +99,22 @@ FurutaPendulumInterface::FurutaPendulumInterface(
   double controlSignalBound = 0.0;
   ocs2::loadData::loadCppDataType(taskFile, "control_signal_bound", controlSignalBound);
 
+  double joint0VelocityBound = 0.0;
+  ocs2::loadData::loadCppDataType(taskFile, "joint0_velocity_bound", joint0VelocityBound);
+
   auto getConstraint = [&]() {
     // C * x + D * u + e = 0
-    constexpr size_t numIneqConstraint = 2;
-    const vector_t e =
-      (vector_t(numIneqConstraint) << controlSignalBound, controlSignalBound).finished();
-    const vector_t D = (vector_t(numIneqConstraint) << 1.0, -1.0).finished();
-    const matrix_t C = matrix_t::Zero(numIneqConstraint, STATE_DIM);
+    constexpr size_t numIneqConstraint = 4;
+    const vector_t e = (vector_t(numIneqConstraint) << controlSignalBound, controlSignalBound,
+                        joint0VelocityBound, joint0VelocityBound)
+                         .finished();
+    const vector_t D = (vector_t(numIneqConstraint) << 1.0, -1.0, 0.0, 0.0).finished();
+    matrix_t C = matrix_t::Zero(numIneqConstraint, STATE_DIM);
+    C(2, 2) = 1.0;
+    C(3, 2) = -1.0;
     return std::make_unique<LinearStateInputConstraint>(e, C, D);
   };
-  problem_.inequalityLagrangianPtr->add("InputLimits", create(getConstraint(), getPenalty()));
+  problem_.inequalityLagrangianPtr->add("InputAndStateLimits", create(getConstraint(), getPenalty()));
 
   // Initialization
   std::cerr << "Initialization\n";

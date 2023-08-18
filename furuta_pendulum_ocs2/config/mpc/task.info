@@ -20,6 +20,7 @@ furuta_pendulum_parameters
 }
 
 control_signal_bound 0.43
+joint0_velocity_bound 18.0
 
 ; DDP settings
 ddp
