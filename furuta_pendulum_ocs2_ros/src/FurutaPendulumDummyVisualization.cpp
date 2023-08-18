@@ -35,12 +35,12 @@ namespace furuta_pendulum {
 void FurutaPendulumDummyVisualization::update(const SystemObservation& observation, const PrimalSolution& policy, const CommandData& command) {
   sensor_msgs::msg::JointState joint_state;
   joint_state.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
-  joint_state.name.resize(2);
-  joint_state.position.resize(2);
-  joint_state.name[0] = "joint0";
-  joint_state.name[1] = "joint1";
-  joint_state.position[0] = observation.state(0);
-  joint_state.position[1] = observation.state(1);
+  joint_state.name.push_back("joint0");
+  joint_state.name.push_back("joint1");
+  joint_state.position.push_back(observation.state(0));
+  joint_state.position.push_back(observation.state(1));
+  joint_state.velocity.push_back(observation.state(2));
+  joint_state.velocity.push_back(observation.state(3));
   jointPublisher_->publish(joint_state);
 }
 
