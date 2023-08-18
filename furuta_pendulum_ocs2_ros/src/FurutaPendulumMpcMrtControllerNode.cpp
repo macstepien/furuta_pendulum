@@ -18,36 +18,47 @@
 #include <ocs2_ros_interfaces/synchronized_module/RosReferenceManager.h>
 #include <furuta_pendulum_ocs2_ros/FurutaPendulumDummyVisualization.h>
 
-static auto LOGGER = rclcpp::get_logger("furuta_pendulum_mpc_mrt");
-
-/**
- * This function implements the evaluation of the MPC policy
- * @param currentObservation : current system observation {time, state, input} to compute the input for. (input can be left empty)
- * @param mpcMrtInterface : interface used for communication with the MPC optimization (running in a different thread)
- * @return system input u(t)
- */
-ocs2::vector_t mpcTrackingController(
-  const ocs2::SystemObservation & currentObservation, ocs2::MPC_MRT_Interface & mpcMrtInterface);
-
 namespace furuta_pendulum_ocs2_ros
 {
 
 class OCS2MPCControllerNode : public rclcpp::Node
 {
 public:
-  OCS2MPCControllerNode(const rclcpp::NodeOptions & options) : Node("controller_node", options)
-  {
-    const std::string robotName = "furuta_pendulum";
+  rclcpp::CallbackGroup::SharedPtr cb_group_;
 
+  OCS2MPCControllerNode() : Node("controller_node")
+  {
+    RCLCPP_INFO_STREAM(this->get_logger(), "Starting");
+    // InitializeController();
+
+    // cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+    cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
+    rclcpp::SubscriptionOptions options;
+    options.callback_group = cb_group_;
+
+    // state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
+    //   "joint_states", 1, std::bind(&OCS2MPCControllerNode::StateCb, this, std::placeholders::_1),
+    //   options);
+
+    state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
+      "joint_states", 1, std::bind(&OCS2MPCControllerNode::StateCb, this, std::placeholders::_1));
+
+    torque_cmd_pub_ =
+      this->create_publisher<std_msgs::msg::Float64MultiArray>("effort_control", 10);
+  }
+
+  void InitializeController(ocs2::SystemObservation initial_observation)
+  {
     // Robot interface
-    std::string taskFile =
+    std::string task_file =
       std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_ocs2")) /
       "config" / "mpc" / "task.info";
-    std::string libraryFolder =
+    std::string library_folder =
       std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_ocs2")) /
       "auto_generated";
-    furutaPendulumInterface =
-      std::make_unique<ocs2::furuta_pendulum::FurutaPendulumInterface>(taskFile, libraryFolder);
+    furuta_pendulum_interface_ =
+      std::make_unique<ocs2::furuta_pendulum::FurutaPendulumInterface>(task_file, library_folder);
 
     /*
    * Set up the MPC and the MPC_MRT_interface.
@@ -56,199 +67,140 @@ public:
 
     // MPC
     mpc_ = std::make_unique<ocs2::GaussNewtonDDP_MPC>(
-      furutaPendulumInterface->mpcSettings(), furutaPendulumInterface->ddpSettings(),
-      furutaPendulumInterface->getRollout(), furutaPendulumInterface->getOptimalControlProblem(),
-      furutaPendulumInterface->getInitializer());
+      furuta_pendulum_interface_->mpcSettings(), furuta_pendulum_interface_->ddpSettings(),
+      furuta_pendulum_interface_->getRollout(),
+      furuta_pendulum_interface_->getOptimalControlProblem(),
+      furuta_pendulum_interface_->getInitializer());
 
     // Create the MPC MRT Interface
-    mpcMrtInterface = std::make_unique<ocs2::MPC_MRT_Interface>(*mpc_);
-    mpcMrtInterface->initRollout(&furutaPendulumInterface->getRollout());
-
-    /*
-   * Initialize the simulation and controller
-   */
-
-    // Initial state
-    ocs2::SystemObservation initObservation;
-    initObservation.state = furutaPendulumInterface->getInitialState();
-    initObservation.input.setZero(ocs2::furuta_pendulum::INPUT_DIM);
-    initObservation.time = 0.0;
+    mpc_mrt_interface_ = std::make_unique<ocs2::MPC_MRT_Interface>(*mpc_);
+    mpc_mrt_interface_->initRollout(&furuta_pendulum_interface_->getRollout());
 
     // Initial command
-    const ocs2::scalar_t initTime = 0.0;
-    ocs2::vector_t goalState = furutaPendulumInterface->getInitialTarget();
-    const ocs2::TargetTrajectories initTargetTrajectories(
-      {initTime}, {goalState}, {ocs2::vector_t::Zero(ocs2::furuta_pendulum::INPUT_DIM)});
+    const ocs2::TargetTrajectories init_target_trajectory(
+      {initial_observation.time}, {furuta_pendulum_interface_->getInitialTarget()},
+      {ocs2::vector_t::Zero(ocs2::furuta_pendulum::INPUT_DIM)});
 
     // Set the first observation and command and wait for optimization to finish
-
     RCLCPP_INFO(this->get_logger(), "Waiting for the initial policy ...");
-    mpcMrtInterface->setCurrentObservation(initObservation);
-    mpcMrtInterface->getReferenceManager().setTargetTrajectories(initTargetTrajectories);
-    double timeStep = 1e9 / furutaPendulumInterface->mpcSettings().mrtDesiredFrequency_;
+    mpc_mrt_interface_->setCurrentObservation(initial_observation);
+    mpc_mrt_interface_->getReferenceManager().setTargetTrajectories(init_target_trajectory);
+    double time_step = 1e9 / furuta_pendulum_interface_->mpcSettings().mrtDesiredFrequency_;
 
-    while (!mpcMrtInterface->initialPolicyReceived() && rclcpp::ok()) {
-      mpcMrtInterface->advanceMpc();
-      rclcpp::sleep_for(std::chrono::nanoseconds(int(timeStep)));
+    while (!mpc_mrt_interface_->initialPolicyReceived() && rclcpp::ok()) {
+      mpc_mrt_interface_->advanceMpc();
+      rclcpp::sleep_for(std::chrono::nanoseconds(int(time_step)));
     }
     RCLCPP_INFO(this->get_logger(), "Initial policy has been received.");
-    currentObservation = initObservation;
+
+    // mrt_timer_ = this->create_wall_timer(
+    //   std::chrono::duration<double>(
+    //     1. / furuta_pendulum_interface_->mpcSettings().mrtDesiredFrequency_),
+    //   std::bind(&OCS2MPCControllerNode::MRTCalc, this));
+
     /*
    * Launch the computation of the MPC in a separate thread.
    * This thread will be triggered at a given frequency and execute an optimization based on the latest available observation.
    */
-
-    // mrt_timer_ = this->create_wall_timer(
-    //   std::chrono::duration<double>(
-    //     1. / furutaPendulumInterface->mpcSettings().mrtDesiredFrequency_),
-    //   std::bind(&OCS2MPCControllerNode::MRTCalc, this));
-    state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
-      "joint_states", 10, std::bind(&OCS2MPCControllerNode::StateCb, this, std::placeholders::_1));
-    torque_cmd_pub_ =
-      this->create_publisher<std_msgs::msg::Float64MultiArray>("effort_control", 10);
-
     mpc_timer_ = this->create_wall_timer(
       std::chrono::duration<double>(
-        1. / furutaPendulumInterface->mpcSettings().mpcDesiredFrequency_),
-      std::bind(&OCS2MPCControllerNode::MPCCalc, this));
+        1. / furuta_pendulum_interface_->mpcSettings().mpcDesiredFrequency_),
+      std::bind(&OCS2MPCControllerNode::MPCCalc, this), cb_group_);
 
     rclcpp::Time current_time = this->get_clock()->now();
-    start_sim_time_ = current_time.nanoseconds() / 1000000000.0;
-
-    observationPublisher =
-      this->create_publisher<ocs2_msgs::msg::MPCObservation>(robotName + "_mpc_observation", 1);
+    start_time_ = current_time.nanoseconds() / 1000000000.0;
   }
-  std::unique_ptr<ocs2::GaussNewtonDDP_MPC> mpc_;
-  rclcpp::TimerBase::SharedPtr mpc_timer_;
+
+  bool first_mpc_call_ = true;
 
   void MPCCalc()
   {
     RCLCPP_INFO(this->get_logger(), "Advancing MPC");
-    mpcMrtInterface->advanceMpc();
+    if (first_mpc_call_) {
+      first_mpc_call_ = false;
+      return;
+    }
+    try {
+      mpc_mrt_interface_->advanceMpc();
+    } catch (std::runtime_error & err) {
+      RCLCPP_INFO_STREAM(this->get_logger(), "Advance MPC exception caught: " << err.what());
+      mpc_error_ = true;
+    }
   }
-
-  rclcpp::Publisher<ocs2_msgs::msg::MPCObservation>::SharedPtr observationPublisher;
-
-  std::unique_ptr<ocs2::MPC_MRT_Interface> mpcMrtInterface;
-  std::unique_ptr<ocs2::furuta_pendulum::FurutaPendulumInterface> furutaPendulumInterface;
-  std::unique_ptr<ocs2::furuta_pendulum::FurutaPendulumDummyVisualization>
-    furutaPendulumDummyVisualization;
-
-  double dtheta2_filtered_ = 0.0;
-  double dtheta1_filtered_ = 0.0;
-  double alpha_ = 0.0;
-  double torque_multiplier_ = 0.0;
-  bool initial_position_ = false;
-  double initial_joint0_ = 0.0;
-  double initial_joint1_ = 0.0;
-  double last_input_ = 0.0;
+  bool mpc_error_ = false;
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
-    // RCLCPP_INFO_STREAM(
-    // this->get_logger(), "### Current time " << currentObservation.time);
+    // RCLCPP_INFO_STREAM(this->get_logger(), "Running state cb");
 
-    /*
-    * State estimation would go here to fill "currentObservation".
-    * In this example we receive the measurement directly after forward integration at the end of the loop.
-    */
-    ocs2::SystemObservation newObservation;
-    // newObservation.state = furutaPendulumInterface.getInitialState();
-    newObservation.state = ocs2::vector_t(4);
-    newObservation.state << msg->position[0], msg->position[1], msg->velocity[0], msg->velocity[1];
+    if (!controller_initialized_) {
+      start_sim_time_ = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
+    }
 
-    newObservation.time =
-      msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0 - start_sim_time_;
+    // State estimation
+    ocs2::SystemObservation new_observation;
+    new_observation.state = ocs2::vector_t(4);
+    new_observation.state << msg->position[0], msg->position[1], msg->velocity[0], msg->velocity[1];
 
-    newObservation.input = ocs2::vector_t(1);
-    newObservation.input << newObservation.input;
+    new_observation.time = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
+    // - start_sim_time_;
 
-    RCLCPP_INFO_STREAM(this->get_logger(), newObservation);
+    new_observation.input = ocs2::vector_t(1);
+    new_observation.input(0) = last_input_;
 
-    // Evaluate the control input
+    if (!controller_initialized_) {
+      InitializeController(new_observation);
+      controller_initialized_ = true;
+      return;
+    }
 
     // Update the current state of the system
-    mpcMrtInterface->setCurrentObservation(newObservation);
+    mpc_mrt_interface_->setCurrentObservation(new_observation);
 
     // Load the latest MPC policy
-    bool policyUpdated = mpcMrtInterface->updatePolicy();
-    // if (policyUpdated) {
+    bool policy_updated = mpc_mrt_interface_->updatePolicy();
+    // if (policy_updated) {
     //   RCLCPP_INFO_STREAM(LOGGER, "<<< New MPC policy received at " << currentObservation.time);
     // }
 
     // Evaluate the current policy
-    ocs2::vector_t optimizedState;  // Evaluation of the optimized state trajectory.
-    ocs2::vector_t optimizedInput;  // Evaluation of the optimized input trajectory.
-    size_t plannedMode;  // The mode that is active at the time the policy is evaluated at.
+    ocs2::vector_t optimized_state;
+    ocs2::vector_t optimized_input;
+    size_t planned_mode;
 
-    mpcMrtInterface->evaluatePolicy(
-      newObservation.time, newObservation.state, optimizedState, optimizedInput, plannedMode);
+    rclcpp::Time current_time = this->get_clock()->now();
+    ocs2::scalar_t current_time_scalar = current_time.nanoseconds() / 1000000000.0 - start_time_;
+    // mpc_mrt_interface_->evaluatePolicy(
+    //   new_observation.time, new_observation.state, optimized_state, optimized_input, planned_mode);
+    mpc_mrt_interface_->evaluatePolicy(
+      current_time_scalar, new_observation.state, optimized_state, optimized_input, planned_mode);
 
-    /*
-    * Sending the commands to the actuators would go here.
-    * In this example, we instead do a forward simulation + visualization.
-    * Simulation is done with the rollout functionality of the mpcMrtInterface, but this can be replaced by any other simulation.
-    */
-
+    // Send the commands to the actuators
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
-    torque_cmd_msg.data.push_back(optimizedInput(0));
+    if (mpc_error_) {
+      RCLCPP_INFO_STREAM(this->get_logger(), "MPC error, sending 0 command");
+      torque_cmd_msg.data.push_back(0.0);
+    } else {
+      torque_cmd_msg.data.push_back(optimized_input(0));
+    }
     torque_cmd_pub_->publish(torque_cmd_msg);
-    last_input_ = optimizedInput(0);
+    last_input_ = optimized_input(0);
+
+    // RCLCPP_INFO_STREAM(this->get_logger(), "Finished running state cb");
   }
 
-  ocs2::SystemObservation currentObservation;
-  rclcpp::TimerBase::SharedPtr mrt_timer_;
-  // void MRTCalc()
-  // {
-  //   // if (!furutaPendulumDummyVisualization) {
-  //   //   // Visualization
-  //   //   furutaPendulumDummyVisualization =
-  //   //     std::make_unique<ocs2::furuta_pendulum::FurutaPendulumDummyVisualization>(
-  //   //       this);
-  //   // }
-
-  //   // RCLCPP_INFO_STREAM(
-  //   // nodeHandle->get_logger(), "### Current time " << currentObservation.time);
-
-  //   /*
-  //          * State estimation would go here to fill "currentObservation".
-  //          * In this example we receive the measurement directly after forward integration at the end of the loop.
-  //          */
-
-  //   RCLCPP_INFO_STREAM(this->get_logger(), currentObservation);
-
-  //   // Evaluate the control input
-  //   const auto systemInput = mpcTrackingController(currentObservation, *mpcMrtInterface);
-
-  //   /*
-  //          * Sending the commands to the actuators would go here.
-  //          * In this example, we instead do a forward simulation + visualization.
-  //          * Simulation is done with the rollout functionality of the mpcMrtInterface, but this can be replaced by any other simulation.
-  //          */
-
-  //   // Forward simulation
-  //   const auto dt = 1.0 / furutaPendulumInterface->mpcSettings().mrtDesiredFrequency_;
-  //   ocs2::SystemObservation nextObservation;
-  //   nextObservation.time = currentObservation.time + dt;
-  //   mpcMrtInterface->rolloutPolicy(
-  //     currentObservation.time, currentObservation.state, dt, nextObservation.state,
-  //     nextObservation.input, nextObservation.mode);
-
-  //   // "state estimation"
-  //   currentObservation = nextObservation;
-
-  //   // Visualization
-  //   // furutaPendulumDummyVisualization->update(
-  //   //   currentObservation, mpcMrtInterface->getPolicy(), mpcMrtInterface->getCommand());
-
-  //   // Publish the observation. Only needed for the command interface
-  //   observationPublisher->publish(
-  //     ocs2::ros_msg_conversions::createObservationMsg(currentObservation));
-  // }
-
 private:
-  double start_sim_time_;
+  double start_sim_time_ = 0.0;
+  double start_time_ = 0.0;
+  double last_input_ = 0.0;
+  bool controller_initialized_ = false;
 
+  std::unique_ptr<ocs2::furuta_pendulum::FurutaPendulumInterface> furuta_pendulum_interface_;
+  std::unique_ptr<ocs2::GaussNewtonDDP_MPC> mpc_;
+  std::unique_ptr<ocs2::MPC_MRT_Interface> mpc_mrt_interface_;
+
+  // rclcpp::TimerBase::SharedPtr mrt_timer_;
+  rclcpp::TimerBase::SharedPtr mpc_timer_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_sub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr torque_cmd_pub_;
 };
@@ -256,5 +208,18 @@ private:
 }  // namespace furuta_pendulum_ocs2_ros
 
 // Register the component with class_loader
-#include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_ocs2_ros::OCS2MPCControllerNode)
+// #include <rclcpp_components/register_node_macro.hpp>
+// RCLCPP_COMPONENTS_REGISTER_NODE(furuta_pendulum_ocs2_ros::OCS2MPCControllerNode)
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  std::cerr << "Starting";
+  rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), 4);
+  rclcpp::Node::SharedPtr node =
+    std::make_shared<furuta_pendulum_ocs2_ros::OCS2MPCControllerNode>();
+  executor.add_node(node);
+  executor.spin();
+  rclcpp::shutdown();
+  return 0;
+}

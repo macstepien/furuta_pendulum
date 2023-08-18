@@ -83,21 +83,29 @@ install(
   LIBRARY DESTINATION lib
 )
 
-add_library(ocs2_mpc_controller SHARED 
+# TODO rclcpp_components multithreaded executor
+# add_library(ocs2_mpc_controller SHARED 
+#   src/FurutaPendulumMpcMrtControllerNode.cpp
+#   src/FurutaPendulumDummyVisualization.cpp)
+# ament_target_dependencies(ocs2_mpc_controller rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp rclcpp_components)
+# rclcpp_components_register_nodes(ocs2_mpc_controller
+#   "furuta_pendulum_ocs2_ros::OCS2MPCControllerNode")
+# rclcpp_components_register_node(ocs2_mpc_controller
+#   PLUGIN "furuta_pendulum_ocs2_ros::OCS2MPCControllerNode"
+#   EXECUTABLE ocs2_mpc_controller_node
+# )
+# install(
+#   TARGETS ocs2_mpc_controller
+#   LIBRARY DESTINATION lib
+# )
+
+add_executable(ocs2_mpc_controller_node
   src/FurutaPendulumMpcMrtControllerNode.cpp
   src/FurutaPendulumDummyVisualization.cpp)
-ament_target_dependencies(ocs2_mpc_controller rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp rclcpp_components)
-rclcpp_components_register_nodes(ocs2_mpc_controller
-  "furuta_pendulum_ocs2_ros::OCS2MPCControllerNode")
-rclcpp_components_register_node(ocs2_mpc_controller
-  PLUGIN "furuta_pendulum_ocs2_ros::OCS2MPCControllerNode"
-  EXECUTABLE ocs2_mpc_controller_node
+ament_target_dependencies(ocs2_mpc_controller_node rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp)
+install(TARGETS ocs2_mpc_controller_node
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
-install(
-  TARGETS ocs2_mpc_controller
-  LIBRARY DESTINATION lib
-)
-
 
 #########################
 ###   CLANG TOOLING   ###
