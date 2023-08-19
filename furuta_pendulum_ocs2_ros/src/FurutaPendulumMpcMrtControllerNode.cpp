@@ -115,7 +115,7 @@ public:
 
   void MPCCalc()
   {
-    RCLCPP_INFO(this->get_logger(), "Advancing MPC");
+    // RCLCPP_INFO(this->get_logger(), "Advancing MPC");
     if (first_mpc_call_) {
       first_mpc_call_ = false;
       return;
@@ -148,6 +148,9 @@ public:
     new_observation.input = ocs2::vector_t(1);
     new_observation.input(0) = last_input_;
 
+    // RCLCPP_INFO_STREAM(this->get_logger(), "New state: " << new_observation);
+    // RCLCPP_INFO_STREAM(this->get_logger(), std::endl);
+
     if (!controller_initialized_) {
       InitializeController(new_observation);
       controller_initialized_ = true;
@@ -164,27 +167,37 @@ public:
     // }
 
     // Evaluate the current policy
-    ocs2::vector_t optimized_state;
-    ocs2::vector_t optimized_input;
-    size_t planned_mode;
+    // ocs2::vector_t optimized_state;
+    // ocs2::vector_t optimized_input;
+    // size_t planned_mode;
 
-    rclcpp::Time current_time = this->get_clock()->now();
-    ocs2::scalar_t current_time_scalar = current_time.nanoseconds() / 1000000000.0 - start_time_;
+    // rclcpp::Time current_time = this->get_clock()->now();
+    // ocs2::scalar_t current_time_scalar = current_time.nanoseconds() / 1000000000.0 - start_time_;
     // mpc_mrt_interface_->evaluatePolicy(
     //   new_observation.time, new_observation.state, optimized_state, optimized_input, planned_mode);
-    mpc_mrt_interface_->evaluatePolicy(
-      current_time_scalar, new_observation.state, optimized_state, optimized_input, planned_mode);
+    // mpc_mrt_interface_->evaluatePolicy(
+    //   current_time_scalar, new_observation.state, optimized_state, optimized_input, planned_mode);
+
+    // TODO check evaluatePolicy vs rolloutPolicy
+    ocs2::SystemObservation predicted_observation;
+    mpc_mrt_interface_->rolloutPolicy(
+      new_observation.time, new_observation.state, 0.002, predicted_observation.state,
+      predicted_observation.input, predicted_observation.mode);
 
     // Send the commands to the actuators
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
     if (mpc_error_) {
       RCLCPP_INFO_STREAM(this->get_logger(), "MPC error, sending 0 command");
-      torque_cmd_msg.data.push_back(0.0);
+      last_input_ = 0.0;
     } else {
-      torque_cmd_msg.data.push_back(optimized_input(0));
+      // last_input_ = optimized_input(0);
+      last_input_ = predicted_observation.input(0);
     }
+
+    torque_cmd_msg.data.push_back(last_input_);
     torque_cmd_pub_->publish(torque_cmd_msg);
-    last_input_ = optimized_input(0);
+
+    // RCLCPP_INFO_STREAM(this->get_logger(), "Predicted state: " << predicted_observation);
 
     // RCLCPP_INFO_STREAM(this->get_logger(), "Finished running state cb");
   }
