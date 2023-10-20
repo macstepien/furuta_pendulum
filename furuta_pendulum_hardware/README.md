@@ -238,3 +238,12 @@ odrv0.axis1.encoder.set_linear_count(0)
 
 
 odrv0.axis0.requested_state = AXIS_STATE_ENCODER_INDEX_SEARCH
+
+
+## Saving and restoring configs
+
+Saving config:
+odrivetool backup-config ./odrive.json
+
+Restoring config:
+odrivetool restore-config odrive_config.json
