@@ -39,8 +39,6 @@ add_library(${PROJECT_NAME}
   src/FurutaPendulumInterface.cpp
   src/dynamics/FurutaPendulumSystemDynamics.cpp
 )
-# add_dependencies(${PROJECT_NAME}
-# )
 ament_target_dependencies(${PROJECT_NAME}
   ${AMENT_PACKAGE_DEPENDENCIES}
 )
