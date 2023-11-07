@@ -1,10 +1,18 @@
 /**:
   ros__parameters:
-    K: [2.392972679139878e-13, 27.67743472906659, -1.0001000050001494, 2.7642140972163816]
-    
+    K: [0.0, 1.4075, -0.070089, 0.1584]
+
+    alpha: 1.0
+    alpha_swingup: 1.0
     # absolute maximum command value that is used in swing up
-    u_max: 0.5
-    
+    # u_max: 0.025
+    u_max: 0.01
+    # u_max: 0.05
     # 0.0 angle - upward position. When absolute angle is less than this threshold
     # transition from swing up to LQR
     lqr_transition_angle: 0.7
+    # torque_multiplier: 0.056179775
+    # 17.2 ohm
+    # torque_multiplier: 17.2
+    torque_multiplier: 1.0
+    # torque_multiplier: 1.0
