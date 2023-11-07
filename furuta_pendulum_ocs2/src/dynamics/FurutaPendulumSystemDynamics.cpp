@@ -109,5 +109,7 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
   return dy;
 }
 
+// TODO: add velocity limit
+
 }  // namespace furuta_pendulum
 }  // namespace ocs2
