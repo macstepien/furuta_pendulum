@@ -23,6 +23,11 @@ Packages in this repository can be divided into two subgroups:
 Some of the source dependencies are specified in the `*.repos` files, you can use them by calling `vcs import src < src/furuta_pendulum/furuta_pendulum.repos` in the src directory (depending on your build you should additionally import *simulation* or *hardware* dependencies).
 Some packages require installing additional dependencies if they can't be installed easily with rosdep. I usually add them to the devcontainer, but I didn't have time to automate all of them, so you may have to do it manually, for details refer to the README file of each package.
 
+<!-- OCS2 needs release to work fast enough -->
+```
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --symlink-install
+```
+
 ## Usage
 To run the pendulum simulation use one of the launch files from **furuta_pendulum_bringup**, launch files have the naming convention:
 
