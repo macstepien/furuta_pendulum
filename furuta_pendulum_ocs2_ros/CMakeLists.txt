@@ -13,6 +13,7 @@ set(AMENT_PACKAGE_DEPENDENCIES
   ocs2_mpc
   ocs2_ros_interfaces
   ocs2_robotic_tools
+  ocs2_msgs
   furuta_pendulum_ocs2
 )
 
@@ -66,7 +67,7 @@ add_executable(furuta_pendulum_mpc_mrt
   src/FurutaPendulumMpcMrtNode.cpp
   src/FurutaPendulumDummyVisualization.cpp
 )
-ament_target_dependencies(furuta_pendulum_mpc_mrt rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp
+ament_target_dependencies(furuta_pendulum_mpc_mrt rclcpp furuta_pendulum_ocs2 ocs2_ros_interfaces ocs2_mpc ocs2_ddp ocs2_msgs
 )
 
 add_library(ocs2_test_simulation SHARED 
