@@ -25,11 +25,28 @@ class OCS2MPCControllerNode : public rclcpp::Node
 {
 public:
   rclcpp::CallbackGroup::SharedPtr cb_group_;
+  double torque_multiplier_;
+  double alpha_;
+  double dtheta2_filtered_ = 0.0;
+  double dtheta1_filtered_ = 0.0;
 
   OCS2MPCControllerNode() : Node("controller_node")
   {
     RCLCPP_INFO_STREAM(this->get_logger(), "Starting");
     // InitializeController();
+
+
+    this->declare_parameter("alpha", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
+
+    try {
+      alpha_ = this->get_parameter("alpha").as_double();
+      torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
+    } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
+      RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
+      throw e;
+    }
+
 
     // cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
     cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -59,6 +76,8 @@ public:
       "auto_generated";
     furuta_pendulum_interface_ =
       std::make_unique<ocs2::furuta_pendulum::FurutaPendulumInterface>(task_file, library_folder);
+
+    time_step_ = furuta_pendulum_interface_->ddpSettings().timeStep_;
 
     /*
    * Set up the MPC and the MPC_MRT_interface.
@@ -116,10 +135,10 @@ public:
   void MPCCalc()
   {
     // RCLCPP_INFO(this->get_logger(), "Advancing MPC");
-    if (first_mpc_call_) {
-      first_mpc_call_ = false;
-      return;
-    }
+    // if (first_mpc_call_) {
+    //   first_mpc_call_ = false;
+    //   return;
+    // }
     try {
       mpc_mrt_interface_->advanceMpc();
     } catch (std::runtime_error & err) {
@@ -128,22 +147,42 @@ public:
     }
   }
   bool mpc_error_ = false;
+  bool controller_just_initialized_ = false;
+  double initial_position_0_ = 0.0;
+  double initial_position_1_ = 0.0;
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
+    dtheta2_filtered_ = alpha_ * msg->velocity[1] + (1.0 - alpha_) * dtheta2_filtered_;
+    dtheta1_filtered_ = alpha_ * msg->velocity[0] + (1.0 - alpha_) * dtheta1_filtered_;
+
+
     // RCLCPP_INFO_STREAM(this->get_logger(), "Running state cb");
 
-    if (!controller_initialized_) {
+    // if (!controller_initialized_) {
+    //   start_sim_time_ = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
+    // }
+
+    if (controller_just_initialized_)
+    {
       start_sim_time_ = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
+      controller_just_initialized_ = false;
+    }
+
+     if (!controller_initialized_) {
+      initial_position_0_ = msg->position[0];
+      initial_position_1_ = msg->position[1];
+    RCLCPP_INFO_STREAM(this->get_logger(), "Initial position: adsgfdsaf" << initial_position_0_ << " " << initial_position_1_);
     }
 
     // State estimation
     ocs2::SystemObservation new_observation;
     new_observation.state = ocs2::vector_t(4);
-    new_observation.state << msg->position[0], msg->position[1], msg->velocity[0], msg->velocity[1];
+    // new_observation.state << msg->position[0], msg->position[1], msg->velocity[0], msg->velocity[1];
+    // new_observation.state << msg->position[0] - initial_position_0_, msg->position[1] - initial_position_1_, dtheta1_filtered_, dtheta2_filtered_;
+    new_observation.state << msg->position[0], msg->position[1], dtheta1_filtered_, dtheta2_filtered_;
 
-    new_observation.time = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
-    // - start_sim_time_;
+    new_observation.time = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0 - start_sim_time_;
 
     new_observation.input = ocs2::vector_t(1);
     new_observation.input(0) = last_input_;
@@ -152,8 +191,14 @@ public:
     // RCLCPP_INFO_STREAM(this->get_logger(), std::endl);
 
     if (!controller_initialized_) {
+      // initial_position_0_ = msg->position[0];
+      // initial_position_1_ = msg->position[1];
+      // new_observation.state[0] = 0.0;
+      // new_observation.state[1] = 0.0;
+      new_observation.time = 0.0;
       InitializeController(new_observation);
       controller_initialized_ = true;
+      controller_just_initialized_ = true;
       return;
     }
 
@@ -181,7 +226,7 @@ public:
     // TODO check evaluatePolicy vs rolloutPolicy
     ocs2::SystemObservation predicted_observation;
     mpc_mrt_interface_->rolloutPolicy(
-      new_observation.time, new_observation.state, 0.002, predicted_observation.state,
+      new_observation.time, new_observation.state, time_step_, predicted_observation.state,
       predicted_observation.input, predicted_observation.mode);
 
     // Send the commands to the actuators
@@ -194,7 +239,7 @@ public:
       last_input_ = predicted_observation.input(0);
     }
 
-    torque_cmd_msg.data.push_back(last_input_);
+    torque_cmd_msg.data.push_back(torque_multiplier_ * last_input_);
     torque_cmd_pub_->publish(torque_cmd_msg);
 
     // RCLCPP_INFO_STREAM(this->get_logger(), "Predicted state: " << predicted_observation);
@@ -203,6 +248,8 @@ public:
   }
 
 private:
+  double time_step_ = 0.0;
+
   double start_sim_time_ = 0.0;
   double start_time_ = 0.0;
   double last_input_ = 0.0;
