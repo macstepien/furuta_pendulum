@@ -50,6 +50,8 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
   // dtheta3 = ddtheta1
   // dtheta4 = ddtheta2
 
+  double MAX_MOTOR_VEL = 22.0;
+
   ad_scalar_t tau1 = input(0);
   ad_scalar_t tau2(0.0);
 
@@ -105,6 +107,26 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
   dy(1) = theta4;
   dy(2) = numerator1(0) / denominator;
   dy(3) = numerator2(0) / denominator;
+
+  if (CppAD::Value(dy(0)).getValue() > MAX_MOTOR_VEL && CppAD::Value(dy(2)).getValue() > 0.0)
+  {
+    dy(0) = MAX_MOTOR_VEL;
+    dy(2) = ad_scalar_t(0.0);
+  } else  if (CppAD::Value(dy(0)).getValue() < -MAX_MOTOR_VEL && CppAD::Value(dy(2)).getValue() < 0.0)
+  {
+    dy(0) = -MAX_MOTOR_VEL;
+    dy(2) = ad_scalar_t(0.0);
+  }
+
+
+  // if (dy(0) > MAX_MOTOR_VEL && dy(2) > ad_scalar_t(0.0)){
+    // dy(0) = MAX_MOTOR_VEL;
+    // dy(2) = ad_scalar_t(0.0);
+  // } else if (dy(0) < -MAX_MOTOR_VEL && dy(2) < ad_scalar_t(0.0)){
+    // dy(0) = MAX_MOTOR_VEL;
+    // dy(2) = ad_scalar_t(0.0);
+  // }
+
 
   return dy;
 }
