@@ -209,6 +209,7 @@ odrv0.axis0.controller.config.vel_integrator_gain = 7.041666507720947
 odrv0.axis0.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
 odrv0.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+odrv0.axis0.controller.input_pos = 0.0
 odrv0.axis0.controller.start_anticogging_calibration()
 
 start_liveplotter(lambda:[odrv0.axis0.encoder.pos_estimate, odrv0.axis0.controller.pos_setpoint])
@@ -222,7 +223,7 @@ odrv0.save_configuration()
 
 7.
 odrv0.axis0.controller.config.vel_limit = 8.0
-odrv0.axis0.motor.config.current_lim = 14
+odrv0.axis0.motor.config.current_lim = 12
 odrv0.save_configuration()
 
 
