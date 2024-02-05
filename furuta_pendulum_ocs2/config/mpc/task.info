@@ -7,20 +7,20 @@ furuta_pendulum_interface
 ; furuta pendulum parameters
 furuta_pendulum_parameters
 {
-  m1 0.040466
-  m2 0.009801
-  l1 0.05415
-  l2 0.096608
-  L1 0.093525
-  L2 0.129
-  b1 0.0
-  b2 1.7905703040590617e-05
-  J1 0.000024054318
-  J2 0.000014790595
+  m1 0.049516791308169786
+  m2 0.008298037379085858
+  l1 0.0647716016621394
+  l2 0.05830823780438202
+  L1 0.07948297420889584
+  L2 0.09739177500000014
+  J1 4.12968967677489e-05
+  J2 5.627983195416846e-06
+  b1 7.923653601699218e-11
+  b2 1.4455825380821696e-05
 }
 
 control_signal_bound 0.43
-joint0_velocity_bound 18.0
+joint0_velocity_bound 22.0
 
 ; DDP settings
 ddp
@@ -47,7 +47,7 @@ ddp
   ; This value determines the relative tolerance error for ode solvers.
   RelTolODE                      1e-3
   ; This value determines the maximum number of integration points per a second for ode solvers. 
-  maxNumStepsPerSecond           100000
+  maxNumStepsPerSecond           70000
   ; The integration time step for Riccati equation which is used for fixed timestep integration scheme
   timeStep                       0.002
   ; The backward pass integrator type: SLQ uses it for solving Riccati equation and ILQR uses it for discretizing LQ approximation.
@@ -87,7 +87,7 @@ rollout
   timeStep                     0.002
   
   ; This value determines the maximum number of integration points per a second for ode solvers.
-  maxNumStepsPerSecond         100000
+  maxNumStepsPerSecond         80000
   
   ; Check the numerical stability of the algorithms for debugging purpose
   checkNumericalStability      false
@@ -100,7 +100,7 @@ mpc
 {
   debugPrint                  false
   
-  timeHorizon                 1.5   ; [s]
+  timeHorizon                 0.5   ; [s]
 
   ; The time window (in seconds) for retrieving the optimized outputs (controller and state-input
   ; trajectories). Any negative number will be interpreted as the whole time horizon.
