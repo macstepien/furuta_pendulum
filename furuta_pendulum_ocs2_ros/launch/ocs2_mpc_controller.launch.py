@@ -14,9 +14,19 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
+    controller_params = PathJoinSubstitution(
+        [
+            FindPackageShare("furuta_pendulum_ocs2_ros"),
+            "config",
+            "controller.yaml",
+        ]
+    )
+
+
     mpc_mrt_node = Node(
         package="furuta_pendulum_ocs2_ros",
         executable="ocs2_mpc_controller_node",
+        parameters=[controller_params],
     )
 
     actions = [
