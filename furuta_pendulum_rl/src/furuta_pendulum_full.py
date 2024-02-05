@@ -18,7 +18,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 25,
+        "render_fps": 100,
     }
 
     def __init__(self, **kwargs):
@@ -32,7 +32,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 "model",
                 "furuta_pendulum.xml",
             ),
-            40,
+            10,
             observation_space=observation_space,
             **kwargs,
         )
@@ -40,9 +40,12 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         # Same as in LQR
         theta1_weight = 0.0
         theta2_weight = 10.0
-        dtheta1_weight = 1.0
-        dtheta2_weight = 1.0
+        dtheta1_weight = 2.0
+        dtheta2_weight = 2.0
         u_weight = 1.0
+
+        self.u_change_weight = 1000.0
+        self.last_u = 0.0
 
         self._Q = np.array(
             [
@@ -80,7 +83,10 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         return obs
 
     def calculate_reward(self, obs: np.array, a: np.array):
-        return -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
+        reward = -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
+        # reward += -np.abs(np.sign(a[0]) - np.sign(self.last_u)) * self.u_change_weight
+        self.last_u = a[0]
+        return reward
 
     def viewer_setup(self):
         assert self.viewer is not None
