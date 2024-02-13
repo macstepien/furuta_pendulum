@@ -3,3 +3,4 @@ MUJOCO_LOG.TXT
 ppo_furuta_pendulum_log/
 ppo_furuta_pendulum_swing_up_log/
 ppo_furuta_pendulum_full_log/
+furuta_pendulum_model/nn/runs/
