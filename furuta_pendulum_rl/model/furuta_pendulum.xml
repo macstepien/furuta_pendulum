@@ -24,12 +24,12 @@
       type="plane" material="matplane" condim="3" />
 
     <!-- Pendulum -->
-    <geom size="0.025 0.0895" pos="0 0 0.0895" type="cylinder" rgba="0.8 0.8 0.8 1" />
+    <geom size="0.025 0.08" pos="0 0 0.08" type="cylinder" rgba="0.8 0.8 0.8 1" />
     <body name="arm1" pos="0 0 0.184">
       <inertial pos="0.05415 0 0" quat="0.5 0.5 0.5 0.5" mass="0.040466"
         diaginertia="2.40543e-05 2.40543e-05 1e-06" />
-      <joint name="joint0" pos="0 0 0" axis="0 0 1" damping="0.0001" />
-      <geom size="0.005 0.0467625" pos="0.0467625 0 0" quat="0.707107 0 0.707107 0" type="cylinder"
+      <joint name="joint0" pos="0 0 0" axis="0 0 1" damping="0.02" />
+      <geom size="0.005 0.042" pos="0.042 0 0" quat="0.707107 0 0.707107 0" type="cylinder"
         rgba="0.8 0.8 0.8 1" />
       <body name="arm2" pos="0.093525 0 0" quat="1 0 0 0">
         <inertial pos="0 0 0.096608" mass="0.009801" diaginertia="1.47906e-05 1.47906e-05 1e-06" />
@@ -40,6 +40,6 @@
   </worldbody>
 
   <actuator>
-    <motor ctrllimited="true" ctrlrange="-0.43 0.43" gear="1.0" joint="joint1" />
+    <motor ctrllimited="true" ctrlrange="-0.43 0.43" gear="1.0" joint="joint0" />
   </actuator>
 </mujoco>
