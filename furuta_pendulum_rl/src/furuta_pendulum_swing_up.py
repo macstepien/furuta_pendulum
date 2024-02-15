@@ -9,6 +9,8 @@ from gym.spaces import Box
 
 from ament_index_python.packages import get_package_share_directory
 
+from utils import limit_minus_pi_pi
+
 
 # Based on inverted pendulum example world from gym
 class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
@@ -18,7 +20,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 25,
+        "render_fps": 250,
     }
 
     def __init__(self, **kwargs):
@@ -32,7 +34,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 "model",
                 "furuta_pendulum.xml",
             ),
-            40,
+            4,
             observation_space=observation_space,
             **kwargs,
         )
@@ -44,7 +46,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         theta2_weight = 10.0
         dtheta1_weight = 1.0
         dtheta2_weight = 1.0
-        u_weight = 1.0
+        a_weight = 0.1
 
         self._Q = np.array(
             [
@@ -54,34 +56,45 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 [0, 0, 0, dtheta2_weight],
             ]
         )
-        self._R = np.array([u_weight])
+        self._R = np.array([a_weight])
+        # self._last_a = np.array([0.0])
+        # self._da_weight = np.array([0.0])
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
         ob = self._get_obs()
         reward = self.calculate_reward(ob, action)
-        terminated = bool(
-            not np.isfinite(ob).all() or (np.abs(ob[1]) < self._angle_threshold)
-        )
+        terminated = False
+
+        if not np.isfinite(ob).all():
+            reward = -1000.0
+            terminated = True
+        elif np.abs(ob[1]) < self._angle_threshold:
+            reward = 1000.0
+            terminated = True
 
         if self.render_mode == "human":
             self.render()
+
+        # self._last_a = action
         return ob, reward, terminated, False, {}
 
     def reset_model(self):
         qpos = self.init_qpos
         # set downward position
-        qpos[1] = -3.14159
+        qpos[1] = -math.pi
         qvel = self.init_qvel
         self.set_state(qpos, qvel)
         return self._get_obs()
 
     def _get_obs(self):
         obs = np.concatenate([self.data.qpos, self.data.qvel]).ravel()
-        obs[1] = self.limit_minus_pi_pi(obs[1])
+        obs[1] = limit_minus_pi_pi(obs[1])
         return obs
 
     def calculate_reward(self, obs: np.array, a: np.array):
+        # da = a - self._last_a
+        # return -(obs.transpose() @ self._Q @ obs + a * self._R * a + da * self._da_weight * da)[0]
         return -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
 
     def viewer_setup(self):
@@ -89,11 +102,3 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         v = self.viewer
         v.cam.trackbodyid = 0
         v.cam.distance = self.model.stat.extent
-
-    def limit_minus_pi_pi(self, angle):
-        angle = math.fmod(angle, 2 * math.pi)
-        if angle > math.pi:
-            angle = 2 * math.pi - angle
-        elif angle < -math.pi:
-            angle = 2 * math.pi + angle
-        return angle

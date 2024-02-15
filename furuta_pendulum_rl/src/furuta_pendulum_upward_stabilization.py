@@ -17,7 +17,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 25,
+        "render_fps": 500,
     }
 
     def __init__(self, **kwargs):
@@ -31,7 +31,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 "model",
                 "furuta_pendulum.xml",
             ),
-            40,
+            2,
             observation_space=observation_space,
             **kwargs,
         )

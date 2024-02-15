@@ -9,6 +9,8 @@ from gym.spaces import Box
 
 from ament_index_python.packages import get_package_share_directory
 
+from utils import limit_minus_pi_pi
+
 
 # Based on inverted pendulum example world from gym
 class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
@@ -18,7 +20,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 100,
+        "render_fps": 500,
     }
 
     def __init__(self, **kwargs):
@@ -32,20 +34,22 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 "model",
                 "furuta_pendulum.xml",
             ),
-            10,
+            2,
             observation_space=observation_space,
             **kwargs,
         )
 
+        self._angle_threshold = 0.2
+
         # Same as in LQR
         theta1_weight = 0.0
         theta2_weight = 10.0
-        dtheta1_weight = 2.0
-        dtheta2_weight = 2.0
-        u_weight = 1.0
+        dtheta1_weight = 1.0
+        dtheta2_weight = 1.0
+        u_weight = 0.1
 
-        self.u_change_weight = 1000.0
-        self.last_u = 0.0
+        # self.u_change_weight = 1000.0
+        # self.last_u = 0.0
 
         self._Q = np.array(
             [
@@ -62,6 +66,9 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         ob = self._get_obs()
         reward = self.calculate_reward(ob, action)
 
+        if np.abs(ob[1]) < self._angle_threshold:
+            reward += 1000.0
+
         terminated = bool(not np.isfinite(ob).all())
 
         if self.render_mode == "human":
@@ -71,33 +78,22 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
     def reset_model(self):
         qpos = self.init_qpos
         # set downward position
-        qpos[1] = -3.14159265
+        qpos[1] = -math.pi
         qvel = self.init_qvel
         self.set_state(qpos, qvel)
         return self._get_obs()
 
     def _get_obs(self):
         obs = np.concatenate([self.data.qpos, self.data.qvel]).ravel()
-        obs[0] = self.limit_minus_pi_pi(obs[0])
-        obs[1] = self.limit_minus_pi_pi(obs[1])
+        obs[0] = limit_minus_pi_pi(obs[0])
+        obs[1] = limit_minus_pi_pi(obs[1])
         return obs
 
     def calculate_reward(self, obs: np.array, a: np.array):
-        reward = -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
-        # reward += -np.abs(np.sign(a[0]) - np.sign(self.last_u)) * self.u_change_weight
-        self.last_u = a[0]
-        return reward
+        return -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
 
     def viewer_setup(self):
         assert self.viewer is not None
         v = self.viewer
         v.cam.trackbodyid = 0
         v.cam.distance = self.model.stat.extent
-
-    def limit_minus_pi_pi(self, angle):
-        angle = math.fmod(angle, 2 * math.pi)
-        if angle > math.pi:
-            angle = 2 * math.pi - angle
-        elif angle < -math.pi:
-            angle = 2 * math.pi + angle
-        return angle
