@@ -39,13 +39,14 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             **kwargs,
         )
 
-        self._angle_threshold = 0.2
+        self._angle_threshold = 0.05
+        self._dangle_threshold = 0.05
 
         # Same as in LQR
         theta1_weight = 0.0
-        theta2_weight = 10.0
-        dtheta1_weight = 1.0
-        dtheta2_weight = 1.0
+        theta2_weight = 17.0
+        dtheta1_weight = 0.5
+        dtheta2_weight = 1.5
         u_weight = 0.1
 
         # self.u_change_weight = 1000.0
@@ -61,25 +62,42 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         )
         self._R = np.array([u_weight])
 
+        self._init_pos_high = 1.0
+        self._init_pos_low = -1.0
+        self._init_vel_high = 1.0
+        self._init_vel_low = -1.0
+
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
         ob = self._get_obs()
         reward = self.calculate_reward(ob, action)
 
-        if np.abs(ob[1]) < self._angle_threshold:
-            reward += 1000.0
-
         terminated = bool(not np.isfinite(ob).all())
+
+        if (
+            np.abs(ob[1]) < self._angle_threshold
+            and np.abs(ob[3]) < self._dangle_threshold
+        ):
+            reward = 1000.0
+            terminated = True
 
         if self.render_mode == "human":
             self.render()
         return ob, reward, terminated, False, {}
 
     def reset_model(self):
-        qpos = self.init_qpos
-        # set downward position
-        qpos[1] = -math.pi
-        qvel = self.init_qvel
+        qpos = self.init_qpos + self.np_random.uniform(
+            size=self.model.nq, low=self._init_pos_low, high=self._init_pos_high
+        )
+        qpos[1] -= math.pi
+        qvel = self.init_qvel + self.np_random.uniform(
+            size=self.model.nv, low=self._init_vel_low, high=self._init_vel_high
+        )
+
+        # qpos = self.init_qpos
+        # qpos[1] = -math.pi
+        # qvel = self.init_qvel
+
         self.set_state(qpos, qvel)
         return self._get_obs()
 
