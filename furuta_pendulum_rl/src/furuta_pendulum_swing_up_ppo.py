@@ -34,7 +34,7 @@ if mode == Mode.FIRST_TRAIN_MODEL:
         "MlpPolicy",
         env,
         verbose=1,
-        tensorboard_log="furuta_pendulum_rl/ppo_furuta_pendulum_swing_up_log",
+        tensorboard_log="furuta_pendulum_rl/furuta_pendulum_logs",
         # policy_kwargs=dict(net_arch=[512, 512, 512]),
     )
     model.learn(total_timesteps=200000, progress_bar=True)
