@@ -52,7 +52,6 @@ private:
 
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
     torque_cmd_msg.data.push_back(u);
-    torque_cmd_msg.data.push_back(0.0);
     torque_cmd_pub_->publish(torque_cmd_msg);
   }
 };
