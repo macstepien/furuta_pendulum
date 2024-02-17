@@ -3,7 +3,7 @@ from gym.envs.registration import register
 
 from lqr_expert import LQRExpert
 
-max_episode_steps = 5000
+max_episode_steps = 10000
 register(
     id="FurutaPendulum-v0",
     entry_point="furuta_pendulum_full:FurutaPendulumEnv",
@@ -21,6 +21,5 @@ while True:
     obs, rewards, done, info, _ = env.step(action[0][0])
     env.render()
     i += 1
-    # if done or i > max_episode_steps:
-    if i > max_episode_steps:
+    if done or i > max_episode_steps:
         break
