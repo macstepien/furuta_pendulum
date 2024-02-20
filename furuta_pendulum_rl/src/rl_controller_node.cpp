@@ -11,6 +11,18 @@
 
 namespace furuta_pendulum_rl
 {
+
+double limit_minus_pi_pi(double angle)
+{
+  angle = fmod(angle, 2 * M_PI);
+  if (angle > M_PI) {
+    angle = 2 * M_PI - angle;
+  } else if (angle < -M_PI) {
+    angle = 2 * M_PI + angle;
+  }
+  return angle;
+}
+
 class RlControllerNode : public rclcpp::Node
 {
 public:
@@ -28,6 +40,14 @@ public:
       throw e;
     }
 
+    this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
+    try {
+      torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
+    } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
+      RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
+      throw e;
+    }
+
     state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
       "joint_states", 10, std::bind(&RlControllerNode::StateCb, this, std::placeholders::_1));
     torque_cmd_pub_ =
@@ -39,10 +59,13 @@ private:
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr torque_cmd_pub_;
   torch::jit::script::Module module_;
 
+  double torque_multiplier_ = 1.0;
+
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
     std::vector<double> data = {
-      msg->position[0], msg->position[1] - M_PI, msg->velocity[0], msg->velocity[1]};
+      limit_minus_pi_pi(msg->position[0]), limit_minus_pi_pi(msg->position[1] - M_PI),
+      msg->velocity[0], msg->velocity[1]};
 
     std::vector<torch::jit::IValue> inputs;
     inputs.push_back(torch::tensor(data));
@@ -51,7 +74,7 @@ private:
     double u = output.item<double>();
 
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
-    torque_cmd_msg.data.push_back(u);
+    torque_cmd_msg.data.push_back(u * torque_multiplier_);
     torque_cmd_pub_->publish(torque_cmd_msg);
   }
 };
