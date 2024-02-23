@@ -5,6 +5,8 @@ find_package(ament_cmake REQUIRED)
 
 install(DIRECTORY
   data
+  nn
+  system_identification
   DESTINATION share/${PROJECT_NAME}
 )
 
