@@ -38,8 +38,8 @@
   <xacro:property name="arm2_inertia_z" value="0.000001" />
 
 
-  <xacro:property name="max_effort" value="4.0" />
-  <xacro:property name="max_velocity_joint0" value="18.0" />
+  <xacro:property name="max_effort" value="0.43" />
+  <xacro:property name="max_velocity_joint0" value="22.0" />
   <xacro:property name="max_velocity_joint1" value="100.0" />
 
   <link name="world" />
