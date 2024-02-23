@@ -28,6 +28,9 @@ class LQRExpert:
         self.lqr_transition_angle_ = 0.075
         self.torque_multiplier_ = 0.8
 
+        self._max_velocity_joint0 = 22.0
+        self._max_velocity_joint1 = 50.0
+
     def SwingUpControl(self, obs: np.array):
         theta2 = limit_minus_pi_pi(obs[1])
         # dtheta1 = obs[2]
@@ -74,7 +77,12 @@ class LQRExpert:
         actions = []
 
         for i in range(len(observations)):
-            obs = observations[i]
+            obs = [
+                math.atan2(observations[i][0], observations[i][1]),
+                math.atan2(observations[i][2], observations[i][3]),
+                observations[i][4] * self._max_velocity_joint0,
+                observations[i][5] * self._max_velocity_joint1,
+            ]
 
             if math.fabs(limit_minus_pi_pi(obs[1])) < self.lqr_transition_angle_:
                 u = self.LQRControl(obs)

@@ -63,9 +63,9 @@ private:
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
-    std::vector<double> data = {
-      limit_minus_pi_pi(msg->position[0]), limit_minus_pi_pi(msg->position[1] - M_PI),
-      msg->velocity[0], msg->velocity[1]};
+    std::vector<double> data = {sin(msg->position[0]),        cos(msg->position[0]),
+                                sin(msg->position[1] - M_PI), cos(msg->position[1] - M_PI),
+                                msg->velocity[0] / 22.0,      msg->velocity[1] / 50.0};
 
     std::vector<torch::jit::IValue> inputs;
     inputs.push_back(torch::tensor(data));
