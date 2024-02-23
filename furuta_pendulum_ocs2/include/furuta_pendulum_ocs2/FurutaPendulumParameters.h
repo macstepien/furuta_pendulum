@@ -28,6 +28,10 @@ struct FurutaPendulumParameters {
     std::cerr << "J2: " << J2_ << "\n";
     std::cerr << "J2_hat: " << J2_hat_ << "\n";
     std::cerr << "J0_hat: " << J0_hat_ << "\n";
+    std::cerr << "Kt: " << Kt_ << "\n";
+    std::cerr << "R: " << R_ << "\n";
+    std::cerr << "Kemf: " << Kemf_ << "\n";
+
   }
 
   void loadSettings(const std::string& filename, const std::string& fieldName, bool verbose = true) {
@@ -47,6 +51,9 @@ struct FurutaPendulumParameters {
     loadData::loadPtreeValue(pt, b2_, fieldName + ".b2", verbose);
     loadData::loadPtreeValue(pt, J1_, fieldName + ".J1", verbose);
     loadData::loadPtreeValue(pt, J2_, fieldName + ".J2", verbose);
+    loadData::loadPtreeValue(pt, Kt_, fieldName + ".Kt", verbose);
+    loadData::loadPtreeValue(pt, R_, fieldName + ".R", verbose);
+    loadData::loadPtreeValue(pt, Kemf_, fieldName + ".Kemf", verbose);
     computeInertiaTerms();
     if (verbose) {
       std::cerr << " #### =============================================================================\n" << std::endl;
@@ -65,6 +72,10 @@ struct FurutaPendulumParameters {
   scalar_t J2_;
   scalar_t J2_hat_;
   scalar_t J0_hat_;
+
+  scalar_t Kt_;
+  scalar_t R_;
+  scalar_t Kemf_;
 
   scalar_t g_ = 9.80665;
 

@@ -52,9 +52,6 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
 
   double MAX_MOTOR_VEL = 22.0;
 
-  ad_scalar_t tau1 = input(0);
-  ad_scalar_t tau2(0.0);
-
   // double theta1 = y(0);
   ad_scalar_t theta2 = state(1);
   ad_scalar_t theta3 = state(2);
@@ -91,6 +88,9 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
   vec22(1) = params_.J0_hat_ + params_.J2_hat_ * pow(sin(theta2), 2);
   vec22(2) = -params_.m2_ * params_.l2_ * sin(theta2) * (params_.J0_hat_ + params_.J2_hat_ * pow(sin(theta2), 2));
 
+  ad_scalar_t tau1 = (params_.Kt_ / params_.R_) * (input(0) - params_.Kemf_ * theta3) - params_.b1_ * theta3;
+  ad_scalar_t tau2(0.0);
+
   Eigen::Matrix<ad_scalar_t, 3, 1> taus_g_vec;
   taus_g_vec(0) = tau1;
   taus_g_vec(1) = tau2;
@@ -108,15 +108,15 @@ ad_vector_t FurutaPendulumSystemDynamics::systemFlowMap(
   dy(2) = numerator1(0) / denominator;
   dy(3) = numerator2(0) / denominator;
 
-  if (CppAD::Value(dy(0)).getValue() > MAX_MOTOR_VEL && CppAD::Value(dy(2)).getValue() > 0.0)
-  {
-    dy(0) = MAX_MOTOR_VEL;
-    dy(2) = ad_scalar_t(0.0);
-  } else  if (CppAD::Value(dy(0)).getValue() < -MAX_MOTOR_VEL && CppAD::Value(dy(2)).getValue() < 0.0)
-  {
-    dy(0) = -MAX_MOTOR_VEL;
-    dy(2) = ad_scalar_t(0.0);
-  }
+  // if (CppAD::Value(dy(0)).getValue() > MAX_MOTOR_VEL && CppAD::Value(dy(2)).getValue() > 0.0)
+  // {
+  //   dy(0) = MAX_MOTOR_VEL;
+  //   dy(2) = ad_scalar_t(0.0);
+  // } else  if (CppAD::Value(dy(0)).getValue() < -MAX_MOTOR_VEL && CppAD::Value(dy(2)).getValue() < 0.0)
+  // {
+  //   dy(0) = -MAX_MOTOR_VEL;
+  //   dy(2) = ad_scalar_t(0.0);
+  // }
 
 
   // if (dy(0) > MAX_MOTOR_VEL && dy(2) > ad_scalar_t(0.0)){
