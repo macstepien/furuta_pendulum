@@ -11,6 +11,7 @@
 #include <ocs2_core/thread_support/SetThreadPriority.h>
 #include <ocs2_ddp/GaussNewtonDDP_MPC.h>
 #include <ocs2_mpc/MPC_MRT_Interface.h>
+#include <ocs2_core/misc/LoadData.h>
 
 #include <furuta_pendulum_ocs2/FurutaPendulumInterface.h>
 
@@ -29,24 +30,39 @@ public:
   double alpha_;
   double dtheta2_filtered_ = 0.0;
   double dtheta1_filtered_ = 0.0;
+  double time_multiplier_;
+  double control_signal_bound_ = 0.0;
+
+  rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr desired_state_sub_;
+  void DesiredStateCb(std_msgs::msg::Float64MultiArray::SharedPtr msg)
+  {
+    auto new_desired_state = ocs2::vector_t(ocs2::furuta_pendulum::STATE_DIM);
+    new_desired_state << msg->data[0], 3.14159265359, 0.0, 0.0;
+
+    const ocs2::TargetTrajectories target_trajectory(
+      {current_time_ + 2.0}, {new_desired_state},
+      {ocs2::vector_t::Zero(ocs2::furuta_pendulum::INPUT_DIM)});
+
+    mpc_mrt_interface_->getReferenceManager().setTargetTrajectories(target_trajectory);
+  }
 
   OCS2MPCControllerNode() : Node("controller_node")
   {
     RCLCPP_INFO_STREAM(this->get_logger(), "Starting");
     // InitializeController();
 
-
     this->declare_parameter("alpha", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("time_multiplier", rclcpp::PARAMETER_DOUBLE);
 
     try {
       alpha_ = this->get_parameter("alpha").as_double();
       torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
+      time_multiplier_ = this->get_parameter("time_multiplier").as_double();
     } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
       RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
       throw e;
     }
-
 
     // cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
     cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -60,6 +76,10 @@ public:
 
     state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
       "joint_states", 1, std::bind(&OCS2MPCControllerNode::StateCb, this, std::placeholders::_1));
+
+    desired_state_sub_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
+      "desired_state", 10,
+      std::bind(&OCS2MPCControllerNode::DesiredStateCb, this, std::placeholders::_1));
 
     torque_cmd_pub_ =
       this->create_publisher<std_msgs::msg::Float64MultiArray>("effort_control", 10);
@@ -78,6 +98,8 @@ public:
       std::make_unique<ocs2::furuta_pendulum::FurutaPendulumInterface>(task_file, library_folder);
 
     time_step_ = furuta_pendulum_interface_->ddpSettings().timeStep_;
+
+    ocs2::loadData::loadCppDataType(task_file, "control_signal_bound", control_signal_bound_);
 
     /*
    * Set up the MPC and the MPC_MRT_interface.
@@ -156,23 +178,23 @@ public:
     dtheta2_filtered_ = alpha_ * msg->velocity[1] + (1.0 - alpha_) * dtheta2_filtered_;
     dtheta1_filtered_ = alpha_ * msg->velocity[0] + (1.0 - alpha_) * dtheta1_filtered_;
 
-
     // RCLCPP_INFO_STREAM(this->get_logger(), "Running state cb");
 
     // if (!controller_initialized_) {
     //   start_sim_time_ = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
     // }
 
-    if (controller_just_initialized_)
-    {
+    if (controller_just_initialized_) {
       start_sim_time_ = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0;
       controller_just_initialized_ = false;
     }
 
-     if (!controller_initialized_) {
+    if (!controller_initialized_) {
       initial_position_0_ = msg->position[0];
       initial_position_1_ = msg->position[1];
-    RCLCPP_INFO_STREAM(this->get_logger(), "Initial position: adsgfdsaf" << initial_position_0_ << " " << initial_position_1_);
+      RCLCPP_INFO_STREAM(
+        this->get_logger(),
+        "Initial position: " << initial_position_0_ << " " << initial_position_1_);
     }
 
     // State estimation
@@ -180,9 +202,13 @@ public:
     new_observation.state = ocs2::vector_t(4);
     // new_observation.state << msg->position[0], msg->position[1], msg->velocity[0], msg->velocity[1];
     // new_observation.state << msg->position[0] - initial_position_0_, msg->position[1] - initial_position_1_, dtheta1_filtered_, dtheta2_filtered_;
-    new_observation.state << msg->position[0], msg->position[1], dtheta1_filtered_, dtheta2_filtered_;
+    new_observation.state << msg->position[0], msg->position[1], dtheta1_filtered_,
+      dtheta2_filtered_;
 
-    new_observation.time = msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0 - start_sim_time_;
+    new_observation.time =
+      msg->header.stamp.sec + msg->header.stamp.nanosec / 1000000000.0 - start_sim_time_;
+
+    current_time_ = new_observation.time;
 
     new_observation.input = ocs2::vector_t(1);
     new_observation.input(0) = last_input_;
@@ -226,8 +252,8 @@ public:
     // TODO check evaluatePolicy vs rolloutPolicy
     ocs2::SystemObservation predicted_observation;
     mpc_mrt_interface_->rolloutPolicy(
-      new_observation.time, new_observation.state, time_step_, predicted_observation.state,
-      predicted_observation.input, predicted_observation.mode);
+      new_observation.time, new_observation.state, time_multiplier_ * time_step_,
+      predicted_observation.state, predicted_observation.input, predicted_observation.mode);
 
     // Send the commands to the actuators
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
@@ -236,7 +262,7 @@ public:
       last_input_ = 0.0;
     } else {
       // last_input_ = optimized_input(0);
-      last_input_ = predicted_observation.input(0);
+      last_input_ = std::clamp(predicted_observation.input(0), -control_signal_bound_, control_signal_bound_);
     }
 
     torque_cmd_msg.data.push_back(torque_multiplier_ * last_input_);
@@ -254,6 +280,8 @@ private:
   double start_time_ = 0.0;
   double last_input_ = 0.0;
   bool controller_initialized_ = false;
+
+  double current_time_ = 0.0;
 
   std::unique_ptr<ocs2::furuta_pendulum::FurutaPendulumInterface> furuta_pendulum_interface_;
   std::unique_ptr<ocs2::GaussNewtonDDP_MPC> mpc_;
