@@ -174,14 +174,16 @@ odrv0.erase_configuration()
 2.
 ```
 odrv0.config.brake_resistance=2.0
-odrv0.axis0.controller.config.vel_limit = 2.0
+odrv0.axis0.controller.config.vel_limit = 40.0
 
 odrv0.axis0.motor.config.current_lim = 12.0 
 odrv0.axis0.motor.config.pole_pairs = 7
-odrv0.axis0.motor.config.torque_constant = 8.27/80.0
+odrv0.axis0.motor.config.torque_constant = 1.0
 odrv0.axis0.motor.config.motor_type = MOTOR_TYPE_GIMBAL
 odrv0.axis0.motor.config.calibration_current = 1.0
 odrv0.axis0.config.calibration_lockin.current = 1.0
+odrv0.axis0.encoder.config.bandwidth = 250.0
+odrv0.axis1.encoder.config.bandwidth = 250.0
 
 odrv0.axis0.encoder.config.cpr = 8192
 
@@ -201,9 +203,9 @@ dump_errors(odrv0)
 
 5.
 
-odrv0.axis0.controller.config.pos_gain = 35.0
-odrv0.axis0.controller.config.vel_gain = 0.14083333313465118
-odrv0.axis0.controller.config.vel_integrator_gain = 7.041666507720947
+odrv0.axis0.controller.config.pos_gain = 70.0
+odrv0.axis0.controller.config.vel_gain = 1.0
+odrv0.axis0.controller.config.vel_integrator_gain = 50.0
 
 <!-- IMPORTANT - don't copy all commands at once, do it one after the other -->
 odrv0.axis0.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
@@ -212,6 +214,8 @@ odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 odrv0.axis0.controller.input_pos = 0.0
 odrv0.axis0.controller.start_anticogging_calibration()
 
+import matplotlib
+matplotlib.use('TkAgg')
 start_liveplotter(lambda:[odrv0.axis0.encoder.pos_estimate, odrv0.axis0.controller.pos_setpoint])
 
 # Wait until odrv0.axis0.controller.config.anticogging.calib_anticogging == False
@@ -248,3 +252,14 @@ odrivetool backup-config ./odrive.json
 
 Restoring config:
 odrivetool restore-config odrive_config.json
+
+Tunning velocity estimator:  (default 1000.0)
+odrv0.axis0.encoder.config.bandwidth = 250.0
+odrv0.axis1.encoder.config.bandwidth = 250.0
+
+In [1]: odrv0.axis0.encoder.config.bandwidth = 250.0
+   ...: odrv0.axis1.encoder.config.bandwidth = 250.0
+
+In [2]: odrv0.axis0.controller.config.vel_limit = 40.0
+
+In [3]: odrv0.axis0.motor.config.torque_constant = 1.0
