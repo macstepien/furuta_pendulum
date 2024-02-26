@@ -24,7 +24,7 @@ class OnnxablePolicy(th.nn.Module):
         return self.actor(observation)
 
 
-model = SAC.load("furuta_pendulum_rl/trained_agents/furuta_pendulum_full", device="cpu")
+model = SAC.load("furuta_pendulum_rl/trained_agents/furuta_pendulum_full_pretrained", device="cpu")
 # model = SAC.load("PathToTrainedModel.zip", device="cpu")
 onnxable_model = OnnxablePolicy(model.policy.actor)
 

@@ -28,6 +28,8 @@
     <body name="arm1" pos="0 0 0.184">
       <inertial pos="0.05415 0 0" quat="0.5 0.5 0.5 0.5" mass="0.040466"
         diaginertia="2.40543e-05 2.40543e-05 1e-06" />
+      <!-- <joint name="joint0" pos="0 0 0" axis="0 0 1" damping="0.000868614247692284" /> -->
+      <!-- <joint name="joint0" pos="0 0 0" axis="0 0 1" damping="0.026595744680851068" /> -->
       <joint name="joint0" pos="0 0 0" axis="0 0 1" damping="0.008" />
       <geom size="0.005 0.042" pos="0.042 0 0" quat="0.707107 0 0.707107 0" type="cylinder"
         rgba="0.8 0.8 0.8 1" />
@@ -40,6 +42,6 @@
   </worldbody>
 
   <actuator>
-    <motor ctrllimited="true" ctrlrange="-0.43 0.43" gear="1.0" joint="joint0" />
+    <motor ctrllimited="true" ctrlrange="-0.4 0.4" gear="1.0" joint="joint0" />
   </actuator>
 </mujoco>

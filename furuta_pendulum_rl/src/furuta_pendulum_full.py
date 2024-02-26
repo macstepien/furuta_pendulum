@@ -26,29 +26,16 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         self._max_velocity_joint0 = 22.0
         self._max_velocity_joint1 = 50.0
 
+        state_size = 6
+        number_of_stacked_states = 1
+        # action_size = 1
+        action_size = 0
+
         utils.EzPickle.__init__(self)
         observation_space = Box(
-            low=np.array(
-                [
-                    -1.0,
-                    -1.0,
-                    -1.0,
-                    -1.0,
-                    -self._max_velocity_joint0,
-                    -self._max_velocity_joint1,
-                ]
-            ),
-            high=np.array(
-                [
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0,
-                    self._max_velocity_joint0,
-                    self._max_velocity_joint1,
-                ]
-            ),
-            shape=(6,),
+            low=-1.0,
+            high=1.0,
+            shape=(state_size * number_of_stacked_states + action_size,),
             dtype=np.float64,
         )
 
@@ -64,13 +51,13 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             **kwargs,
         )
 
-        self._angle_threshold = 0.02
-        self._dangle_threshold = 0.02
+        self._angle_threshold = 0.2
+        self._dangle_threshold = 0.5
 
         theta1_weight = 0.0
-        theta2_weight = 10.0
-        dtheta1_weight = 1.0
-        dtheta2_weight = 3.0
+        theta2_weight = 1.0
+        dtheta1_weight = 0.1
+        dtheta2_weight = 1.0
 
         self._desired_obs_values = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
         self._obs_weights = [
@@ -82,20 +69,34 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             dtheta2_weight,
         ]
 
-        self._action_weight = 0.0
+        self._action_weight = 0.05
 
-        self._init_pos_high = 3.0
-        self._init_pos_low = -3.0
+        # self._daction_weight = 25.0
+        # self._last_action = [0.0]
+
+        # self._velocity_noise = 0.0
+
+        self._init_pos_high = math.pi
+        self._init_pos_low = -math.pi
         self._init_vel_high = 3.0
         self._init_vel_low = -3.0
+
+        self._stabilized_count = 0
+        self._stabilized_count_threshold = 1000
+
+        self._last_observation = None
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
         self.bound_velocities()
-        ob = self._get_obs()
+        ob = self._get_current_obs()
         reward = self.calculate_reward(ob, action)
 
         terminated = bool(not np.isfinite(ob).all())
+
+        # theta1_diff = self._angle_threshold - np.abs(limit_minus_pi_pi(self.data.qpos[1]))
+        # dtheta1_diff = self._dangle_threshold - np.abs(self.data.qvel[0])
+        # dtheta2_diff = self._dangle_threshold - np.abs(self.data.qvel[1])
 
         if (
             np.abs(limit_minus_pi_pi(self.data.qpos[1])) < self._angle_threshold
@@ -104,11 +105,24 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         ):
             # reward = 1000.0
             # terminated = True
-            reward += 1.0
+            reward += 0.1 * self._stabilized_count
+            # reward += 0.1
+            self._stabilized_count += 1
+            # if self._stabilized_count > self._stabilized_count_threshold:
+            #     terminated = True
+            #     reward = 1000.0
+        else:
+            self._stabilized_count = 0
 
         if self.render_mode == "human":
             self.render()
-        return ob, reward, terminated, False, {}
+
+        full_obs = self._get_obs()
+
+        self._last_action = action
+        self._last_observation = ob
+
+        return full_obs, reward, terminated, False, {}
 
     def reset_model(self):
         qpos = self.init_qpos + self.np_random.uniform(
@@ -124,6 +138,8 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         # qvel = self.init_qvel
 
         self.set_state(qpos, qvel)
+        self._last_observation = self._get_current_obs()
+        self._last_action = [0.0]
         return self._get_obs()
 
     def bound_velocities(self):
@@ -134,7 +150,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             self.data.qvel[1], -self._max_velocity_joint1, self._max_velocity_joint1
         )
 
-    def _get_obs(self):
+    def _get_current_obs(self):
         # obs = np.concatenate([self.data.qpos, self.data.qvel]).ravel()
 
         # obs[0] = limit_minus_pi_pi(obs[0])
@@ -142,6 +158,15 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
 
         # sin and cos instead of limit to get rid of discontinuities
         # scale angular velocities so that they won't dominate
+
+        # vel0_with_noise = (
+        #     self.data.qvel[0]
+        #     + self.np_random.standard_normal() * self._velocity_noise
+        # )
+        # vel1_with_noise = (
+        #     self.data.qvel[1]
+        #       + self.np_random.standard_normal() * self._velocity_noise
+        # )
 
         obs = np.array(
             [
@@ -151,23 +176,52 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 np.cos(self.data.qpos[1]),
                 self.data.qvel[0] / self._max_velocity_joint0,
                 self.data.qvel[1] / self._max_velocity_joint1,
+                # vel0_with_noise / self._max_velocity_joint0,
+                # vel1_with_noise / self._max_velocity_joint1,
             ]
         )
 
         return obs
 
+    def _get_obs(self):
+        # return np.concatenate(
+        #     (self._get_current_obs(), self._last_observation, self._last_action)
+        # )
+        # return np.concatenate((self._get_current_obs(), self._last_observation))
+        return self._get_current_obs()
+
     def calculate_reward(self, obs: np.array, a: np.array):
         observation_reward = np.sum(
             [
-                -weight * np.power((desired_value - observation_value), 2)
+                -weight * np.power(np.abs(desired_value - observation_value), 2.0)
+                # -weight * np.abs(desired_value - observation_value)
                 for (observation_value, desired_value, weight) in zip(
                     obs, self._desired_obs_values, self._obs_weights
                 )
             ]
         )
 
+        # theta2_weight = 2.0
+        # dtheta1_weight = 0.5
+        # dtheta2_weight = 0.5
+        # action_weight = 1.0
+
+        # observation_reward = -np.sum(
+        #     [
+        #         theta2_weight * np.abs(limit_minus_pi_pi(self.data.qpos[1])),
+        #         dtheta1_weight * np.abs(self.data.qvel[0]),
+        #         dtheta2_weight * np.abs(self.data.qvel[1]),
+        #     ]
+        # )
+
+        # action_reward = -action_weight * np.abs(a[0])
         action_reward = -self._action_weight * np.power(a[0], 2)
 
+        # daction_reward = -self._daction_weight * np.power(
+        #     (a[0] - self._last_action[0]), 2
+        # )
+        # daction_reward = -self._daction_weight * np.abs((a[0] - self._last_action[0]))
+        # return observation_reward + action_reward + daction_reward
         return observation_reward + action_reward
 
     def viewer_setup(self):

@@ -1,7 +1,5 @@
-import tempfile
 import numpy as np
 from enum import Enum
-import pprint
 
 import gym
 from gym.envs.registration import register
@@ -9,35 +7,26 @@ from gym.envs.registration import register
 from stable_baselines3 import SAC, PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.noise import NormalActionNoise
 
-from stable_baselines3.common.policies import ActorCriticPolicy
-
-from imitation.algorithms.mce_irl import (
-    MCEIRL,
-    mce_occupancy_measures,
-    mce_partition_fh,
-)
 from imitation.algorithms import sqil
-from imitation.algorithms import density as db
 from imitation.algorithms import bc
 from imitation.algorithms.adversarial.gail import GAIL
 from imitation.algorithms.adversarial.airl import AIRL
-from imitation.algorithms.dagger import SimpleDAggerTrainer
-from imitation.rewards import reward_nets
 
 import imitation.data.rollout as rollout
 from imitation.rewards.reward_nets import BasicRewardNet, BasicShapedRewardNet
 from imitation.util.networks import RunningNorm
 
-import torch
-
 from lqr_expert import LQRExpert
 
-# torch.set_default_device("cuda")
+import torch
 
-n_envs=6
+torch.set_default_device("cuda")
 
-max_episode_steps = 2000
+n_envs = 12
+
+max_episode_steps = 2500
 register(
     id="FurutaPendulum-v0",
     entry_point="furuta_pendulum_full:FurutaPendulumEnv",
@@ -64,6 +53,7 @@ rollouts = rollout.rollout(
 )
 
 print(rollout.rollout_stats(rollouts))
+
 
 class ImitationMethod(Enum):
     BC = 1
@@ -162,14 +152,19 @@ elif imitation_method == ImitationMethod.SQIL:
         policy="MlpPolicy",
         rl_algo_class=SAC,
         rl_kwargs=dict(
-            policy_kwargs=dict(net_arch=[64, 64, 64]),
+            # policy_kwargs=dict(net_arch=[64, 64, 64]),
+            use_sde = True,
+            sde_sample_freq = 100,
             tensorboard_log="furuta_pendulum_rl/furuta_pendulum_logs",
             verbose=1,
+            device="cuda",
+            # action_noise=NormalActionNoise(mean=np.array([0.0]), sigma=np.array([0.04])),
+            # batch_size=1024,
         ),
     )
     reward_before_training, _ = evaluate_policy(sqil_trainer.policy, env, 10)
     print(f"Reward before training: {reward_before_training}")
-    sqil_trainer.train(total_timesteps=200_000, progress_bar=True)
+    sqil_trainer.train(total_timesteps=400_000, progress_bar=True)
     reward_after_training, _ = evaluate_policy(sqil_trainer.policy, env, 10)
     print(f"Reward after training: {reward_after_training}")
     model = sqil_trainer.rl_algo

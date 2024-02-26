@@ -18,3 +18,10 @@ In scripts with the name of the environment and the name of the algorithm you ca
 ## Exporting model
 
 Due to problems with ROS2 performance in Python I decided to use C++. To export the actor model from SAC used to solve the full control problem, I used `export_sac_model.py` script.
+
+## Development
+
+### Problems
+
+High variance of actions - in gaussian exploration actions can be different in each timestep which results in high variance and oscillations of the motor. 
+gSDE results in smoother actions.
