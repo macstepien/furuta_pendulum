@@ -4,3 +4,22 @@
     # torque_multiplier: 6.0
     # torque_multiplier: 77.38814994
     # torque_multiplier: 154.776299879
+
+    # High variance
+    # odrv0.axis0.encoder.config.bandwidth = 1000.0
+    # odrv0.axis1.encoder.config.bandwidth = 1000.0
+    # dtheta0_alpha: 1.0
+    # dtheta1_alpha: 1.0
+    # action_alpha: 0.3
+
+    dtheta0_alpha: 1.0
+    dtheta1_alpha: 1.0
+    action_alpha: 0.1
+    # action_alpha: 1.0
+
+    # SDE
+    # odrv0.axis0.encoder.config.bandwidth = 1000.0
+    # odrv0.axis1.encoder.config.bandwidth = 1000.0
+    # dtheta0_alpha: 0.25
+    # dtheta1_alpha: 0.25
+    # action_alpha: 1.0

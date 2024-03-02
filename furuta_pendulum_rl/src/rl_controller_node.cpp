@@ -41,8 +41,14 @@ public:
     }
 
     this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("dtheta0_alpha", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("dtheta1_alpha", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("action_alpha", rclcpp::PARAMETER_DOUBLE);
     try {
       torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
+      dtheta0_alpha_ = this->get_parameter("dtheta0_alpha").as_double();
+      dtheta1_alpha_ = this->get_parameter("dtheta1_alpha").as_double();
+      action_alpha_ = this->get_parameter("action_alpha").as_double();
     } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
       RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
       throw e;
@@ -61,20 +67,36 @@ private:
 
   double torque_multiplier_ = 1.0;
 
+  double dtheta0_alpha_ = 1.0;
+  double dtheta1_alpha_ = 1.0;
+
+  double action_alpha_ = 1.0;
+
+  double dtheta0_filtered_ = 0.0;
+  double dtheta1_filtered_ = 0.0;
+  
+  double action_filtered_ = 0.0;
+
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
+    dtheta0_filtered_ =
+      dtheta0_alpha_ * msg->velocity[0] + (1.0 - dtheta0_alpha_) * dtheta0_filtered_;
+    dtheta1_filtered_ =
+      dtheta1_alpha_ * msg->velocity[1] + (1.0 - dtheta1_alpha_) * dtheta1_filtered_;
+
     std::vector<double> data = {sin(msg->position[0]),        cos(msg->position[0]),
                                 sin(msg->position[1] - M_PI), cos(msg->position[1] - M_PI),
-                                msg->velocity[0] / 22.0,      msg->velocity[1] / 50.0};
+                                dtheta0_filtered_ / 22.0,     dtheta1_filtered_ / 50.0};
 
     std::vector<torch::jit::IValue> inputs;
     inputs.push_back(torch::tensor(data));
 
     at::Tensor output = module_.forward(inputs).toTensor();
     double u = output.item<double>();
+    action_filtered_ = action_alpha_ * u + (1.0 - action_alpha_) * action_filtered_;
 
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
-    torque_cmd_msg.data.push_back(u * torque_multiplier_);
+    torque_cmd_msg.data.push_back(action_filtered_ * torque_multiplier_);
     torque_cmd_pub_->publish(torque_cmd_msg);
   }
 };
