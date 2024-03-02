@@ -29,28 +29,30 @@ public:
   RlControllerNode(const rclcpp::NodeOptions & options)
   : Node("furuta_pendulum_rl_controller_node", options)
   {
-    std::string model_path =
-      std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_rl")) /
-      "trained_agents" / "furuta_pendulum_full.pt";
-
-    try {
-      module_ = torch::jit::load(model_path);
-    } catch (const c10::Error & e) {
-      RCLCPP_ERROR_STREAM(this->get_logger(), "Error loading the model: " << e.what());
-      throw e;
-    }
-
     this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("dtheta0_alpha", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("dtheta1_alpha", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("action_alpha", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("agent_name", rclcpp::PARAMETER_STRING);
     try {
       torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
       dtheta0_alpha_ = this->get_parameter("dtheta0_alpha").as_double();
       dtheta1_alpha_ = this->get_parameter("dtheta1_alpha").as_double();
       action_alpha_ = this->get_parameter("action_alpha").as_double();
+      agent_name_ = this->get_parameter("agent_name").as_string();
     } catch (const rclcpp::exceptions::ParameterUninitializedException & e) {
       RCLCPP_ERROR_STREAM(this->get_logger(), "Required parameter not defined: " << e.what());
+      throw e;
+    }
+
+    std::string model_path =
+      std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_rl")) /
+      "trained_agents" / agent_name_;
+
+    try {
+      module_ = torch::jit::load(model_path);
+    } catch (const c10::Error & e) {
+      RCLCPP_ERROR_STREAM(this->get_logger(), "Error loading the model: " << e.what());
       throw e;
     }
 
@@ -74,8 +76,10 @@ private:
 
   double dtheta0_filtered_ = 0.0;
   double dtheta1_filtered_ = 0.0;
-  
+
   double action_filtered_ = 0.0;
+
+  std::string agent_name_;
 
   void StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
   {
