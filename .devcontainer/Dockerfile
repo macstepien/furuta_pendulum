@@ -55,3 +55,8 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
 # /opt/drake/lib/ - To have a working executable after installation
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+# pip install imitation
+# IMPORANT: it may result in upgrading gym, and it will be necessary to downgrade it again (by once again executing install of the specific stable baselines version)
+
+# ImportError: Missing shimmy installation. You provided an OpenAI Gym environment. Stable-Baselines3 (SB3) has transitioned to using Gymnasium internally. In order to use OpenAI Gym environments with SB3, you need to install shimmy (`pip install 'shimmy>=0.2.1'`).
