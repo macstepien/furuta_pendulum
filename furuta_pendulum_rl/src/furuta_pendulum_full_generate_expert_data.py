@@ -24,9 +24,9 @@ import torch
 
 torch.set_default_device("cuda")
 
-n_envs = 12
+n_envs=6
 
-max_episode_steps = 2500
+max_episode_steps = 2000
 register(
     id="FurutaPendulum-v0",
     entry_point="furuta_pendulum_full:FurutaPendulumEnv",
@@ -135,7 +135,7 @@ elif imitation_method == ImitationMethod.AIRL:
         reward_net=reward_net,
     )
 
-    airl_trainer.train(200_000)
+    airl_trainer.train(300_000)
     model.save("furuta_pendulum_rl/trained_agents/furuta_pendulum_full_pretrained")
 
 elif imitation_method == ImitationMethod.SQIL:
@@ -152,19 +152,14 @@ elif imitation_method == ImitationMethod.SQIL:
         policy="MlpPolicy",
         rl_algo_class=SAC,
         rl_kwargs=dict(
-            # policy_kwargs=dict(net_arch=[64, 64, 64]),
-            use_sde = True,
-            sde_sample_freq = 100,
+            policy_kwargs=dict(net_arch=[64, 64, 64]),
             tensorboard_log="furuta_pendulum_rl/furuta_pendulum_logs",
             verbose=1,
-            device="cuda",
-            # action_noise=NormalActionNoise(mean=np.array([0.0]), sigma=np.array([0.04])),
-            # batch_size=1024,
         ),
     )
     reward_before_training, _ = evaluate_policy(sqil_trainer.policy, env, 10)
     print(f"Reward before training: {reward_before_training}")
-    sqil_trainer.train(total_timesteps=400_000, progress_bar=True)
+    sqil_trainer.train(total_timesteps=200_000, progress_bar=True)
     reward_after_training, _ = evaluate_policy(sqil_trainer.policy, env, 10)
     print(f"Reward after training: {reward_after_training}")
     model = sqil_trainer.rl_algo

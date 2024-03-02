@@ -5,9 +5,6 @@ from utils import limit_minus_pi_pi
 
 class LQRExpert:
     def __init__(self, n_envs=1) -> None:
-        self._dtheta2_filtered = [0.0] * n_envs
-        self._dtheta2_alpha = 0.01
-
         self.g_ = 9.80665
 
         self.m1_ = 0.040466
@@ -25,20 +22,19 @@ class LQRExpert:
         self.J1_hat_ = self.J1_ + self.m1_ * self.l1_ * self.l1_
         self.J2_hat_ = self.J2_ + self.m2_ * self.l2_ * self.l2_
 
-        self.u_max_ = 0.4
+        self.u_max_ = 0.19
 
         self.K = np.array([0.0, 1.4075, -0.070089, 0.1584])
-        self.lqr_transition_angle_ = 0.4
-        self.torque_multiplier_ = 1.0
+        self.lqr_transition_angle_ = 0.075
+        self.torque_multiplier_ = 0.8
 
         self._max_velocity_joint0 = 22.0
         self._max_velocity_joint1 = 50.0
 
-    def SwingUpControl(self, obs: np.array, dtheta2):
-    # def SwingUpControl(self, obs: np.array):
+    def SwingUpControl(self, obs: np.array):
         theta2 = limit_minus_pi_pi(obs[1])
         # dtheta1 = obs[2]
-        # dtheta2 = obs[3]
+        dtheta2 = obs[3]
 
         E = 0.5 * self.m2_ * math.pow(self.l2_, 2) * math.pow(
             dtheta2, 2
@@ -88,17 +84,10 @@ class LQRExpert:
                 observations[i][5] * self._max_velocity_joint1,
             ]
 
-            self._dtheta2_filtered[i] = (obs[3] * self._dtheta2_alpha) + (
-                self._dtheta2_filtered[i] * (1.0 - self._dtheta2_alpha)
-            )
-
             if math.fabs(limit_minus_pi_pi(obs[1])) < self.lqr_transition_angle_:
                 u = self.LQRControl(obs)
             else:
-                u = self.SwingUpControl(obs, self._dtheta2_filtered[i])
-                # u = self.SwingUpControl(obs)
-
-            u = np.clip(u, -0.4, 0.4)
+                u = self.SwingUpControl(obs)
 
             actions.append([u * self.torque_multiplier_])
 
