@@ -4,6 +4,8 @@ import torch as th
 
 from stable_baselines3 import SAC
 
+# model_name = "furuta_pendulum_full_pretrained_high_variance"
+model_name = "furuta_pendulum_full_pretrained_sde"
 
 class OnnxablePolicy(th.nn.Module):
     def __init__(self, actor: th.nn.Module):
@@ -24,8 +26,7 @@ class OnnxablePolicy(th.nn.Module):
         return self.actor(observation)
 
 
-model = SAC.load("furuta_pendulum_rl/trained_agents/furuta_pendulum_full_pretrained", device="cpu")
-# model = SAC.load("PathToTrainedModel.zip", device="cpu")
+model = SAC.load("furuta_pendulum_rl/trained_agents/" + model_name, device="cpu")
 onnxable_model = OnnxablePolicy(model.policy.actor)
 
 observation_size = model.observation_space.shape
@@ -39,7 +40,7 @@ dummy_input = th.randn(1, *observation_size)
 #     input_names=["input"],
 # )
 
-jit_path = "furuta_pendulum_rl/trained_agents/furuta_pendulum_full.pt"
+jit_path = "furuta_pendulum_rl/trained_agents/" + model_name + ".pt"
 
 # Trace and optimize the module
 traced_module = th.jit.trace(onnxable_model.eval(), dummy_input)
