@@ -178,12 +178,12 @@ odrv0.axis0.controller.config.vel_limit = 40.0
 
 odrv0.axis0.motor.config.current_lim = 12.0 
 odrv0.axis0.motor.config.pole_pairs = 7
-odrv0.axis0.motor.config.torque_constant = 1.0
+odrv0.axis0.motor.config.torque_constant = 8.27/80.0
 odrv0.axis0.motor.config.motor_type = MOTOR_TYPE_GIMBAL
 odrv0.axis0.motor.config.calibration_current = 1.0
 odrv0.axis0.config.calibration_lockin.current = 1.0
-odrv0.axis0.encoder.config.bandwidth = 250.0
-odrv0.axis1.encoder.config.bandwidth = 250.0
+odrv0.axis0.encoder.config.bandwidth = 1000.0
+odrv0.axis1.encoder.config.bandwidth = 1000.0
 
 odrv0.axis0.encoder.config.cpr = 8192
 
@@ -203,9 +203,9 @@ dump_errors(odrv0)
 
 5.
 
-odrv0.axis0.controller.config.pos_gain = 70.0
-odrv0.axis0.controller.config.vel_gain = 1.0
-odrv0.axis0.controller.config.vel_integrator_gain = 50.0
+odrv0.axis0.controller.config.pos_gain = 35.0
+odrv0.axis0.controller.config.vel_gain = 0.14083333313465118
+odrv0.axis0.controller.config.vel_integrator_gain = 7.041666507720947
 
 <!-- IMPORTANT - don't copy all commands at once, do it one after the other -->
 odrv0.axis0.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
