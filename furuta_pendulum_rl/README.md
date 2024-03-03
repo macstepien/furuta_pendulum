@@ -4,6 +4,18 @@
 ### Mujoco
 Copy mujoco210 to `~/.mujoco/mujoco210`
 
+### Imitation
+`imitation` library isn't currently installed automatically, so it is necessary to do it manually:
+```
+pip install imitation
+```
+
+> [!WARNING]  
+> It may result in upgrading gym, and it will be necessary to downgrade it again (by once again executing install of the specific stable baselines version, refer to Dockerfile). Here is the message caused by this problem:
+> ```
+> ImportError: Missing shimmy installation. You provided an OpenAI Gym environment. Stable-Baselines3 (SB3) has transitioned to using Gymnasium internally. In order to use OpenAI Gym environments with SB3, you need to install shimmy (`pip install 'shimmy>=0.2.1'`).
+> ```
+
 ## Training
 
 To solve Furuta control, I created three environments with progressive level of difficulty:
