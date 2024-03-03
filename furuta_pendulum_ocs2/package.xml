@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>furuta_pendulum_ocs2</name>
+  <version>0.0.1</version>
+
+  <description>TODO: Package description</description>
+
+  <maintainer email="macorobots@gmail.com">Maciej Stępień</maintainer>
+  <license>GPLv3</license>
+
+  <author email="macorobots@gmail.com">Maciej Stępień</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>ocs2_core</depend>
+  <depend>ocs2_mpc</depend>
+  <depend>ocs2_ddp</depend>
+  <depend>ocs2_slp</depend>
+  <depend>ocs2_sqp</depend>
+  <depend>ocs2_robotic_tools</depend>
+
+  <build_depend>Eigen</build_depend>
+
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

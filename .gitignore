@@ -1,5 +1,7 @@
 __pycache__
 MUJOCO_LOG.TXT
+furuta_pendulum_logs/
 ppo_furuta_pendulum_log/
 ppo_furuta_pendulum_swing_up_log/
 ppo_furuta_pendulum_full_log/
+furuta_pendulum_model/nn/runs/

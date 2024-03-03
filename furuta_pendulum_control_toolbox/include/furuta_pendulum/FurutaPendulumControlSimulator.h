@@ -69,11 +69,11 @@ public:
     sensor_msgs::msg::JointState joint_state_msg;
     joint_state_msg.header.stamp = this->get_clock()->now();
 
-    joint_state_msg.name.push_back("joint1");
+    joint_state_msg.name.push_back("joint0");
     joint_state_msg.position.push_back(x_(0));
     joint_state_msg.velocity.push_back(x_(2));
 
-    joint_state_msg.name.push_back("joint2");
+    joint_state_msg.name.push_back("joint1");
     joint_state_msg.position.push_back(x_(1));
     joint_state_msg.velocity.push_back(x_(3));
 

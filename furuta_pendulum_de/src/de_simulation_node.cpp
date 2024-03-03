@@ -32,7 +32,8 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
 
   this->declare_parameter("simulation_dt", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("max_torque", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("max_velocity", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("max_velocity_joint0", rclcpp::PARAMETER_DOUBLE);
+  this->declare_parameter("max_velocity_joint1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("m1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("m2", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("l1", rclcpp::PARAMETER_DOUBLE);
@@ -41,16 +42,14 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
   this->declare_parameter("L2", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("b1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("b2", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("L", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("R", rclcpp::PARAMETER_DOUBLE);
-  this->declare_parameter("Km", rclcpp::PARAMETER_DOUBLE);
 
   this->declare_parameter("J1", rclcpp::PARAMETER_DOUBLE);
   this->declare_parameter("J2", rclcpp::PARAMETER_DOUBLE);
   try {
     dt_ = this->get_parameter("simulation_dt").as_double();
     max_torque_ = this->get_parameter("max_torque").as_double();
-    max_velocity_ = this->get_parameter("max_velocity").as_double();
+    max_velocity_joint0_ = this->get_parameter("max_velocity_joint0").as_double();
+    max_velocity_joint1_ = this->get_parameter("max_velocity_joint1").as_double();
     m1_ = this->get_parameter("m1").as_double();
     m2_ = this->get_parameter("m2").as_double();
     l1_ = this->get_parameter("l1").as_double();
@@ -59,9 +58,6 @@ DeSimulationNode::DeSimulationNode(const rclcpp::NodeOptions & options)
     L2_ = this->get_parameter("L2").as_double();
     b1_ = this->get_parameter("b1").as_double();
     b2_ = this->get_parameter("b2").as_double();
-    L_ = this->get_parameter("L").as_double();
-    R_ = this->get_parameter("R").as_double();
-    Km_ = this->get_parameter("Km").as_double();
 
     double J1 = this->get_parameter("J1").as_double();
     double J2 = this->get_parameter("J2").as_double();
@@ -175,6 +171,9 @@ void DeSimulationNode::Simulate()
   dtheta1_ = y_n1(2);
   dtheta2_ = y_n1(3);
 
+  dtheta1_ = std::clamp(dtheta1_, -max_velocity_joint0_, max_velocity_joint0_);
+  dtheta2_ = std::clamp(dtheta2_, -max_velocity_joint1_, max_velocity_joint1_);
+
   current_time_ += dt_;
 
   PublishJointStates();
@@ -190,11 +189,11 @@ void DeSimulationNode::PublishJointStates()
   joint_state_msg.header.stamp.sec = current_time_;
   joint_state_msg.header.stamp.nanosec = (current_time_ - (int)current_time_) * 1000000000.0;
 
-  joint_state_msg.name.push_back("joint1");
+  joint_state_msg.name.push_back("joint0");
   joint_state_msg.position.push_back(theta1_);
   joint_state_msg.velocity.push_back(dtheta1_);
 
-  joint_state_msg.name.push_back("joint2");
+  joint_state_msg.name.push_back("joint1");
   joint_state_msg.position.push_back(theta2_);
   joint_state_msg.velocity.push_back(dtheta2_);
 

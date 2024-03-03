@@ -8,6 +8,7 @@ endif()
 set(PACKAGE_INCLUDE_DEPENDS
   ament_cmake
   ament_index_cpp
+  yaml-cpp
 )
 
 foreach(Dependency IN ITEMS ${PACKAGE_INCLUDE_DEPENDS})
@@ -18,7 +19,7 @@ find_package(drake CONFIG REQUIRED PATHS /opt/drake)
 
 add_executable(drake_lqr src/drake_lqr.cpp)
 ament_target_dependencies(drake_lqr ament_index_cpp)
-target_link_libraries(drake_lqr drake::drake)
+target_link_libraries(drake_lqr drake::drake yaml-cpp)
 
 install(
   TARGETS drake_lqr

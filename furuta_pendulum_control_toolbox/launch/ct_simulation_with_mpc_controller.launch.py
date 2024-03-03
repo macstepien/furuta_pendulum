@@ -37,6 +37,7 @@ def generate_launch_description():
         package="rviz2",
         executable="rviz2",
         arguments=["-d", rviz_config],
+        output={"stdout": "log", "stderr": "log"},
     )
 
     furuta_pendulum_simulation_node = Node(
@@ -47,7 +48,7 @@ def generate_launch_description():
     actions = [
         description_launch,
         rviz_node,
-        TimerAction(period=4.0, actions=[furuta_pendulum_simulation_node]),
+        TimerAction(period=2.0, actions=[furuta_pendulum_simulation_node]),
     ]
 
     return LaunchDescription(actions)

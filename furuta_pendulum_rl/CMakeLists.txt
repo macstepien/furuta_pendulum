@@ -41,6 +41,7 @@ install(
 )
 
 install(DIRECTORY
+  config  
   launch
   model
   trained_agents

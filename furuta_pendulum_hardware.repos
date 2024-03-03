@@ -1,0 +1,5 @@
+repositories:
+  odrive_ros2_control:
+    type: git
+    url: https://github.com/macstepien/odrive_ros2_control.git
+    version: humble-fw-v0.5.1

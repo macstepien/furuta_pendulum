@@ -13,9 +13,9 @@
 
   <link name="base_link">
     <visual>
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0895" />
       <geometry>
-        <cylinder length="0.35" radius="0.1" />
+        <cylinder length="0.179" radius="0.025" />
       </geometry>
       <material name="grey" />
     </visual>
@@ -24,9 +24,9 @@
     without collisions it is sufficient to use only plant's context: 
     https://stackoverflow.com/questions/65471497/how-are-you-supposed-to-use-a-controller-with-a-urdf -->
     <!-- <collision>
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0895" />
       <geometry>
-        <cylinder length="0.35" radius="0.1" />
+        <cylinder length="0.179" radius="0.025" />
       </geometry>
     </collision> -->
     <inertial>
@@ -36,8 +36,8 @@
     </inertial>
   </link>
 
-  <joint name="joint1" type="continuous">
-    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.37" />
+  <joint name="joint0" type="continuous">
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.184" />
     <parent link="base_link" />
     <child link="arm1" />
     <axis xyz="0 0 1" />
@@ -47,65 +47,65 @@
 
   <link name="arm1">
     <visual>
-      <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.139 0.0 0.0" />
+      <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.0467625 0.0 0.0" />
       <geometry>
-        <cylinder length="0.278" radius="0.02" />
+        <cylinder length="0.093525" radius="0.005" />
       </geometry>
       <material name="grey" />
     </visual>
     <!-- <collision>
-      <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.139 0.0 0.0" />
+      <origin rpy="0.0 1.5707963267948966 0.0" xyz="0.0467625 0.0 0.0" />
       <geometry>
-        <cylinder length="0.278" radius="0.02" />
+        <cylinder length="0.093525" radius="0.005" />
       </geometry>
     </collision> -->
     <inertial>
-      <mass value="0.3" />
-      <origin rpy="0.0 0.0 0.0" xyz="0.15 0.0 0.0" />
-      <inertia ixx="1e-06" ixy="0.0" ixz="0.0" iyy="0.0248" iyz="0.0" izz="0.0248" />
+      <mass value="0.040466" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.05415 0.0 0.0" />
+      <inertia ixx="1e-06" ixy="0.0" ixz="0.0" iyy="2.4054318e-05" iyz="0.0" izz="2.4054318e-05" />
     </inertial>
   </link>
 
-  <joint name="joint2" type="continuous">
+  <joint name="joint1" type="continuous">
     <!-- -pi rotation so that for 0 pendulum is downward -->
-    <origin rpy="-3.141592653589793 0.0 0.0" xyz="0.278 0.0 0.0" />
+    <origin rpy="-3.141592653589793 0.0 0.0" xyz="0.093525 0.0 0.0" />
     <parent link="arm1" />
     <child link="arm2" />
     <axis xyz="1 0 0" />
-    <dynamics damping="0.00028" />
+    <dynamics damping="1.7905703040590617e-05" />
     <limit effort="4.0" velocity="15.0" />
   </joint>
 
   <link name="arm2">
     <visual>
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.15" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0645" />
       <geometry>
-        <cylinder length="0.3" radius="0.02" />
+        <cylinder length="0.129" radius="0.005" />
       </geometry>
       <material name="grey" />
     </visual>
     <!-- <collision>
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.15" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0645" />
       <geometry>
-        <cylinder length="0.3" radius="0.02" />
+        <cylinder length="0.129" radius="0.005" />
       </geometry>
     </collision> -->
     <inertial>
-      <mass value="0.075" />
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.148" />
-      <inertia ixx="0.00386" ixy="0.0" ixz="0.0" iyy="0.00386" iyz="0.0" izz="1e-06" />
+      <mass value="0.009801" />
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.096608" />
+      <inertia ixx="1.4790595e-05" ixy="0.0" ixz="0.0" iyy="1.4790595e-05" iyz="0.0" izz="1e-06" />
     </inertial>
   </link>
 
-  <transmission name="joint1_trans" type="SimpleTransmission">
-    <actuator name="joint1_actuator" />
-    <joint name="joint1" />
+  <transmission name="joint0_trans" type="SimpleTransmission">
+    <actuator name="joint0_actuator" />
+    <joint name="joint0" />
     <mechanicalReduction>1</mechanicalReduction>
   </transmission>
 
-  <!-- <transmission name="joint2_trans" type="SimpleTransmission">
-    <actuator name="joint2_actuator" />
-    <joint name="joint2" />
+  <!-- <transmission name="joint1_trans" type="SimpleTransmission">
+    <actuator name="joint1_actuator" />
+    <joint name="joint1" />
     <mechanicalReduction>1</mechanicalReduction>
   </transmission> -->
 </robot>

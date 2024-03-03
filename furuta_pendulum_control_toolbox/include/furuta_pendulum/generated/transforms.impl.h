@@ -104,12 +104,12 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_base_link_X_fr_arm1::
   (*this)(0, 1) = -s_q_joint1_;
   (*this)(1, 0) = s_q_joint1_;
   (*this)(1, 1) = c_q_joint1_;
-  (*this)(3, 0) = (-0.37 * s_q_joint1_);
-  (*this)(3, 1) = (-0.37 * c_q_joint1_);
+  (*this)(3, 0) = (-0.184 * s_q_joint1_);
+  (*this)(3, 1) = (-0.184 * c_q_joint1_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = -s_q_joint1_;
-  (*this)(4, 0) = (0.37 * c_q_joint1_);
-  (*this)(4, 1) = (-0.37 * s_q_joint1_);
+  (*this)(4, 0) = (0.184 * c_q_joint1_);
+  (*this)(4, 1) = (-0.184 * s_q_joint1_);
   (*this)(4, 3) = s_q_joint1_;
   (*this)(4, 4) = c_q_joint1_;
   return *this;
@@ -154,20 +154,22 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_base_link_X_fr_arm2::
   (*this)(1, 2) = s_q_joint1_;
   (*this)(2, 0) = -c_q_joint2_;
   (*this)(2, 1) = s_q_joint2_;
-  (*this)(3, 0) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
-  (*this)(3, 1) = (((0.278 * s_q_joint1_) * s_q_joint2_) - ((0.37 * c_q_joint1_) * c_q_joint2_));
-  (*this)(3, 2) = (-0.37 * s_q_joint1_);
+  (*this)(3, 0) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
+  (*this)(3, 1) = (((0.09352 * s_q_joint1_) * s_q_joint2_) - ((0.184 * c_q_joint1_) * c_q_joint2_));
+  (*this)(3, 2) = (-0.184 * s_q_joint1_);
   (*this)(3, 3) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(3, 4) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(3, 5) = c_q_joint1_;
-  (*this)(4, 0) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
-  (*this)(4, 1) = (((-0.278 * c_q_joint1_) * s_q_joint2_) - ((0.37 * s_q_joint1_) * c_q_joint2_));
-  (*this)(4, 2) = (0.37 * c_q_joint1_);
+  (*this)(4, 0) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
+  (*this)(4, 1) =
+    (((-0.09352 * c_q_joint1_) * s_q_joint2_) - ((0.184 * s_q_joint1_) * c_q_joint2_));
+  (*this)(4, 2) = (0.184 * c_q_joint1_);
   (*this)(4, 3) = (c_q_joint1_ * s_q_joint2_);
   (*this)(4, 4) = (c_q_joint1_ * c_q_joint2_);
   (*this)(4, 5) = s_q_joint1_;
-  (*this)(5, 0) = (0.278 * s_q_joint2_);
-  (*this)(5, 1) = (0.278 * c_q_joint2_);
+  (*this)(5, 0) = (0.09352 * s_q_joint2_);
+  (*this)(5, 1) = (0.09352 * c_q_joint2_);
   (*this)(5, 3) = -c_q_joint2_;
   (*this)(5, 4) = s_q_joint2_;
   return *this;
@@ -211,25 +213,26 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_base_link_X_fr_ee::up
   (*this)(1, 2) = (c_q_joint1_ * s_q_joint2_);
   (*this)(2, 1) = -s_q_joint2_;
   (*this)(2, 2) = -c_q_joint2_;
-  (*this)(3, 0) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.37 * s_q_joint1_));
+  (*this)(3, 0) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.184 * s_q_joint1_));
   (*this)(3, 1) =
-    ((((-0.278 * s_q_joint1_) * s_q_joint2_) + ((0.37 * c_q_joint1_) * c_q_joint2_)) -
+    ((((-0.09352 * s_q_joint1_) * s_q_joint2_) + ((0.184 * c_q_joint1_) * c_q_joint2_)) -
      (0.3 * c_q_joint1_));
-  (*this)(3, 2) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
+  (*this)(3, 2) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = (s_q_joint1_ * c_q_joint2_);
   (*this)(3, 5) = (-s_q_joint1_ * s_q_joint2_);
-  (*this)(4, 0) = ((0.37 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
+  (*this)(4, 0) = ((0.184 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
   (*this)(4, 1) =
-    ((((0.278 * c_q_joint1_) * s_q_joint2_) + ((0.37 * s_q_joint1_) * c_q_joint2_)) -
+    ((((0.09352 * c_q_joint1_) * s_q_joint2_) + ((0.184 * s_q_joint1_) * c_q_joint2_)) -
      (0.3 * s_q_joint1_));
-  (*this)(4, 2) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
+  (*this)(4, 2) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
   (*this)(4, 3) = s_q_joint1_;
   (*this)(4, 4) = (-c_q_joint1_ * c_q_joint2_);
   (*this)(4, 5) = (c_q_joint1_ * s_q_joint2_);
   (*this)(5, 0) = (-0.3 * s_q_joint2_);
-  (*this)(5, 1) = (-0.278 * c_q_joint2_);
-  (*this)(5, 2) = (0.278 * s_q_joint2_);
+  (*this)(5, 1) = (-0.09352 * c_q_joint2_);
+  (*this)(5, 2) = (0.09352 * s_q_joint2_);
   (*this)(5, 4) = -s_q_joint2_;
   (*this)(5, 5) = -c_q_joint2_;
   return *this;
@@ -274,20 +277,22 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_arm2_X_fr_base_link::
   (*this)(1, 2) = s_q_joint2_;
   (*this)(2, 0) = c_q_joint1_;
   (*this)(2, 1) = s_q_joint1_;
-  (*this)(3, 0) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
-  (*this)(3, 1) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
-  (*this)(3, 2) = (0.278 * s_q_joint2_);
+  (*this)(3, 0) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
+  (*this)(3, 1) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
+  (*this)(3, 2) = (0.09352 * s_q_joint2_);
   (*this)(3, 3) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(3, 4) = (c_q_joint1_ * s_q_joint2_);
   (*this)(3, 5) = -c_q_joint2_;
-  (*this)(4, 0) = (((0.278 * s_q_joint1_) * s_q_joint2_) - ((0.37 * c_q_joint1_) * c_q_joint2_));
-  (*this)(4, 1) = (((-0.278 * c_q_joint1_) * s_q_joint2_) - ((0.37 * s_q_joint1_) * c_q_joint2_));
-  (*this)(4, 2) = (0.278 * c_q_joint2_);
+  (*this)(4, 0) = (((0.09352 * s_q_joint1_) * s_q_joint2_) - ((0.184 * c_q_joint1_) * c_q_joint2_));
+  (*this)(4, 1) =
+    (((-0.09352 * c_q_joint1_) * s_q_joint2_) - ((0.184 * s_q_joint1_) * c_q_joint2_));
+  (*this)(4, 2) = (0.09352 * c_q_joint2_);
   (*this)(4, 3) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(4, 4) = (c_q_joint1_ * c_q_joint2_);
   (*this)(4, 5) = s_q_joint2_;
-  (*this)(5, 0) = (-0.37 * s_q_joint1_);
-  (*this)(5, 1) = (0.37 * c_q_joint1_);
+  (*this)(5, 0) = (-0.184 * s_q_joint1_);
+  (*this)(5, 1) = (0.184 * c_q_joint1_);
   (*this)(5, 3) = c_q_joint1_;
   (*this)(5, 4) = s_q_joint1_;
   return *this;
@@ -336,12 +341,12 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_arm1_X_fr_base_link::
   (*this)(0, 1) = s_q_joint1_;
   (*this)(1, 0) = -s_q_joint1_;
   (*this)(1, 1) = c_q_joint1_;
-  (*this)(3, 0) = (-0.37 * s_q_joint1_);
-  (*this)(3, 1) = (0.37 * c_q_joint1_);
+  (*this)(3, 0) = (-0.184 * s_q_joint1_);
+  (*this)(3, 1) = (0.184 * c_q_joint1_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = s_q_joint1_;
-  (*this)(4, 0) = (-0.37 * c_q_joint1_);
-  (*this)(4, 1) = (-0.37 * s_q_joint1_);
+  (*this)(4, 0) = (-0.184 * c_q_joint1_);
+  (*this)(4, 1) = (-0.184 * s_q_joint1_);
   (*this)(4, 3) = -s_q_joint1_;
   (*this)(4, 4) = c_q_joint1_;
   return *this;
@@ -385,24 +390,25 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_ee_X_fr_base_link::up
   (*this)(2, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(2, 1) = (c_q_joint1_ * s_q_joint2_);
   (*this)(2, 2) = -c_q_joint2_;
-  (*this)(3, 0) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.37 * s_q_joint1_));
-  (*this)(3, 1) = ((0.37 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
+  (*this)(3, 0) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.184 * s_q_joint1_));
+  (*this)(3, 1) = ((0.184 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
   (*this)(3, 2) = (-0.3 * s_q_joint2_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = s_q_joint1_;
   (*this)(4, 0) =
-    ((((-0.278 * s_q_joint1_) * s_q_joint2_) + ((0.37 * c_q_joint1_) * c_q_joint2_)) -
+    ((((-0.09352 * s_q_joint1_) * s_q_joint2_) + ((0.184 * c_q_joint1_) * c_q_joint2_)) -
      (0.3 * c_q_joint1_));
   (*this)(4, 1) =
-    ((((0.278 * c_q_joint1_) * s_q_joint2_) + ((0.37 * s_q_joint1_) * c_q_joint2_)) -
+    ((((0.09352 * c_q_joint1_) * s_q_joint2_) + ((0.184 * s_q_joint1_) * c_q_joint2_)) -
      (0.3 * s_q_joint1_));
-  (*this)(4, 2) = (-0.278 * c_q_joint2_);
+  (*this)(4, 2) = (-0.09352 * c_q_joint2_);
   (*this)(4, 3) = (s_q_joint1_ * c_q_joint2_);
   (*this)(4, 4) = (-c_q_joint1_ * c_q_joint2_);
   (*this)(4, 5) = -s_q_joint2_;
-  (*this)(5, 0) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
-  (*this)(5, 1) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
-  (*this)(5, 2) = (0.278 * s_q_joint2_);
+  (*this)(5, 0) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
+  (*this)(5, 1) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
+  (*this)(5, 2) = (0.09352 * s_q_joint2_);
   (*this)(5, 3) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(5, 4) = (c_q_joint1_ * s_q_joint2_);
   (*this)(5, 5) = -c_q_joint2_;
@@ -431,12 +437,12 @@ iit::FurutaPendulum::tpl::MotionTransforms<
   (*this)(2, 4) = 0;
   (*this)(2, 5) = 0;
   (*this)(3, 0) = 0;
-  (*this)(3, 1) = -0.37;
+  (*this)(3, 1) = -0.184;
   (*this)(3, 2) = 0;
   (*this)(3, 3) = 1;
   (*this)(3, 4) = 0;
   (*this)(3, 5) = 0;
-  (*this)(4, 0) = 0.37;
+  (*this)(4, 0) = 0.184;
   (*this)(4, 1) = 0;
   (*this)(4, 2) = 0;
   (*this)(4, 3) = 0;
@@ -477,7 +483,7 @@ iit::FurutaPendulum::tpl::MotionTransforms<
   (*this)(3, 3) = 0;
   (*this)(4, 3) = 0;
   (*this)(5, 0) = 0;
-  (*this)(5, 1) = 0.278;
+  (*this)(5, 1) = 0.09352;
   (*this)(5, 2) = 0;
   (*this)(5, 3) = -1.0;
   (*this)(5, 4) = 0;
@@ -498,14 +504,14 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_base_link_X_fr_joint2
   (*this)(0, 2) = c_q_joint1_;
   (*this)(1, 1) = c_q_joint1_;
   (*this)(1, 2) = s_q_joint1_;
-  (*this)(3, 0) = (-0.278 * s_q_joint1_);
-  (*this)(3, 1) = (-0.37 * c_q_joint1_);
-  (*this)(3, 2) = (-0.37 * s_q_joint1_);
+  (*this)(3, 0) = (-0.09352 * s_q_joint1_);
+  (*this)(3, 1) = (-0.184 * c_q_joint1_);
+  (*this)(3, 2) = (-0.184 * s_q_joint1_);
   (*this)(3, 4) = -s_q_joint1_;
   (*this)(3, 5) = c_q_joint1_;
-  (*this)(4, 0) = (0.278 * c_q_joint1_);
-  (*this)(4, 1) = (-0.37 * s_q_joint1_);
-  (*this)(4, 2) = (0.37 * c_q_joint1_);
+  (*this)(4, 0) = (0.09352 * c_q_joint1_);
+  (*this)(4, 1) = (-0.184 * s_q_joint1_);
+  (*this)(4, 2) = (0.184 * c_q_joint1_);
   (*this)(4, 4) = c_q_joint1_;
   (*this)(4, 5) = s_q_joint1_;
   return *this;
@@ -552,12 +558,12 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_arm2_X_fr_arm1::updat
   (*this)(0, 2) = -c_q_joint2_;
   (*this)(1, 1) = c_q_joint2_;
   (*this)(1, 2) = s_q_joint2_;
-  (*this)(3, 1) = (0.278 * c_q_joint2_);
-  (*this)(3, 2) = (0.278 * s_q_joint2_);
+  (*this)(3, 1) = (0.09352 * c_q_joint2_);
+  (*this)(3, 2) = (0.09352 * s_q_joint2_);
   (*this)(3, 4) = s_q_joint2_;
   (*this)(3, 5) = -c_q_joint2_;
-  (*this)(4, 1) = (-0.278 * s_q_joint2_);
-  (*this)(4, 2) = (0.278 * c_q_joint2_);
+  (*this)(4, 1) = (-0.09352 * s_q_joint2_);
+  (*this)(4, 2) = (0.09352 * c_q_joint2_);
   (*this)(4, 4) = c_q_joint2_;
   (*this)(4, 5) = s_q_joint2_;
   return *this;
@@ -604,12 +610,12 @@ iit::FurutaPendulum::tpl::MotionTransforms<TRAIT>::Type_fr_arm1_X_fr_arm2::updat
   (*this)(1, 1) = c_q_joint2_;
   (*this)(2, 0) = -c_q_joint2_;
   (*this)(2, 1) = s_q_joint2_;
-  (*this)(4, 0) = (0.278 * c_q_joint2_);
-  (*this)(4, 1) = (-0.278 * s_q_joint2_);
+  (*this)(4, 0) = (0.09352 * c_q_joint2_);
+  (*this)(4, 1) = (-0.09352 * s_q_joint2_);
   (*this)(4, 3) = s_q_joint2_;
   (*this)(4, 4) = c_q_joint2_;
-  (*this)(5, 0) = (0.278 * s_q_joint2_);
-  (*this)(5, 1) = (0.278 * c_q_joint2_);
+  (*this)(5, 0) = (0.09352 * s_q_joint2_);
+  (*this)(5, 1) = (0.09352 * c_q_joint2_);
   (*this)(5, 3) = -c_q_joint2_;
   (*this)(5, 4) = s_q_joint2_;
   return *this;
@@ -657,12 +663,12 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_base_link_X_fr_arm1::u
 
   (*this)(0, 0) = c_q_joint1_;
   (*this)(0, 1) = -s_q_joint1_;
-  (*this)(0, 3) = (-0.37 * s_q_joint1_);
-  (*this)(0, 4) = (-0.37 * c_q_joint1_);
+  (*this)(0, 3) = (-0.184 * s_q_joint1_);
+  (*this)(0, 4) = (-0.184 * c_q_joint1_);
   (*this)(1, 0) = s_q_joint1_;
   (*this)(1, 1) = c_q_joint1_;
-  (*this)(1, 3) = (0.37 * c_q_joint1_);
-  (*this)(1, 4) = (-0.37 * s_q_joint1_);
+  (*this)(1, 3) = (0.184 * c_q_joint1_);
+  (*this)(1, 4) = (-0.184 * s_q_joint1_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = -s_q_joint1_;
   (*this)(4, 3) = s_q_joint1_;
@@ -704,19 +710,21 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_base_link_X_fr_arm2::u
   (*this)(0, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(0, 1) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(0, 2) = c_q_joint1_;
-  (*this)(0, 3) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
-  (*this)(0, 4) = (((0.278 * s_q_joint1_) * s_q_joint2_) - ((0.37 * c_q_joint1_) * c_q_joint2_));
-  (*this)(0, 5) = (-0.37 * s_q_joint1_);
+  (*this)(0, 3) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
+  (*this)(0, 4) = (((0.09352 * s_q_joint1_) * s_q_joint2_) - ((0.184 * c_q_joint1_) * c_q_joint2_));
+  (*this)(0, 5) = (-0.184 * s_q_joint1_);
   (*this)(1, 0) = (c_q_joint1_ * s_q_joint2_);
   (*this)(1, 1) = (c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = s_q_joint1_;
-  (*this)(1, 3) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
-  (*this)(1, 4) = (((-0.278 * c_q_joint1_) * s_q_joint2_) - ((0.37 * s_q_joint1_) * c_q_joint2_));
-  (*this)(1, 5) = (0.37 * c_q_joint1_);
+  (*this)(1, 3) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
+  (*this)(1, 4) =
+    (((-0.09352 * c_q_joint1_) * s_q_joint2_) - ((0.184 * s_q_joint1_) * c_q_joint2_));
+  (*this)(1, 5) = (0.184 * c_q_joint1_);
   (*this)(2, 0) = -c_q_joint2_;
   (*this)(2, 1) = s_q_joint2_;
-  (*this)(2, 3) = (0.278 * s_q_joint2_);
-  (*this)(2, 4) = (0.278 * c_q_joint2_);
+  (*this)(2, 3) = (0.09352 * s_q_joint2_);
+  (*this)(2, 4) = (0.09352 * c_q_joint2_);
   (*this)(3, 3) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(3, 4) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(3, 5) = c_q_joint1_;
@@ -761,24 +769,25 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_base_link_X_fr_ee::upd
   (*this)(0, 0) = c_q_joint1_;
   (*this)(0, 1) = (s_q_joint1_ * c_q_joint2_);
   (*this)(0, 2) = (-s_q_joint1_ * s_q_joint2_);
-  (*this)(0, 3) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.37 * s_q_joint1_));
+  (*this)(0, 3) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.184 * s_q_joint1_));
   (*this)(0, 4) =
-    ((((-0.278 * s_q_joint1_) * s_q_joint2_) + ((0.37 * c_q_joint1_) * c_q_joint2_)) -
+    ((((-0.09352 * s_q_joint1_) * s_q_joint2_) + ((0.184 * c_q_joint1_) * c_q_joint2_)) -
      (0.3 * c_q_joint1_));
-  (*this)(0, 5) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
+  (*this)(0, 5) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
   (*this)(1, 0) = s_q_joint1_;
   (*this)(1, 1) = (-c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = (c_q_joint1_ * s_q_joint2_);
-  (*this)(1, 3) = ((0.37 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
+  (*this)(1, 3) = ((0.184 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
   (*this)(1, 4) =
-    ((((0.278 * c_q_joint1_) * s_q_joint2_) + ((0.37 * s_q_joint1_) * c_q_joint2_)) -
+    ((((0.09352 * c_q_joint1_) * s_q_joint2_) + ((0.184 * s_q_joint1_) * c_q_joint2_)) -
      (0.3 * s_q_joint1_));
-  (*this)(1, 5) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
+  (*this)(1, 5) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
   (*this)(2, 1) = -s_q_joint2_;
   (*this)(2, 2) = -c_q_joint2_;
   (*this)(2, 3) = (-0.3 * s_q_joint2_);
-  (*this)(2, 4) = (-0.278 * c_q_joint2_);
-  (*this)(2, 5) = (0.278 * s_q_joint2_);
+  (*this)(2, 4) = (-0.09352 * c_q_joint2_);
+  (*this)(2, 5) = (0.09352 * s_q_joint2_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = (s_q_joint1_ * c_q_joint2_);
   (*this)(3, 5) = (-s_q_joint1_ * s_q_joint2_);
@@ -824,19 +833,21 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_arm2_X_fr_base_link::u
   (*this)(0, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(0, 1) = (c_q_joint1_ * s_q_joint2_);
   (*this)(0, 2) = -c_q_joint2_;
-  (*this)(0, 3) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
-  (*this)(0, 4) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
-  (*this)(0, 5) = (0.278 * s_q_joint2_);
+  (*this)(0, 3) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
+  (*this)(0, 4) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
+  (*this)(0, 5) = (0.09352 * s_q_joint2_);
   (*this)(1, 0) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(1, 1) = (c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = s_q_joint2_;
-  (*this)(1, 3) = (((0.278 * s_q_joint1_) * s_q_joint2_) - ((0.37 * c_q_joint1_) * c_q_joint2_));
-  (*this)(1, 4) = (((-0.278 * c_q_joint1_) * s_q_joint2_) - ((0.37 * s_q_joint1_) * c_q_joint2_));
-  (*this)(1, 5) = (0.278 * c_q_joint2_);
+  (*this)(1, 3) = (((0.09352 * s_q_joint1_) * s_q_joint2_) - ((0.184 * c_q_joint1_) * c_q_joint2_));
+  (*this)(1, 4) =
+    (((-0.09352 * c_q_joint1_) * s_q_joint2_) - ((0.184 * s_q_joint1_) * c_q_joint2_));
+  (*this)(1, 5) = (0.09352 * c_q_joint2_);
   (*this)(2, 0) = c_q_joint1_;
   (*this)(2, 1) = s_q_joint1_;
-  (*this)(2, 3) = (-0.37 * s_q_joint1_);
-  (*this)(2, 4) = (0.37 * c_q_joint1_);
+  (*this)(2, 3) = (-0.184 * s_q_joint1_);
+  (*this)(2, 4) = (0.184 * c_q_joint1_);
   (*this)(3, 3) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(3, 4) = (c_q_joint1_ * s_q_joint2_);
   (*this)(3, 5) = -c_q_joint2_;
@@ -889,12 +900,12 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_arm1_X_fr_base_link::u
 
   (*this)(0, 0) = c_q_joint1_;
   (*this)(0, 1) = s_q_joint1_;
-  (*this)(0, 3) = (-0.37 * s_q_joint1_);
-  (*this)(0, 4) = (0.37 * c_q_joint1_);
+  (*this)(0, 3) = (-0.184 * s_q_joint1_);
+  (*this)(0, 4) = (0.184 * c_q_joint1_);
   (*this)(1, 0) = -s_q_joint1_;
   (*this)(1, 1) = c_q_joint1_;
-  (*this)(1, 3) = (-0.37 * c_q_joint1_);
-  (*this)(1, 4) = (-0.37 * s_q_joint1_);
+  (*this)(1, 3) = (-0.184 * c_q_joint1_);
+  (*this)(1, 4) = (-0.184 * s_q_joint1_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = s_q_joint1_;
   (*this)(4, 3) = -s_q_joint1_;
@@ -934,25 +945,26 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_ee_X_fr_base_link::upd
 
   (*this)(0, 0) = c_q_joint1_;
   (*this)(0, 1) = s_q_joint1_;
-  (*this)(0, 3) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.37 * s_q_joint1_));
-  (*this)(0, 4) = ((0.37 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
+  (*this)(0, 3) = (((0.3 * s_q_joint1_) * c_q_joint2_) - (0.184 * s_q_joint1_));
+  (*this)(0, 4) = ((0.184 * c_q_joint1_) - ((0.3 * c_q_joint1_) * c_q_joint2_));
   (*this)(0, 5) = (-0.3 * s_q_joint2_);
   (*this)(1, 0) = (s_q_joint1_ * c_q_joint2_);
   (*this)(1, 1) = (-c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = -s_q_joint2_;
   (*this)(1, 3) =
-    ((((-0.278 * s_q_joint1_) * s_q_joint2_) + ((0.37 * c_q_joint1_) * c_q_joint2_)) -
+    ((((-0.09352 * s_q_joint1_) * s_q_joint2_) + ((0.184 * c_q_joint1_) * c_q_joint2_)) -
      (0.3 * c_q_joint1_));
   (*this)(1, 4) =
-    ((((0.278 * c_q_joint1_) * s_q_joint2_) + ((0.37 * s_q_joint1_) * c_q_joint2_)) -
+    ((((0.09352 * c_q_joint1_) * s_q_joint2_) + ((0.184 * s_q_joint1_) * c_q_joint2_)) -
      (0.3 * s_q_joint1_));
-  (*this)(1, 5) = (-0.278 * c_q_joint2_);
+  (*this)(1, 5) = (-0.09352 * c_q_joint2_);
   (*this)(2, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(2, 1) = (c_q_joint1_ * s_q_joint2_);
   (*this)(2, 2) = -c_q_joint2_;
-  (*this)(2, 3) = (((-0.37 * c_q_joint1_) * s_q_joint2_) - ((0.278 * s_q_joint1_) * c_q_joint2_));
-  (*this)(2, 4) = (((0.278 * c_q_joint1_) * c_q_joint2_) - ((0.37 * s_q_joint1_) * s_q_joint2_));
-  (*this)(2, 5) = (0.278 * s_q_joint2_);
+  (*this)(2, 3) =
+    (((-0.184 * c_q_joint1_) * s_q_joint2_) - ((0.09352 * s_q_joint1_) * c_q_joint2_));
+  (*this)(2, 4) = (((0.09352 * c_q_joint1_) * c_q_joint2_) - ((0.184 * s_q_joint1_) * s_q_joint2_));
+  (*this)(2, 5) = (0.09352 * s_q_joint2_);
   (*this)(3, 3) = c_q_joint1_;
   (*this)(3, 4) = s_q_joint1_;
   (*this)(4, 3) = (s_q_joint1_ * c_q_joint2_);
@@ -971,12 +983,12 @@ iit::FurutaPendulum::tpl::ForceTransforms<
   (*this)(0, 1) = 0;
   (*this)(0, 2) = 0;
   (*this)(0, 3) = 0;
-  (*this)(0, 4) = -0.37;
+  (*this)(0, 4) = -0.184;
   (*this)(0, 5) = 0;
   (*this)(1, 0) = 0;
   (*this)(1, 1) = 1;
   (*this)(1, 2) = 0;
-  (*this)(1, 3) = 0.37;
+  (*this)(1, 3) = 0.184;
   (*this)(1, 4) = 0;
   (*this)(1, 5) = 0;
   (*this)(2, 0) = 0;
@@ -1021,7 +1033,7 @@ iit::FurutaPendulum::tpl::ForceTransforms<
   (*this)(2, 1) = 0;
   (*this)(2, 2) = 0;
   (*this)(2, 3) = 0;
-  (*this)(2, 4) = 0.278;
+  (*this)(2, 4) = 0.09352;
   (*this)(2, 5) = 0;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
@@ -1051,14 +1063,14 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_base_link_X_fr_joint2:
 
   (*this)(0, 1) = -s_q_joint1_;
   (*this)(0, 2) = c_q_joint1_;
-  (*this)(0, 3) = (-0.278 * s_q_joint1_);
-  (*this)(0, 4) = (-0.37 * c_q_joint1_);
-  (*this)(0, 5) = (-0.37 * s_q_joint1_);
+  (*this)(0, 3) = (-0.09352 * s_q_joint1_);
+  (*this)(0, 4) = (-0.184 * c_q_joint1_);
+  (*this)(0, 5) = (-0.184 * s_q_joint1_);
   (*this)(1, 1) = c_q_joint1_;
   (*this)(1, 2) = s_q_joint1_;
-  (*this)(1, 3) = (0.278 * c_q_joint1_);
-  (*this)(1, 4) = (-0.37 * s_q_joint1_);
-  (*this)(1, 5) = (0.37 * c_q_joint1_);
+  (*this)(1, 3) = (0.09352 * c_q_joint1_);
+  (*this)(1, 4) = (-0.184 * s_q_joint1_);
+  (*this)(1, 5) = (0.184 * c_q_joint1_);
   (*this)(3, 4) = -s_q_joint1_;
   (*this)(3, 5) = c_q_joint1_;
   (*this)(4, 4) = c_q_joint1_;
@@ -1105,12 +1117,12 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_arm2_X_fr_arm1::update
 
   (*this)(0, 1) = s_q_joint2_;
   (*this)(0, 2) = -c_q_joint2_;
-  (*this)(0, 4) = (0.278 * c_q_joint2_);
-  (*this)(0, 5) = (0.278 * s_q_joint2_);
+  (*this)(0, 4) = (0.09352 * c_q_joint2_);
+  (*this)(0, 5) = (0.09352 * s_q_joint2_);
   (*this)(1, 1) = c_q_joint2_;
   (*this)(1, 2) = s_q_joint2_;
-  (*this)(1, 4) = (-0.278 * s_q_joint2_);
-  (*this)(1, 5) = (0.278 * c_q_joint2_);
+  (*this)(1, 4) = (-0.09352 * s_q_joint2_);
+  (*this)(1, 5) = (0.09352 * c_q_joint2_);
   (*this)(3, 4) = s_q_joint2_;
   (*this)(3, 5) = -c_q_joint2_;
   (*this)(4, 4) = c_q_joint2_;
@@ -1157,12 +1169,12 @@ iit::FurutaPendulum::tpl::ForceTransforms<TRAIT>::Type_fr_arm1_X_fr_arm2::update
 
   (*this)(1, 0) = s_q_joint2_;
   (*this)(1, 1) = c_q_joint2_;
-  (*this)(1, 3) = (0.278 * c_q_joint2_);
-  (*this)(1, 4) = (-0.278 * s_q_joint2_);
+  (*this)(1, 3) = (0.09352 * c_q_joint2_);
+  (*this)(1, 4) = (-0.09352 * s_q_joint2_);
   (*this)(2, 0) = -c_q_joint2_;
   (*this)(2, 1) = s_q_joint2_;
-  (*this)(2, 3) = (0.278 * s_q_joint2_);
-  (*this)(2, 4) = (0.278 * c_q_joint2_);
+  (*this)(2, 3) = (0.09352 * s_q_joint2_);
+  (*this)(2, 4) = (0.09352 * c_q_joint2_);
   (*this)(4, 3) = s_q_joint2_;
   (*this)(4, 4) = c_q_joint2_;
   (*this)(5, 3) = -c_q_joint2_;
@@ -1181,7 +1193,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   (*this)(2, 0) = 0;
   (*this)(2, 1) = 0;
   (*this)(2, 2) = 1.0;
-  (*this)(2, 3) = 0.37;
+  (*this)(2, 3) = 0.184;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1209,7 +1221,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   TRAIT>::Type_fr_base_link_X_fr_arm2::Type_fr_base_link_X_fr_arm2()
 {
   (*this)(2, 2) = 0;
-  (*this)(2, 3) = 0.37;
+  (*this)(2, 3) = 0.184;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1233,11 +1245,11 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<TRAIT>::Type_fr_base_link_X_fr_a
   (*this)(0, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(0, 1) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(0, 2) = c_q_joint1_;
-  (*this)(0, 3) = (0.278 * c_q_joint1_);
+  (*this)(0, 3) = (0.09352 * c_q_joint1_);
   (*this)(1, 0) = (c_q_joint1_ * s_q_joint2_);
   (*this)(1, 1) = (c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = s_q_joint1_;
-  (*this)(1, 3) = (0.278 * s_q_joint1_);
+  (*this)(1, 3) = (0.09352 * s_q_joint1_);
   (*this)(2, 0) = -c_q_joint2_;
   (*this)(2, 1) = s_q_joint2_;
   return *this;
@@ -1270,14 +1282,14 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<TRAIT>::Type_fr_base_link_X_fr_e
   (*this)(0, 0) = c_q_joint1_;
   (*this)(0, 1) = (s_q_joint1_ * c_q_joint2_);
   (*this)(0, 2) = (-s_q_joint1_ * s_q_joint2_);
-  (*this)(0, 3) = ((0.278 * c_q_joint1_) - ((0.3 * s_q_joint1_) * s_q_joint2_));
+  (*this)(0, 3) = ((0.09352 * c_q_joint1_) - ((0.3 * s_q_joint1_) * s_q_joint2_));
   (*this)(1, 0) = s_q_joint1_;
   (*this)(1, 1) = (-c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = (c_q_joint1_ * s_q_joint2_);
-  (*this)(1, 3) = (((0.3 * c_q_joint1_) * s_q_joint2_) + (0.278 * s_q_joint1_));
+  (*this)(1, 3) = (((0.3 * c_q_joint1_) * s_q_joint2_) + (0.09352 * s_q_joint1_));
   (*this)(2, 1) = -s_q_joint2_;
   (*this)(2, 2) = -c_q_joint2_;
-  (*this)(2, 3) = (0.37 - (0.3 * c_q_joint2_));
+  (*this)(2, 3) = (0.184 - (0.3 * c_q_joint2_));
   return *this;
 }
 template <typename TRAIT>
@@ -1285,7 +1297,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   TRAIT>::Type_fr_arm2_X_fr_base_link::Type_fr_arm2_X_fr_base_link()
 {
   (*this)(2, 2) = 0;
-  (*this)(2, 3) = -0.278;
+  (*this)(2, 3) = -0.09352;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1309,11 +1321,11 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<TRAIT>::Type_fr_arm2_X_fr_base_l
   (*this)(0, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(0, 1) = (c_q_joint1_ * s_q_joint2_);
   (*this)(0, 2) = -c_q_joint2_;
-  (*this)(0, 3) = (0.37 * c_q_joint2_);
+  (*this)(0, 3) = (0.184 * c_q_joint2_);
   (*this)(1, 0) = (-s_q_joint1_ * c_q_joint2_);
   (*this)(1, 1) = (c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = s_q_joint2_;
-  (*this)(1, 3) = (-0.37 * s_q_joint2_);
+  (*this)(1, 3) = (-0.184 * s_q_joint2_);
   (*this)(2, 0) = c_q_joint1_;
   (*this)(2, 1) = s_q_joint1_;
   return *this;
@@ -1329,7 +1341,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   (*this)(2, 0) = 0;
   (*this)(2, 1) = 0;
   (*this)(2, 2) = 1;
-  (*this)(2, 3) = -0.37;
+  (*this)(2, 3) = -0.184;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1357,7 +1369,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   TRAIT>::Type_fr_ee_X_fr_base_link::Type_fr_ee_X_fr_base_link()
 {
   (*this)(0, 2) = 0;
-  (*this)(0, 3) = -0.278;
+  (*this)(0, 3) = -0.09352;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1383,11 +1395,11 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<TRAIT>::Type_fr_ee_X_fr_base_lin
   (*this)(1, 0) = (s_q_joint1_ * c_q_joint2_);
   (*this)(1, 1) = (-c_q_joint1_ * c_q_joint2_);
   (*this)(1, 2) = -s_q_joint2_;
-  (*this)(1, 3) = (0.37 * s_q_joint2_);
+  (*this)(1, 3) = (0.184 * s_q_joint2_);
   (*this)(2, 0) = (-s_q_joint1_ * s_q_joint2_);
   (*this)(2, 1) = (c_q_joint1_ * s_q_joint2_);
   (*this)(2, 2) = -c_q_joint2_;
-  (*this)(2, 3) = ((0.37 * c_q_joint2_) - 0.3);
+  (*this)(2, 3) = ((0.184 * c_q_joint2_) - 0.3);
   return *this;
 }
 template <typename TRAIT>
@@ -1405,7 +1417,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   (*this)(2, 0) = 0;
   (*this)(2, 1) = 0;
   (*this)(2, 2) = 1;
-  (*this)(2, 3) = 0.37;
+  (*this)(2, 3) = 0.184;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1428,7 +1440,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   (*this)(2, 0) = -1.0;
   (*this)(2, 1) = 0;
   (*this)(2, 2) = 0;
-  (*this)(2, 3) = 0.37;
+  (*this)(2, 3) = 0.184;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1448,10 +1460,10 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<TRAIT>::Type_fr_base_link_X_fr_j
 
   (*this)(0, 1) = -s_q_joint1_;
   (*this)(0, 2) = c_q_joint1_;
-  (*this)(0, 3) = (0.278 * c_q_joint1_);
+  (*this)(0, 3) = (0.09352 * c_q_joint1_);
   (*this)(1, 1) = c_q_joint1_;
   (*this)(1, 2) = s_q_joint1_;
-  (*this)(1, 3) = (0.278 * s_q_joint1_);
+  (*this)(1, 3) = (0.09352 * s_q_joint1_);
   return *this;
 }
 template <typename TRAIT>
@@ -1465,7 +1477,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   (*this)(2, 0) = 1;
   (*this)(2, 1) = 0;
   (*this)(2, 2) = 0;
-  (*this)(2, 3) = -0.278;
+  (*this)(2, 3) = -0.09352;
   (*this)(3, 0) = 0;
   (*this)(3, 1) = 0;
   (*this)(3, 2) = 0;
@@ -1495,7 +1507,7 @@ iit::FurutaPendulum::tpl::HomogeneousTransforms<
   (*this)(0, 0) = 0;
   (*this)(0, 1) = 0;
   (*this)(0, 2) = 1.0;
-  (*this)(0, 3) = 0.278;
+  (*this)(0, 3) = 0.09352;
   (*this)(1, 2) = 0;
   (*this)(1, 3) = 0;
   (*this)(2, 2) = 0;

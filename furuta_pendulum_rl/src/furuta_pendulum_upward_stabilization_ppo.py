@@ -23,7 +23,7 @@ if train_model:
         "MlpPolicy",
         env,
         verbose=1,
-        tensorboard_log="furuta_pendulum_rl/ppo_furuta_pendulum_log",
+        tensorboard_log="furuta_pendulum_rl/furuta_pendulum_logs",
     )
     model.learn(total_timesteps=50000, progress_bar=True)
     model.save("furuta_pendulum_rl/trained_agents/ppo_furuta_pendulum")

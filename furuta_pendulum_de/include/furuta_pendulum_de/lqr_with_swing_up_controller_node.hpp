@@ -20,12 +20,25 @@ private:
 
   Eigen::Vector4d K_;
 
-  double m2_;
-  double l2_;
+  double m1_, m2_;
+  double l1_, l2_;
+  double J1_, J2_;
+  double L1_, L2_;
 
   double u_max_;
 
   double lqr_transition_angle_;
+
+  double last_control_ = 0.0;
+  int last_change_count_ = 0;
+  bool swing_up_started_ = false;
+
+  double torque_multiplier_;
+  double alpha_;
+  double alpha_swingup_;
+  double dtheta2_filtered_ = 0.0;
+  double dtheta2_filtered_swingup_ = 0.0;
+  double dtheta1_filtered_ = 0.0;
 
   static constexpr double g_ = 9.80665;
 

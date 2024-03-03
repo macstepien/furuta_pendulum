@@ -23,6 +23,8 @@
 #include <drake/systems/primitives/constant_vector_source.h>
 #include <drake/systems/primitives/linear_system.h>
 
+#include <yaml-cpp/yaml.h>
+
 namespace furuta_pendulum_drake
 {
 
@@ -88,9 +90,14 @@ int main()
     std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_drake")) /
     "urdf" / "furuta_pendulum.urdf";
 
+  std::string params_path =
+    std::filesystem::path(ament_index_cpp::get_package_share_directory("furuta_pendulum_drake")) /
+    "config" / "params.yaml";
+  YAML::Node config = YAML::LoadFile(params_path);
+
   const double kTargetRealtimeRate = 1.0;
   const double kSimulationTime = 50.0;
-  const double kMaxTimeStep = 0.001;
+  const double kMaxTimeStep = 0.002;
 
   const double g = 9.80665;
   const double m2 = 0.075;
@@ -105,20 +112,20 @@ int main()
   drake::multibody::Parser(&furuta_pendulum, &scene_graph)
     .AddModelFromFile(furuta_pendulum_urdf_path);
 
+  // auto & joint0 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint0");
   // auto & joint1 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint1");
-  // auto & joint2 = furuta_pendulum.GetMutableJointByName<drake::multibody::RevoluteJoint>("joint2");
 
   // double max_position = 10.0;
+  // joint0.set_position_limits(Vector1d(-max_position), Vector1d(max_position));
   // joint1.set_position_limits(Vector1d(-max_position), Vector1d(max_position));
-  // joint2.set_position_limits(Vector1d(-max_position), Vector1d(max_position));
 
   // double max_velocity = 1.0;
+  // joint0.set_velocity_limits(Vector1d(-max_velocity), Vector1d(max_velocity));
   // joint1.set_velocity_limits(Vector1d(-max_velocity), Vector1d(max_velocity));
-  // joint2.set_velocity_limits(Vector1d(-max_velocity), Vector1d(max_velocity));
 
   // double max_acceleration = 1.0;
+  // joint0.set_acceleration_limits(Vector1d(-max_acceleration), Vector1d(max_acceleration));
   // joint1.set_acceleration_limits(Vector1d(-max_acceleration), Vector1d(max_acceleration));
-  // joint2.set_acceleration_limits(Vector1d(-max_acceleration), Vector1d(max_acceleration));
 
   // Now the model is complete.
   furuta_pendulum.Finalize();
@@ -141,18 +148,23 @@ int main()
   furuta_pendulum_context->SetDiscreteState(x0);
 
   Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(4, 4);
-  Q(0, 0) = 0.0;
-  Q(1, 1) = 10.0;
-  Q(2, 2) = 1.0;
-  Q(3, 3) = 1.0;
+  std::cout << config["Q0"] << " " << config["Q1"] << " " << config["Q2"] << " " << config["Q3"]
+            << std::endl;
+  Q(0, 0) = config["Q0"].as<double>();
+  Q(1, 1) = config["Q1"].as<double>();
+  Q(2, 2) = config["Q2"].as<double>();
+  Q(3, 3) = config["Q3"].as<double>();
   // Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2, 2);
-  drake::Vector1d R = drake::Vector1d::Constant(1.0);
+  drake::Vector1d R = drake::Vector1d::Constant(config["R0"].as<double>());
   Eigen::MatrixXd N;
 
   auto lqr = builder.AddSystem(drake::systems::controllers::LinearQuadraticRegulator(
     furuta_pendulum, *furuta_pendulum_context, Q, R, N, furuta_pendulum_actuation_port));
 
-  std::cout << "D: " << lqr->D() << std::endl;
+  // std::cout << "D: " << lqr->D() << std::endl;
+  // Print out in form used later
+  std::cout << "K: [" << -lqr->D()(0) << ", " << -lqr->D()(1) << ", " << -lqr->D()(2) << ", "
+            << -lqr->D()(3) << "]" << std::endl;
   std::cout << "y0: " << lqr->y0() << std::endl;
 
   // -------------

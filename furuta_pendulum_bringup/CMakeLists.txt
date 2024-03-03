@@ -8,4 +8,9 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(PROGRAMS
+  dev_utils/record_system_response.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

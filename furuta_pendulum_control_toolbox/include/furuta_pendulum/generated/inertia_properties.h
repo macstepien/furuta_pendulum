@@ -95,7 +95,7 @@ inline const typename InertiaProperties<TRAIT>::Vec3d & InertiaProperties<TRAIT>
 template <typename TRAIT>
 inline typename InertiaProperties<TRAIT>::Scalar InertiaProperties<TRAIT>::getTotalMass() const
 {
-  return 0.3 + 0.075;
+  return 0.040466 + 0.009801;
 }
 
 }  // namespace tpl

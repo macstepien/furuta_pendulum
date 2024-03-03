@@ -36,10 +36,8 @@ private:
   double tau1_, tau2_;
 
   double max_torque_;
-  double max_velocity_;
-
-  // Motor parameters
-  double L_, R_, Km_;
+  double max_velocity_joint0_;
+  double max_velocity_joint1_;
 
   double current_time_ = 0.0;
 
@@ -54,7 +52,7 @@ private:
 
   void SetEffortCb(std_msgs::msg::Float64MultiArray::SharedPtr msg)
   {
-    if (msg->data.size() > 1) {
+    if (msg->data.size() >= 1) {
       SetTorque(msg->data[0]);
     }
     // Ignore disturbance from effort command

@@ -1,0 +1,8 @@
+<launch>
+  <include file="$(find-pkg-share furuta_pendulum_ocs2_ros)/launch/visualize.launch.py"/>
+  <include file="$(find-pkg-share furuta_pendulum_description)/launch/description.launch.py"/>
+
+  <node pkg="furuta_pendulum_ocs2_ros" exec="furuta_pendulum_mpc" name="furuta_pendulum_mpc" />
+  <node pkg="furuta_pendulum_ocs2_ros" exec="furuta_pendulum_dummy_test" name="furuta_pendulum_dummy_test" />
+</launch>
+	

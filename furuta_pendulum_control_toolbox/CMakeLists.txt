@@ -27,7 +27,6 @@ find_package(hpipm QUIET)
 
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS}
   ${blasfeo_INCLUDE_DIRS}
   ${hpipm_INCLUDE_DIRS}
 )

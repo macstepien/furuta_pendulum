@@ -28,7 +28,11 @@ CreateMPCController(std::string config_file, bool verbose = true)
     // Control signal bounds
     Eigen::VectorXd u_lb(FPSystem::CONTROL_DIM);
     Eigen::VectorXd u_ub(FPSystem::CONTROL_DIM);
-    u_lb.setConstant(-4.0);
+
+    double control_signal_bound = 0.0;
+    ct::core::loadScalar(config_file, "control_signal_bound", control_signal_bound);
+
+    u_lb.setConstant(-control_signal_bound);
     u_ub = -u_lb;
 
     // constraint terms
@@ -53,7 +57,11 @@ CreateMPCController(std::string config_file, bool verbose = true)
     sp_state << 0, 1, 0, 1;
     Eigen::VectorXd x_lb(2);
     Eigen::VectorXd x_ub(2);
-    x_lb.setConstant(-10.0);
+
+    double velocity_bound = 0.0;
+    ct::core::loadScalar(config_file, "velocity_bound", velocity_bound);
+
+    x_lb.setConstant(-velocity_bound);
     x_ub = -x_lb;
     // constraint terms
     std::shared_ptr<ct::optcon::StateConstraint<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>
@@ -162,9 +170,12 @@ CreateMPCController(std::string config_file, bool verbose = true)
     mpc_settings.postTruncation_ = false;
     mpc_settings.measureDelay_ = false;
     mpc_settings.delayMeasurementMultiplier_ = 1.0;
-    mpc_settings.mpc_mode = ct::optcon::MPC_MODE::CONSTANT_RECEDING_HORIZON;
+    mpc_settings.mpc_mode = ct::optcon::MPC_MODE::FIXED_FINAL_TIME_WITH_MIN_TIME_HORIZON;
     mpc_settings.coldStart_ = false;
-    mpc_settings.minimumTimeHorizonMpc_ = 3.0;
+
+    ct::core::Time minimum_time_horizon;
+    ct::core::loadScalar(config_file, "minimum_time_horizon", minimum_time_horizon);
+    mpc_settings.minimumTimeHorizonMpc_ = minimum_time_horizon;
 
     std::unique_ptr<
       ct::optcon::MPC<ct::optcon::NLOptConSolver<FPSystem::STATE_DIM, FPSystem::CONTROL_DIM>>>

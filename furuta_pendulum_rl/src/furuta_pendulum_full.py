@@ -9,8 +9,9 @@ from gym.spaces import Box
 
 from ament_index_python.packages import get_package_share_directory
 
+from utils import limit_minus_pi_pi
 
-# Based on inverted pendulum example world from gym
+
 class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
     metadata = {
         "render_modes": [
@@ -18,12 +19,20 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 25,
+        "render_fps": 500,
     }
 
     def __init__(self, **kwargs):
+        self._max_velocity_joint0 = 22.0
+        self._max_velocity_joint1 = 50.0
+
         utils.EzPickle.__init__(self)
-        observation_space = Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float64)
+        observation_space = Box(
+            low=-1.0,
+            high=1.0,
+            shape=(6,),
+            dtype=np.float64,
+        )
 
         MujocoEnv.__init__(
             self,
@@ -32,66 +41,131 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
                 "model",
                 "furuta_pendulum.xml",
             ),
-            40,
+            2,
             observation_space=observation_space,
             **kwargs,
         )
 
-        # Same as in LQR
+        self._angle_threshold = 0.02
+        self._dangle_threshold = 0.02
+
+        # self._angle_threshold = 0.1
+        # self._dangle_threshold = 0.1
+
         theta1_weight = 0.0
         theta2_weight = 10.0
         dtheta1_weight = 1.0
-        dtheta2_weight = 1.0
-        u_weight = 1.0
+        dtheta2_weight = 3.0
 
-        self._Q = np.array(
-            [
-                [theta1_weight, 0, 0, 0],
-                [0, theta2_weight, 0, 0],
-                [0, 0, dtheta1_weight, 0],
-                [0, 0, 0, dtheta2_weight],
-            ]
-        )
-        self._R = np.array([u_weight])
+        self._desired_obs_values = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
+        self._obs_weights = [
+            theta1_weight,
+            theta1_weight,
+            theta2_weight,
+            theta2_weight,
+            dtheta1_weight,
+            dtheta2_weight,
+        ]
+
+        self._action_weight = 0.0
+
+        self._init_pos_high = math.pi
+        self._init_pos_low = -math.pi
+        self._init_vel_high = 3.0
+        self._init_vel_low = -3.0
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
+        self.bound_velocities()
         ob = self._get_obs()
         reward = self.calculate_reward(ob, action)
 
         terminated = bool(not np.isfinite(ob).all())
+
+        # angle1_diff = self._angle_threshold - np.abs(
+        #     limit_minus_pi_pi(self.data.qpos[1])
+        # )
+        # dangle0_diff = self._dangle_threshold - np.abs(self.data.qvel[0])
+        # dangle1_diff = self._dangle_threshold - np.abs(self.data.qvel[1])
+
+        # if (angle1_diff > 0.0 and dangle0_diff > 0.0 and dangle1_diff > 0.0):
+        #     reward += angle1_diff + dangle0_diff + dangle1_diff
+
+        if (
+            np.abs(limit_minus_pi_pi(self.data.qpos[1])) < self._angle_threshold
+            and np.abs(self.data.qvel[0]) < self._dangle_threshold
+            and np.abs(self.data.qvel[1]) < self._dangle_threshold
+        ):
+            # reward = 1000.0
+            # terminated = True
+            reward += 1.0
 
         if self.render_mode == "human":
             self.render()
         return ob, reward, terminated, False, {}
 
     def reset_model(self):
-        qpos = self.init_qpos
-        # set downward position
-        qpos[1] = -3.14159265
-        qvel = self.init_qvel
+        qpos = self.init_qpos + self.np_random.uniform(
+            size=self.model.nq, low=self._init_pos_low, high=self._init_pos_high
+        )
+        qpos[1] -= math.pi
+        qvel = self.init_qvel + self.np_random.uniform(
+            size=self.model.nv, low=self._init_vel_low, high=self._init_vel_high
+        )
+
+        # qpos = self.init_qpos
+        # qpos[1] = -math.pi
+        # qvel = self.init_qvel
+
         self.set_state(qpos, qvel)
         return self._get_obs()
 
+    def bound_velocities(self):
+        self.data.qvel[0] = np.clip(
+            self.data.qvel[0], -self._max_velocity_joint0, self._max_velocity_joint0
+        )
+        self.data.qvel[1] = np.clip(
+            self.data.qvel[1], -self._max_velocity_joint1, self._max_velocity_joint1
+        )
+
     def _get_obs(self):
-        obs = np.concatenate([self.data.qpos, self.data.qvel]).ravel()
-        obs[0] = self.limit_minus_pi_pi(obs[0])
-        obs[1] = self.limit_minus_pi_pi(obs[1])
+        # obs = np.concatenate([self.data.qpos, self.data.qvel]).ravel()
+
+        # obs[0] = limit_minus_pi_pi(obs[0])
+        # obs[1] = limit_minus_pi_pi(obs[1])
+
+        # sin and cos instead of limit to get rid of discontinuities
+        # scale angular velocities so that they won't dominate
+
+        obs = np.array(
+            [
+                np.sin(self.data.qpos[0]),
+                np.cos(self.data.qpos[0]),
+                np.sin(self.data.qpos[1]),
+                np.cos(self.data.qpos[1]),
+                self.data.qvel[0] / self._max_velocity_joint0,
+                self.data.qvel[1] / self._max_velocity_joint1,
+            ]
+        )
+
         return obs
 
     def calculate_reward(self, obs: np.array, a: np.array):
-        return -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
+        observation_reward = np.sum(
+            [
+                -weight * np.power((desired_value - observation_value), 2)
+                for (observation_value, desired_value, weight) in zip(
+                    obs, self._desired_obs_values, self._obs_weights
+                )
+            ]
+        )
+
+        action_reward = -self._action_weight * np.power(a[0], 2)
+
+        return observation_reward + action_reward
 
     def viewer_setup(self):
         assert self.viewer is not None
         v = self.viewer
         v.cam.trackbodyid = 0
         v.cam.distance = self.model.stat.extent
-
-    def limit_minus_pi_pi(self, angle):
-        angle = math.fmod(angle, 2 * math.pi)
-        if angle > math.pi:
-            angle = 2 * math.pi - angle
-        elif angle < -math.pi:
-            angle = 2 * math.pi + angle
-        return angle
