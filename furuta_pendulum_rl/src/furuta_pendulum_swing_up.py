@@ -57,8 +57,6 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             ]
         )
         self._R = np.array([a_weight])
-        # self._last_a = np.array([0.0])
-        # self._da_weight = np.array([0.0])
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
@@ -76,7 +74,6 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         if self.render_mode == "human":
             self.render()
 
-        # self._last_a = action
         return ob, reward, terminated, False, {}
 
     def reset_model(self):
@@ -93,8 +90,6 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         return obs
 
     def calculate_reward(self, obs: np.array, a: np.array):
-        # da = a - self._last_a
-        # return -(obs.transpose() @ self._Q @ obs + a * self._R * a + da * self._da_weight * da)[0]
         return -(obs.transpose() @ self._Q @ obs + a * self._R * a)[0]
 
     def viewer_setup(self):

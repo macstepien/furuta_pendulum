@@ -1,17 +1,19 @@
 /**:
   ros__parameters:
-    # Used when odrive has no torque constant set
-    torque_multiplier: 1.0
+    action_scale: 1.0
 
     agent_name: furuta_pendulum_full_pretrained_high_variance.pt
+    # agent_name: furuta_pendulum_full_pretrained_sde.pt
 
-    # High variance:
+    # Exponential moving average filter parameters
+
+    # High variance parameters:
     dtheta0_alpha: 1.0
     dtheta1_alpha: 1.0
     action_alpha: 0.1
     # Also works for action_alpha 0.2 and 0.3
 
-    # SDE:
+    # SDE parameters:
     # dtheta0_alpha: 0.25
     # dtheta1_alpha: 0.25
     # action_alpha: 1.0

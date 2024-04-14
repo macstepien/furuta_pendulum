@@ -26,7 +26,7 @@ class LQRExpert:
 
         self.K = np.array([0.0, 1.4075, -0.070089, 0.1584])
         self.lqr_transition_angle_ = 0.075
-        self.torque_multiplier_ = 0.8
+        self.torque_multiplier_ = 1.0
 
         self._max_velocity_joint0 = 22.0
         self._max_velocity_joint1 = 50.0
@@ -39,28 +39,6 @@ class LQRExpert:
         E = 0.5 * self.m2_ * math.pow(self.l2_, 2) * math.pow(
             dtheta2, 2
         ) + self.m2_ * self.g_ * self.l2_ * (math.cos(theta2) + 1)
-
-        # Ek1 = 0.5 * math.pow(dtheta1, 2) * (self.J1_hat_)
-        # Ep2 = self.m2_ * self.g_ * self.l2_ * (math.cos(theta2) + 1)
-        # Ek2 = (
-        #     0.5
-        #     * math.pow(dtheta1, 2)
-        #     * (
-        #         self.m2_ * math.pow(self.L2_, 2)
-        #         + self.J2_hat_ * math.pow(math.sin(theta2 + math.pi), 2)
-        #     )
-        #     + 0.5 * math.pow(dtheta2, 2) * self.J2_hat_
-        #     + self.m2_
-        #     * self.L1_
-        #     * self.l2_
-        #     * math.cos(theta2 + math.pi)
-        #     * dtheta1
-        #     * dtheta2
-        # )
-
-        # E = Ek1 + Ep2 + Ek2
-        # E = Ep2 + Ek2
-        # E = Ek2
 
         E0 = 2.0 * self.m2_ * self.g_ * self.l2_
         x = (E0 - E) * dtheta2 * math.cos(theta2)

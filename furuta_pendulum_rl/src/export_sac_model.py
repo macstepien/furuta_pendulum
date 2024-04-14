@@ -1,4 +1,4 @@
-# https://stable-baselines3.readthedocs.io/en/master/guide/export.html
+# Based on https://stable-baselines3.readthedocs.io/en/master/guide/export.html
 
 import torch as th
 
@@ -6,6 +6,7 @@ from stable_baselines3 import SAC
 
 # model_name = "furuta_pendulum_full_pretrained_high_variance"
 model_name = "furuta_pendulum_full_pretrained_sde"
+
 
 class OnnxablePolicy(th.nn.Module):
     def __init__(self, actor: th.nn.Module):

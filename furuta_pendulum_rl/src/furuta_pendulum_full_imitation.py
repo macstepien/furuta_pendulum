@@ -7,7 +7,6 @@ from gym.envs.registration import register
 from stable_baselines3 import SAC, PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common.noise import NormalActionNoise
 
 from imitation.algorithms import sqil
 from imitation.algorithms import bc
@@ -24,7 +23,7 @@ import torch
 
 torch.set_default_device("cuda")
 
-n_envs=6
+n_envs = 6
 
 max_episode_steps = 2000
 register(
@@ -56,12 +55,10 @@ print(rollout.rollout_stats(rollouts))
 
 
 class ImitationMethod(Enum):
-    BC = 1
-    GAIL = 2
-    AIRL = 3
-    DBRM = 4
-    MCEIRL = 5
-    SQIL = 6
+    BC = 0
+    GAIL = 1
+    AIRL = 2
+    SQIL = 3
 
 
 # couldn't get DAGGER to work with my lqr expert
@@ -75,7 +72,6 @@ if imitation_method == ImitationMethod.BC:
     model = PPO(
         env=env,
         policy="MlpPolicy",
-        # policy_kwargs=dict(net_arch=[128, 128, 128]),
     )
     transitions = rollout.flatten_trajectories(rollouts)
     bc_trainer = bc.BC(
@@ -94,9 +90,6 @@ elif imitation_method == ImitationMethod.GAIL:
     model = SAC(
         "MlpPolicy",
         env,
-        # verbose=1,
-        # tensorboard_log="furuta_pendulum_rl/furuta_pendulum_logs",
-        # policy_kwargs=dict(net_arch=[512, 512, 512]),
     )
     reward_net = BasicRewardNet(
         observation_space=env.observation_space,
@@ -139,13 +132,6 @@ elif imitation_method == ImitationMethod.AIRL:
     model.save("furuta_pendulum_rl/trained_agents/furuta_pendulum_full_pretrained")
 
 elif imitation_method == ImitationMethod.SQIL:
-    # model = SAC(
-    #     "MlpPolicy",
-    #     env,
-    #     # verbose=1,
-    #     # tensorboard_log="furuta_pendulum_rl/furuta_pendulum_logs",
-    #     # policy_kwargs=dict(net_arch=[512, 512, 512]),
-    # )
     sqil_trainer = sqil.SQIL(
         venv=env,
         demonstrations=rollouts,
@@ -157,11 +143,7 @@ elif imitation_method == ImitationMethod.SQIL:
             verbose=1,
         ),
     )
-    reward_before_training, _ = evaluate_policy(sqil_trainer.policy, env, 10)
-    print(f"Reward before training: {reward_before_training}")
     sqil_trainer.train(total_timesteps=200_000, progress_bar=True)
-    reward_after_training, _ = evaluate_policy(sqil_trainer.policy, env, 10)
-    print(f"Reward after training: {reward_after_training}")
     model = sqil_trainer.rl_algo
     model.save("furuta_pendulum_rl/trained_agents/furuta_pendulum_full_pretrained")
 

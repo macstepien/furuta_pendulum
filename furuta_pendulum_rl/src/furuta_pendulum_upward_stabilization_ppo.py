@@ -11,14 +11,12 @@ register(
     max_episode_steps=max_episode_steps,
 )
 
-# Parallel environments
-# env = make_vec_env("FurutaPendulum-v0", n_envs=4)
-env = gym.make("FurutaPendulum-v0", render_mode="human")
 
 train_model = False
 # train_model = True
 
 if train_model:
+    env = make_vec_env("FurutaPendulum-v0", n_envs=4)
     model = PPO(
         "MlpPolicy",
         env,
@@ -28,6 +26,7 @@ if train_model:
     model.learn(total_timesteps=50000, progress_bar=True)
     model.save("furuta_pendulum_rl/trained_agents/ppo_furuta_pendulum")
 else:
+    env = gym.make("FurutaPendulum-v0", render_mode="human")
     model = PPO.load("furuta_pendulum_rl/trained_agents/ppo_furuta_pendulum")
 
     env.reset()

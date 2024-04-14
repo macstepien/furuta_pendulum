@@ -12,6 +12,7 @@
 namespace furuta_pendulum_rl
 {
 
+// TODO: move it to common furuta_pendulum_utils
 double limit_minus_pi_pi(double angle)
 {
   angle = fmod(angle, 2 * M_PI);
@@ -29,13 +30,13 @@ public:
   RlControllerNode(const rclcpp::NodeOptions & options)
   : Node("furuta_pendulum_rl_controller_node", options)
   {
-    this->declare_parameter("torque_multiplier", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("action_scale", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("dtheta0_alpha", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("dtheta1_alpha", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("action_alpha", rclcpp::PARAMETER_DOUBLE);
     this->declare_parameter("agent_name", rclcpp::PARAMETER_STRING);
     try {
-      torque_multiplier_ = this->get_parameter("torque_multiplier").as_double();
+      action_scale_ = this->get_parameter("action_scale").as_double();
       dtheta0_alpha_ = this->get_parameter("dtheta0_alpha").as_double();
       dtheta1_alpha_ = this->get_parameter("dtheta1_alpha").as_double();
       action_alpha_ = this->get_parameter("action_alpha").as_double();
@@ -67,7 +68,7 @@ private:
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr torque_cmd_pub_;
   torch::jit::script::Module module_;
 
-  double torque_multiplier_ = 1.0;
+  double action_scale_ = 1.0;
 
   double dtheta0_alpha_ = 1.0;
   double dtheta1_alpha_ = 1.0;
@@ -88,19 +89,20 @@ private:
     dtheta1_filtered_ =
       dtheta1_alpha_ * msg->velocity[1] + (1.0 - dtheta1_alpha_) * dtheta1_filtered_;
 
-    std::vector<double> data = {sin(msg->position[0]),        cos(msg->position[0]),
-                                sin(msg->position[1] - M_PI), cos(msg->position[1] - M_PI),
-                                dtheta0_filtered_ / 22.0,     dtheta1_filtered_ / 50.0};
+    std::vector<double> observations = {
+      std::sin(msg->position[0]),        std::cos(msg->position[0]),
+      std::sin(msg->position[1] - M_PI), std::cos(msg->position[1] - M_PI),
+      dtheta0_filtered_ / 22.0,          dtheta1_filtered_ / 50.0};
 
     std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(torch::tensor(data));
+    inputs.push_back(torch::tensor(observations));
 
     at::Tensor output = module_.forward(inputs).toTensor();
-    double u = output.item<double>();
-    action_filtered_ = action_alpha_ * u + (1.0 - action_alpha_) * action_filtered_;
+    double action = output.item<double>();
+    action_filtered_ = action_alpha_ * action + (1.0 - action_alpha_) * action_filtered_;
 
     std_msgs::msg::Float64MultiArray torque_cmd_msg;
-    torque_cmd_msg.data.push_back(action_filtered_ * torque_multiplier_);
+    torque_cmd_msg.data.push_back(action_filtered_ * action_scale_);
     torque_cmd_pub_->publish(torque_cmd_msg);
   }
 };

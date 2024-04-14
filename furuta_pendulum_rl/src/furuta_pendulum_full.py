@@ -9,8 +9,6 @@ from gym.spaces import Box
 
 from ament_index_python.packages import get_package_share_directory
 
-from utils import limit_minus_pi_pi
-
 
 class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -46,12 +44,13 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             **kwargs,
         )
 
-        self._angle_threshold = 0.02
-        self._dangle_threshold = 0.02
+        # Distribution of random initial states
+        self._init_pos_high = math.pi
+        self._init_pos_low = -math.pi
+        self._init_vel_high = 3.0
+        self._init_vel_low = -3.0
 
-        # self._angle_threshold = 0.1
-        # self._dangle_threshold = 0.1
-
+        # Reward function parameters
         theta1_weight = 0.0
         theta2_weight = 10.0
         dtheta1_weight = 1.0
@@ -66,45 +65,25 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             dtheta1_weight,
             dtheta2_weight,
         ]
-
         self._action_weight = 0.0
-
-        self._init_pos_high = math.pi
-        self._init_pos_low = -math.pi
-        self._init_vel_high = 3.0
-        self._init_vel_low = -3.0
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
         self.bound_velocities()
-        ob = self._get_obs()
-        reward = self.calculate_reward(ob, action)
+        obs = self._get_obs()
+        reward = self.calculate_reward(obs, action)
 
-        terminated = bool(not np.isfinite(ob).all())
-
-        # angle1_diff = self._angle_threshold - np.abs(
-        #     limit_minus_pi_pi(self.data.qpos[1])
-        # )
-        # dangle0_diff = self._dangle_threshold - np.abs(self.data.qvel[0])
-        # dangle1_diff = self._dangle_threshold - np.abs(self.data.qvel[1])
-
-        # if (angle1_diff > 0.0 and dangle0_diff > 0.0 and dangle1_diff > 0.0):
-        #     reward += angle1_diff + dangle0_diff + dangle1_diff
-
-        if (
-            np.abs(limit_minus_pi_pi(self.data.qpos[1])) < self._angle_threshold
-            and np.abs(self.data.qvel[0]) < self._dangle_threshold
-            and np.abs(self.data.qvel[1]) < self._dangle_threshold
-        ):
-            # reward = 1000.0
-            # terminated = True
-            reward += 1.0
+        # Terminate if simulation become unstable
+        terminated = bool(not np.isfinite(obs).all())
 
         if self.render_mode == "human":
             self.render()
-        return ob, reward, terminated, False, {}
+
+        return obs, reward, terminated, False, {}
 
     def reset_model(self):
+        # TODO: at parameter for selecting starting state (random or only downward)
+        # Start at random state
         qpos = self.init_qpos + self.np_random.uniform(
             size=self.model.nq, low=self._init_pos_low, high=self._init_pos_high
         )
@@ -113,6 +92,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
             size=self.model.nv, low=self._init_vel_low, high=self._init_vel_high
         )
 
+        # Start at downward position
         # qpos = self.init_qpos
         # qpos[1] = -math.pi
         # qvel = self.init_qvel
@@ -121,6 +101,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         return self._get_obs()
 
     def bound_velocities(self):
+        # Bound velocities to set ranges - it isn't possible to define it in xml model
         self.data.qvel[0] = np.clip(
             self.data.qvel[0], -self._max_velocity_joint0, self._max_velocity_joint0
         )
@@ -129,14 +110,8 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         )
 
     def _get_obs(self):
-        # obs = np.concatenate([self.data.qpos, self.data.qvel]).ravel()
-
-        # obs[0] = limit_minus_pi_pi(obs[0])
-        # obs[1] = limit_minus_pi_pi(obs[1])
-
         # sin and cos instead of limit to get rid of discontinuities
         # scale angular velocities so that they won't dominate
-
         obs = np.array(
             [
                 np.sin(self.data.qpos[0]),
