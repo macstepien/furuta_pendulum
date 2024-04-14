@@ -71,7 +71,8 @@ LqrWithSwingUpControllerNode::LqrWithSwingUpControllerNode(const rclcpp::NodeOpt
 void LqrWithSwingUpControllerNode::StateCb(sensor_msgs::msg::JointState::SharedPtr msg)
 {
   dtheta2_filtered_ = alpha_ * msg->velocity[1] + (1.0 - alpha_) * dtheta2_filtered_;
-  dtheta2_filtered_swingup_ = alpha_swingup_ * msg->velocity[1] + (1.0 - alpha_swingup_) * dtheta2_filtered_swingup_;
+  dtheta2_filtered_swingup_ =
+    alpha_swingup_ * msg->velocity[1] + (1.0 - alpha_swingup_) * dtheta2_filtered_swingup_;
   dtheta1_filtered_ = alpha_ * msg->velocity[0] + (1.0 - alpha_) * dtheta1_filtered_;
 
   double u = 0.0;
@@ -109,49 +110,17 @@ double LqrWithSwingUpControllerNode::SwingUpControl(
   const double dtheta1 = current_state->velocity[0];
   const double theta1 = current_state->position[0];
 
-  const double E = 0.5 * m2_ * pow(l2_, 2) * pow(dtheta2_filtered_swingup_, 2) + m2_ * g_ * l2_ * cos(theta2);
-
-  // double Ek1 = 0.5 * pow(dtheta1, 2) * (m1_ * pow(l1_, 2) + J1_);
-  // double Ep2 = m2_ * g_ * l2_ * (1 - cos(theta2));
-  // double Ek2 = 0.5 * pow(dtheta1, 2) *
-  //                (m2_ * pow(L2_, 2) + (m2_ * pow(l2_, 2) + J2_) * pow(sin(theta2), 2) +
-  //                 J2_ * pow(cos(theta2), 2)) +
-  //              0.5 * pow(dtheta2, 2) * (J2_ + m2_ * pow(l2_, 2)) +
-  //              m2_ * L1_ * l2_ * cos(theta2) * dtheta1 * dtheta2;
-
-  // // double E = Ek1 + Ep2 + Ek2;
-  // double E = Ep2 + Ek2;
+  const double E =
+    0.5 * m2_ * pow(l2_, 2) * pow(dtheta2_filtered_swingup_, 2) + m2_ * g_ * l2_ * cos(theta2);
 
   const double E0 = m2_ * g_ * l2_;
-  const double x = (E0 - E) * dtheta2_filtered_swingup_ * (1-cos(theta2));
-  
-  // const double x = -dtheta2 * (cos(theta2));
-  // if (x > 0.0) {
-  //   return -u_max_ * fabs(E - E0);
-  // } else {
-  //   return u_max_ * fabs(E - E0);
-  // }
+  const double x = (E0 - E) * dtheta2_filtered_swingup_ * (1 - cos(theta2));
+
   if (x > 0.0) {
     return -u_max_;
   } else {
     return u_max_;
   }
-
-  // if (fabs(dtheta2) > 0.02) {
-  // if (dtheta2_filtered_ * cos(theta2) > 0) {
-  //   return -u_max_;
-  // } else {
-  //   return u_max_;
-  // }
-  
-  // if (swing_up_started_) {
-  //   double K = u_max_;
-  //   return K * pow(cos(theta2), 4) * dtheta2_filtered_ *
-  //          (9.81 * (1 - cos(theta2)) - 0.0075 * pow(dtheta2_filtered_, 2));
-  // } else {
-  //   swing_up_started_ = true;
-  //   return 0.1;
-  // }
 }
 
 }  // namespace furuta_pendulum_de
