@@ -6,6 +6,12 @@ LQR, MPC and RL approaches to control the Furuta Pendulum.
   <img src=".github/furuta_pendulum_rl.gif" height="400" />
 </p>
 
+## Hardware
+
+For more details about the hardware of the device, please refer to the `hardware` directory.
+
+## Software
+
 Packages in this repository can be divided into two subgroups: 
 
 1. Different approaches to solving the control problem:
