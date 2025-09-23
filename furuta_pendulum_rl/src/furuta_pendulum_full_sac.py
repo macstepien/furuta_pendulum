@@ -10,7 +10,9 @@ import torch
 
 torch.set_default_device("cuda")
 
-max_episode_steps = 2500
+n_envs = 6
+
+max_episode_steps = 2000
 register(
     id="FurutaPendulum-v0",
     entry_point="furuta_pendulum_full:FurutaPendulumEnv",
@@ -23,12 +25,12 @@ train_model = True
 
 if train_model:
     # Parallel environments
-    env = make_vec_env("FurutaPendulum-v0", n_envs=12)
+    env = make_vec_env("FurutaPendulum-v0", n_envs=n_envs)
 
     model = SAC(
         "MlpPolicy",
         env,
-        policy_kwargs=dict(net_arch=[512, 512, 512]),
+        policy_kwargs=dict(net_arch=[64, 64, 64]),
     )
 
     # With pretraining
@@ -47,7 +49,7 @@ if train_model:
 
     reward_before, _ = evaluate_policy(model, env, n_eval_episodes=10)
 
-    model.learn(total_timesteps=300_000, progress_bar=True)
+    model.learn(total_timesteps=200_000, progress_bar=True)
     model.save("furuta_pendulum_rl/trained_agents/furuta_pendulum_full")
 
     reward_after, _ = evaluate_policy(model, env, n_eval_episodes=10)
