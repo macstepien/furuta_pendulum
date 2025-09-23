@@ -71,7 +71,7 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
         self.bound_velocities()
         obs = self._get_obs()
-        reward = self.calculate_reward(obs, action)
+        reward = self.calculate_reward_lq(obs, action)
 
         # Terminate if simulation become unstable
         terminated = bool(not np.isfinite(obs).all())
@@ -136,6 +136,30 @@ class FurutaPendulumEnv(MujocoEnv, utils.EzPickle):
         )
 
         action_reward = -self._action_weight * np.power(a[0], 2)
+
+        return observation_reward + action_reward
+
+    def calculate_reward_lq(self, obs: np.array, a: np.array):
+        # LQR
+        # This is only around upward, so may not work here
+        # Q = [-0.0, -1.0, -1.0, -1.0]
+        # R = -10.0
+
+        # MPC
+        # with this weights full trajectory was optimized
+        # which should be similar case here
+        Q = [-0.0, -17.0, -0.5, -1.5]
+        R = -0.1
+
+        observation_reward = np.sum(
+            [
+                Q[0] * np.power(self.data.qpos[0], 2),
+                Q[1] * np.power(self.data.qpos[1], 2),
+                Q[2] * np.power(self.data.qvel[0], 2),
+                Q[3] * np.power(self.data.qvel[1], 2),
+            ]
+        )
+        action_reward = R * np.power(a[0], 2)
 
         return observation_reward + action_reward
 
