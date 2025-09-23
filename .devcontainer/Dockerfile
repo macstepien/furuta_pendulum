@@ -14,7 +14,7 @@ WORKDIR /home/${user}
 
 RUN sudo apt-get update && \
     sudo apt-get install --no-install-recommends -y \
-    nano gdb clang clang-format cppcheck bash-completion python3-pip unzip \
+    nano gdb wget clang clang-format cppcheck bash-completion python3-pip unzip \
     git htop ros-$ROS_DISTRO-rmw-fastrtps-cpp ros-$ROS_DISTRO-plotjuggler \
     ros-$ROS_DISTRO-plotjuggler-ros ros-$ROS_DISTRO-rviz2 ros-$ROS_DISTRO-teleop-twist-keyboard \
     ros-$ROS_DISTRO-cyclonedds ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
@@ -37,10 +37,11 @@ RUN sudo apt-get update && \
     echo "deb [arch=amd64] https://drake-apt.csail.mit.edu/$(lsb_release -cs) $(lsb_release -cs) main" \
         | sudo tee /etc/apt/sources.list.d/drake.list >/dev/null && \
     sudo apt-get update && \
-    sudo apt-get install --no-install-recommends drake-dev
+    sudo apt-get install --no-install-recommends -y drake-dev=1.17.0-1
 
 RUN sudo apt-get update && \
-    sudo apt install liblapack-dev libeigen3-dev coinor-libipopt-dev libboost-all-dev libomp-dev clang python3 python3-dev python3-numpy python3-matplotlib
+    sudo apt-get install --no-install-recommends -y liblapack-dev libeigen3-dev coinor-libipopt-dev \
+    libboost-all-dev libomp-dev clang python3 python3-dev python3-numpy python3-matplotlib
 
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
     echo "source /home/$user/ros2_ws/install/setup.bash --extend" >> /home/${user}/.bashrc && \
@@ -50,7 +51,7 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/${user}/.bashrc && \
     echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/libtorch/lib/" >> /home/${user}/.bashrc  && \
     echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/drake/lib/" >> /home/${user}/.bashrc  && \
     echo "export PATH=\"/opt/drake/bin${PATH:+:${PATH}}\"" >> /home/${user}/.bashrc  && \
-    echo "export PYTHONPATH=\"/opt/drake/lib/python$(python3 -c 'import sys; print("{0}.{1}".format(*sys.version_info))')/site-packages${PYTHONPATH:+:${PYTHONPATH}}\"" >> /home/${user}/.bashrc  && \
+    echo "export PYTHONPATH=\"/opt/drake/lib/python$(python3 -c 'import sys; print("{0}.{1}".format(*sys.version_info))')/site-packages${PYTHONPATH:+:${PYTHONPATH}}\"" >> /home/${user}/.bashrc
 
 # /opt/drake/lib/ - To have a working executable after installation
 

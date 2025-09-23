@@ -3,3 +3,18 @@ repositories:
     type: git
     url: https://github.com/macstepien/control-toolbox.git
     version: v3.0.2
+  
+  kindr:
+    type: git
+    url: https://github.com/ANYbotics/kindr.git
+    version: e1b2620919113a5ba135650a79b0f681ccf57d8c
+  
+  ocs2:
+    type: git
+    url: https://github.com/macstepien/ocs2.git
+    version: ros2
+
+  ocs2_robotic_assets:
+    type: git
+    url: https://github.com/macstepien/ocs2_robotic_assets.git
+    version: ros2

@@ -28,9 +28,16 @@ Some of the source dependencies are specified in the `*.repos` files, you can us
 Some packages require installing additional dependencies if they can't be installed easily with rosdep. I usually add them to the devcontainer, but I didn't have time to automate all of them, so you may have to do it manually, for details refer to the README file of each package.
 
 <!-- OCS2 needs release to work fast enough -->
+<!-- -r for rosdep - some of packages are not available (catkin for ct) but it doesn't matter -->
+<!-- colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --symlink-install --packages-skip ocs2_self_collision ocs2_sphere_approximation ocs2_self_collision_visualization -->
 ```
+rosdep update
+rosdep install --from-paths src -y -r --ignore-src
+. /opt/ros/humble/setup.bash
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --symlink-install
 ```
+
+In case there's a problem with some of the ocs2 packages you can skip them by adding `--packages-skip ocs2_self_collision ocs2_sphere_approximation ocs2_self_collision_visualization` to the `colcon build` command.
 
 ## Usage
 To run the pendulum simulation use one of the launch files from **furuta_pendulum_bringup**, launch files have the naming convention:
